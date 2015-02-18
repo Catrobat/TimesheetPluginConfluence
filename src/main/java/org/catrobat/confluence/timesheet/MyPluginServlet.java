@@ -44,7 +44,7 @@ public class MyPluginServlet extends HttpServlet
 	{
 		UserKey userKey = userManager.getRemoteUserKey(request);
 		UserProfile userProfile = userManager.getUserProfile(userKey);
-		String username = userProfile.getUsername();
+		String username = (userProfile != null) ? userProfile.getUsername() : null;
 		if (username == null)
 		{
 			redirectToLogin(request, response);

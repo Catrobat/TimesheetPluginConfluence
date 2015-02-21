@@ -1,4 +1,4 @@
-package org.catrobat.confluence.services.imp;
+package ut.org.catrobat.confluence.services.imp;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import net.java.ao.EntityManager;
@@ -13,6 +13,7 @@ import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.services.TimesheetService;
+import org.catrobat.confluence.services.imp.TimesheetServiceImpl;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(TimesheetServiceImplTest.MyDatabaseUpdater.class)

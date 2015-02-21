@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.catrobat.confluence.services.imp;
+package ut.org.catrobat.confluence.services.imp;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import net.java.ao.EntityManager;
@@ -32,6 +32,7 @@ import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Project;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(TimesheetEntryServiceImplTest.MyDatabaseUpdater.class)

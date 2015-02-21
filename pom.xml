@@ -44,7 +44,6 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-
         <!-- We're going to write a simple servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -81,6 +80,24 @@
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.applinks</groupId>
+            <artifactId>applinks-api</artifactId>
+            <version>3.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.atlassian.activeobjects</groupId>
+          <artifactId>activeobjects-test</artifactId>
+          <version>${ao.version}</version>
+          <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

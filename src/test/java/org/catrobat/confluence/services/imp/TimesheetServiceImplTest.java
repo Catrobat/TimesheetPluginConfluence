@@ -110,14 +110,15 @@ public class TimesheetServiceImplTest {
 		//Assert
 		assertNotNull(sheet1);
 		assertEquals(sheet1.getUserKey(), "USER_001");
+	}
 
+	@Test
+	public void testGetTimesheetByUserNotFound() throws Exception
+	{
 		//Act
-		Timesheet missingSheet = service.getTimesheetByUser("USER_002");
+		Timesheet missingSheet = service.getTimesheetByUser("USER_DOES_NOT_EXIST");
 
 		//Assert
 		assertNull(missingSheet);
-
 	}
 }
-
-

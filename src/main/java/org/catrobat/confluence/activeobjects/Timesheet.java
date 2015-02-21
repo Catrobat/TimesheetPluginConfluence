@@ -22,7 +22,7 @@ public interface Timesheet extends Entity
 	String getLecture();
 	void setLecture(String lecture);
 
-	@OneToMany
+	@OneToMany(reverse = "getTimeSheet")
 	TimesheetEntry[] getEntries();
 
 }

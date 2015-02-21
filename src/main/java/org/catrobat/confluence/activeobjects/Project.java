@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.catrobat.confluence.activeobjects;
 
 import net.java.ao.Entity;
@@ -18,10 +13,10 @@ public interface Project extends Entity {
   String getProjectKey();
   void setProjectKey(String key);
 
-  @ManyToMany(value=CategoryToProject.class)
+  @ManyToMany(value=CategoryToProject.class, through="getCategory", reverse = "getProject")
   Category[] getCategories();
 
-  @OneToMany
+  @OneToMany(reverse = "getProject")
   TimesheetEntry[] getEntries();
 
 }

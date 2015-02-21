@@ -9,10 +9,10 @@ public interface Category extends Entity {
   String getName();
   void setName(String name);
 
-  @ManyToMany(value=CategoryToProject.class)
-  Project getProject();
+  @ManyToMany(value = CategoryToProject.class, through = "getProject", reverse = "getCategory")
+  Project[] getProjects();
 
-	@OneToMany
+	@OneToMany(reverse = "getCategory")
 	TimesheetEntry[] getEntries();
 
 }

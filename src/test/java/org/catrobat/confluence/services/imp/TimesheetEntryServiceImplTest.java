@@ -41,7 +41,6 @@ public class TimesheetEntryServiceImplTest {
   private EntityManager entityManager;
 	private TimesheetEntryService service;
   private ActiveObjects ao;
-  private static final String TODO_DESC = "Todo Item Description";
 
 	@Before
 	public void setUp() throws Exception

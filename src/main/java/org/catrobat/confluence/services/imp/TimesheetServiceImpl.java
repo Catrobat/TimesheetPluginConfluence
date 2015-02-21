@@ -36,7 +36,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 	public Timesheet getTimesheetByUser(String userKey) {
 		Timesheet[] found = ao.find(Timesheet.class, "USER_KEY = ?", userKey);
 		assert(found.length <= 1);
-		return found[0];
+		return (found.length > 0)? found[0] : null;
 	}
 
 }

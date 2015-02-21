@@ -23,9 +23,6 @@ public interface TimesheetEntry extends Entity {
 	long getPause();
 	void setPause(long pause);
 
-	String getUser();
-	void setUser(String username);
-
 	Project getProject();
 	void setProject(Project project);
 

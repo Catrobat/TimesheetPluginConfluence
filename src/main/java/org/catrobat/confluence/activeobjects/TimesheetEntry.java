@@ -20,8 +20,8 @@ public interface TimesheetEntry extends Entity {
 	String getDescription();
 	void setDescription(String description);
 
-	long getPause();
-	void setPause(long pause);
+	int getPauseMinutes();
+	void setPauseMinutes(int pause);
 
 	Project getProject();
 	void setProject(Project project);

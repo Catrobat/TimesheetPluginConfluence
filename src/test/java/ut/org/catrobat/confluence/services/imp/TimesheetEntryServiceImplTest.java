@@ -73,7 +73,7 @@ public class TimesheetEntryServiceImplTest {
 		Date      begin    = new Date();
 		Date      end      = new Date(begin.getTime() + oneHourInMS);
 		String    desc     = "Debugged this thingy...";
-		long			pause		 = 0;
+		int       pause		 = 0;
 
 		//Act
 		service.add(sheet, begin, end, category, desc, pause, project);
@@ -87,7 +87,7 @@ public class TimesheetEntryServiceImplTest {
 		assertEquals(begin,    entries[0].getBeginDate());
 		assertEquals(end,      entries[0].getEndDate());
 		assertEquals(desc,     entries[0].getDescription());
-		assertEquals(pause,    entries[0].getPause());
+		assertEquals(pause,    entries[0].getPauseMinutes());
 	}
 }
 

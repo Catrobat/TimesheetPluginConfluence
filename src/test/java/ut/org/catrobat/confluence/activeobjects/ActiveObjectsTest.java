@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.atlassian.activeobjects.test.TestActiveObjects;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
@@ -102,13 +104,15 @@ public class ActiveObjectsTest {
 			entry1.setEndDate(  sdf.parse("01-01-2015 10:00"));
 			entry1.setTimeSheet(chrisSheet);
 			entry1.setProject(scratchProject);
+			entry1.setPauseMinutes(10);
 			entry1.setDescription("Besprechung: Project Fetcher");
 			entry1.save();
 
 			TimesheetEntry entry2 = em.create(TimesheetEntry.class);
 			entry2.setCategory(programmingCategory);
 			entry2.setBeginDate(sdf.parse("02-01-2015 10:30"));
-			entry2.setEndDate(  sdf.parse("02-01-2015 11:45"));
+			entry2.setEndDate(  sdf.parse("02-01-2015 10:45"));
+			entry2.setPauseMinutes(5); //10 minutes
 			entry2.setTimeSheet(johSheet);
 			entry2.setProject(catrobatProject);
 			entry2.setDescription("Master Fixen");
@@ -159,4 +163,25 @@ public class ActiveObjectsTest {
 
 		assertEquals(projectsOfMeeting.length, 2);
 	}
+
+	@Test
+	public void testDateQueries() throws Exception {
+		//get all time sheet entries where duration < 20 minutes
+
+		SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
+		tf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		TimesheetEntry[] entries = ao.find(TimesheetEntry.class, 
+						"DATEDIFF('minute', BEGIN_DATE, END_DATE) - PAUSE_MINUTES < 20" );
+
+		//assert
+		assertEquals(entries.length, 1);
+		assertEquals(entries[0].getDescription(), "Master Fixen");
+		assertEquals(tf.format(new Date(
+				entries[0].getEndDate().getTime()
+				- entries[0].getBeginDate().getTime()
+				- (entries[0].getPauseMinutes() * 60 * 1000)
+			)), "00:10");
+	}
+
 }

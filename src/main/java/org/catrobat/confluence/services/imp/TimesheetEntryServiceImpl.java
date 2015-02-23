@@ -19,7 +19,7 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 
 	@Override
 	public TimesheetEntry add(Timesheet sheet, Date begin, Date end, 
-					Category category, String description, long pause, Project project) {
+					Category category, String description, int pause, Project project) {
 		
 		TimesheetEntry entry = ao.create(TimesheetEntry.class);
 
@@ -28,7 +28,7 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 		entry.setEndDate(end);
 		entry.setCategory(category);
 		entry.setDescription(description);
-		entry.setPause(pause);
+		entry.setPauseMinutes(pause);
 		entry.setProject(project);
 
 		entry.save();

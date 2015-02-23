@@ -47,5 +47,10 @@
   <ao key="ao-module">
     <description>The module configuring the Active Objects service used by this plugin</description>
     <entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
+    <entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
+    <entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
+    <entity>org.catrobat.confluence.activeobjects.Project</entity>
+    <entity>org.catrobat.confluence.activeobjects.Category</entity>
+    <entity>org.catrobat.confluence.activeobjects.CategoryToProject</entity>
   </ao>
 </atlassian-plugin>

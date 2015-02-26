@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Map;
 
@@ -27,12 +28,12 @@ public class MyPluginServlet extends HttpServlet
 	private final UserManager userManager;
 	private final LoginUriProvider loginUriProvider;
 	private final TemplateRenderer templateRenderer;
-	private final ActiveObjects ao;
+	//private final ActiveObjects ao;
 	private final TimesheetEntryService timesheetEntryService;
 	
-	public MyPluginServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, ActiveObjects ao, TimesheetEntryService timesheetEntryService)
+	public MyPluginServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetEntryService timesheetEntryService)
 	{
-		this.ao = checkNotNull(ao);
+		//this.ao = checkNotNull(ao);
 		this.userManager = userManager;
 		this.loginUriProvider = loginUriProvider;
 		this.templateRenderer = templateRenderer;
@@ -42,19 +43,34 @@ public class MyPluginServlet extends HttpServlet
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		UserKey userKey = userManager.getRemoteUserKey(request);
-		UserProfile userProfile = userManager.getUserProfile(userKey);
-		String username = (userProfile != null) ? userProfile.getUsername() : null;
-		if (username == null)
-		{
-			redirectToLogin(request, response);
-			return;
-		}
-		else if (userManager.isSystemAdmin(userKey))
-		{
-			// show Adminpage
-			System.out.println("SHOW ADMIN PAGE");
-		}
+        UserKey userKey = userManager.getRemoteUserKey(request);
+        UserProfile userProfile = userManager.getUserProfile(userKey);
+        String loggedInUsername = (userProfile != null) ? userProfile.getUsername() : null;
+
+        if (loggedInUsername == null)
+        {
+            redirectToLogin(request, response);
+            return;
+        }
+        else if (userManager.isSystemAdmin(userKey))
+        {
+            System.out.println("SHOW ADMIN PAGE");
+        }
+
+		String username = getQueryUsername(request);
+        System.out.println("username: " + username);
+
+        if (username != null && userManager.getUserProfile(username) == null)
+        {
+            Map<String, Object> paramMap = Maps.newHashMap();
+            paramMap.put("messageWithHtml", "User does not exist!");
+            response.setContentType("text/html;charset=utf-8");
+            templateRenderer.render("error.vm", paramMap, response.getWriter());
+            return;
+        }
+        else
+            username = loggedInUsername;
+
 		Map<String, Object> paramMap = Maps.newHashMap();
 		Map<String, Object> entryMap = Maps.newHashMap();
 		for (TimesheetEntry entry : timesheetEntryService.allForUser(username))
@@ -88,11 +104,15 @@ public class MyPluginServlet extends HttpServlet
 		final String description = request.getParameter("description");
 		final String category = request.getParameter("category");
 
-		String username = userManager.getRemoteUsername(request);
+        UserKey userKey = userManager.getRemoteUserKey(request);
+        UserProfile userProfile = userManager.getUserProfile(userKey);
+        String username = getQueryUsername(request);
+        if (username == null && userProfile != null)
+            username = userProfile.getUsername();
 
 		timesheetEntryService.add(date, startTime, endTime, duration, pause, theory, description, category, username);
 
-		resp.sendRedirect(request.getContextPath() + "/plugins/servlet/timesheet");
+		resp.sendRedirect(request.getContextPath() + "/plugins/servlet/timesheet/" + username);
 	}
 
 	private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
@@ -108,5 +128,13 @@ public class MyPluginServlet extends HttpServlet
 			builder.append(request.getQueryString());
 		}
 		return URI.create(builder.toString());
+	}
+
+	private String getQueryUsername(HttpServletRequest request)
+	{
+		String requestUri = request.getRequestURI();
+        String servletPath = request.getServletPath();
+        String[] split  = requestUri.split(servletPath + "/");
+        return (split.length > 1) ? split[1] : null;
 	}
 }

@@ -1,51 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
-  <plugin-info>
-    <description>${project.description}</description>
-    <version>${project.version}</version>
-    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
-    <param name="plugin-icon">images/pluginIcon.png</param>
-    <param name="plugin-logo">images/pluginLogo.png</param>
-  </plugin-info>
-  <!-- add our i18n resource -->
-  <resource type="i18n" name="i18n" location="timesheet"  />
-  <web-item key="timesheetmenu" name="Timesheet Logo" section="system.user"  weight="40">
-    <label key="timesheet.menu" />
-    <link>/plugins/servlet/timesheet</link>
-  </web-item>
-  <!-- add our web resources -->
-  <web-resource key="timesheet-resources" name="timesheet Web Resources">
-    <dependency>com.atlassian.auiplugin:ajs</dependency>
-    <resource type="download" name="timesheet.css" location="/css/timesheet.css"/>
-    <resource type="download" name="timesheet.js" location="/js/timesheet.js"/>
-    <resource type="download" name="images/" location="/images"/>
-    <context>timesheet</context>
-  </web-resource>
-  <!-- publish our component -->
-  <!--<component key="myPluginComponent" class="org.catrobat.confluence.timesheet.MyPluginComponentImpl" public="true">
-        <interface>org.catrobat.confluence.timesheet.MyPluginComponent</interface>
-    </component>-->
-  <servlet name="timesheet" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet">
-    <url-pattern>/timesheet</url-pattern>
-  </servlet>
-  <!-- import from the product container -->
-  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
-  <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
-  <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
-  <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
-  <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
-  <component-import key="ao" name="Active Objects service" interface="com.atlassian.activeobjects.external.ActiveObjects">
-    <description>Component to access Active Objects functionality from the plugin</description>
-  </component-import>
-  <component key="tx-processor" name="Transactional Annotation Processor"
-               class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
-    <decription>Processes @Transactional annotations.</decription>
-  </component>
-  <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.timesheet.TimesheetEntryServiceImpl"/>
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
+		<param name="plugin-icon">images/pluginIcon.png</param>
+		<param name="plugin-logo">images/pluginLogo.png</param>
+	</plugin-info>
+	<!-- add our i18n resource -->
+	<resource type="i18n" name="i18n" location="timesheet"  />
+	<web-item key="timesheetmenu" name="Timesheet Logo" section="system.user"  weight="40">
+		<label key="timesheet.menu" />
+		<link>/plugins/servlet/timesheet/$user.name</link>
+	</web-item>
+    <!-- TODO: add link for admins, project leaders etc to the overview servlet -->
 
-  <ao key="ao-module">
-    <description>The module configuring the Active Objects service used by this plugin</description>
-    <entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
-  </ao>
+	<!-- add our web resources -->
+	<web-resource key="timesheet-resources" name="timesheet Web Resources">
+		<dependency>com.atlassian.auiplugin:ajs</dependency>
+		<resource type="download" name="timesheet.css" location="/css/timesheet.css"/>
+		<resource type="download" name="timesheet.js" location="/js/timesheet.js"/>
+		<resource type="download" name="images/" location="/images"/>
+		<context>timesheet</context>
+	</web-resource>
+	<!-- publish our component -->
+	<!--<component key="myPluginComponent" class="org.catrobat.confluence.timesheet.MyPluginComponentImpl" public="true">
+	<interface>org.catrobat.confluence.timesheet.MyPluginComponent</interface>
+	</component>-->
+	<servlet name="timesheet" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet">
+		<url-pattern>/timesheet/*</url-pattern>
+	</servlet>
+    <!-- TODO: change class to correctly call the overview servlet -->
+    <servlet name="timesheet_overview" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet_overview">
+        <url-pattern>/timesheets</url-pattern>
+    </servlet>
+	<!-- import from the product container -->
+	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
+	<component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
+	<component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
+	<component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
+	<component-import key="ao" name="Active Objects service" interface="com.atlassian.activeobjects.external.ActiveObjects">
+		<description>Component to access Active Objects functionality from the plugin</description>
+	</component-import>
+	<component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
+		<decription>Processes @Transactional annotations.</decription>
+	</component>
+	<component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.timesheet.TimesheetEntryServiceImpl"/>
+
+	<ao key="ao-module">
+		<description>The module configuring the Active Objects service used by this plugin</description>
+		<entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
+	</ao>
 </atlassian-plugin>

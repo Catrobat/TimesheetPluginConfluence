@@ -14,7 +14,7 @@
 		<label key="timesheet.menu" />
 		<link>/plugins/servlet/timesheet/$user.name</link>
 	</web-item>
-    <!-- TODO: add link for admins, project leaders etc to the overview servlet -->
+	<!-- TODO: add link for admins, project leaders etc to the overview servlet -->
 
 	<!-- add our web resources -->
 	<web-resource key="timesheet-resources" name="timesheet Web Resources">
@@ -31,10 +31,10 @@
 	<servlet name="timesheet" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet">
 		<url-pattern>/timesheet/*</url-pattern>
 	</servlet>
-    <!-- TODO: change class to correctly call the overview servlet -->
-    <servlet name="timesheet_overview" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet_overview">
-        <url-pattern>/timesheets</url-pattern>
-    </servlet>
+	<!-- TODO: change class to correctly call the overview servlet -->
+	<servlet name="timesheet_overview" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet_overview">
+		<url-pattern>/timesheets</url-pattern>
+	</servlet>
 	<!-- import from the product container -->
 	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
 	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
@@ -49,8 +49,13 @@
 	</component>
 	<component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.timesheet.TimesheetEntryServiceImpl"/>
 
-	<ao key="ao-module">
-		<description>The module configuring the Active Objects service used by this plugin</description>
-		<entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
-	</ao>
+    <ao key="ao-module">
+        <description>The module configuring the Active Objects service used by this plugin</description>
+        <entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
+        <entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
+        <entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
+        <entity>org.catrobat.confluence.activeobjects.Project</entity>
+        <entity>org.catrobat.confluence.activeobjects.Category</entity>
+        <entity>org.catrobat.confluence.activeobjects.CategoryToProject</entity>
+    </ao>
 </atlassian-plugin>

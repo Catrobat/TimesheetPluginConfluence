@@ -1,29 +1,35 @@
 package org.catrobat.confluence.activeobjects;
 
+import org.catrobat.confluence.activeobjects.impl.TimesheetEntryImpl;
 import java.util.Date;
 import net.java.ao.Entity;
+import net.java.ao.Implementation;
 
+@Implementation(TimesheetEntryImpl.class)
 public interface TimesheetEntry extends Entity {
 
-	Timesheet getTimeSheet();
-	void setTimeSheet(Timesheet sheet);
+	public Timesheet getTimeSheet();
+	public void setTimeSheet(Timesheet sheet);
 
-	Date getBeginDate();
-	void setBeginDate(Date date);
+	public Date getBeginDate();
+	public void setBeginDate(Date date);
 
-	Date getEndDate();
-	void setEndDate(Date date);
+	public Date getEndDate();
+	public void setEndDate(Date date);
 
-	Category getCategory();
-	void setCategory(Category category);
+	public Category getCategory();
+	public void setCategory(Category category);
 
-	String getDescription();
-	void setDescription(String description);
+	public String getDescription();
+	public void setDescription(String description);
 
-	int getPauseMinutes();
-	void setPauseMinutes(int pause);
+	public int getPauseMinutes();
+	public void setPauseMinutes(int pause);
 
-	Project getProject();
-	void setProject(Project project);
+	public Project getProject();
+	public void setProject(Project project);
+
+	public int getDurationMinutes();
+	public void setDurationMinutes(int duration);
 
 }

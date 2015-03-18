@@ -26,8 +26,8 @@ public interface TimesheetEntry extends Entity {
 	public int getPauseMinutes();
 	public void setPauseMinutes(int pause);
 
-	public Project getProject();
-	public void setProject(Project project);
+	public Team getTeam();
+	public void setTeam(Team team);
 
 	public int getDurationMinutes();
 	public void setDurationMinutes(int duration);

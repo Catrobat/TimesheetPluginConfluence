@@ -14,7 +14,7 @@
 		<label key="timesheet.menu" />
 		<link>/plugins/servlet/timesheet/$user.name</link>
 	</web-item>
-	<!-- TODO: add link for admins, project leaders etc to the overview servlet -->
+	<!-- TODO: add link for admins, team leaders etc to the overview servlet -->
 
 	<!-- add our web resources -->
 	<web-resource key="timesheet-resources" name="timesheet Web Resources">
@@ -29,33 +29,51 @@
 	<interface>org.catrobat.confluence.timesheet.MyPluginComponent</interface>
 	</component>-->
 	<servlet name="timesheet" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet">
+		<url-pattern>/timesheet</url-pattern>
 		<url-pattern>/timesheet/*</url-pattern>
 	</servlet>
 	<!-- TODO: change class to correctly call the overview servlet -->
 	<servlet name="timesheet_overview" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet_overview">
 		<url-pattern>/timesheets</url-pattern>
+		<url-pattern>/timesheets/</url-pattern>
 	</servlet>
+	<servlet name="test" class="org.catrobat.confluence.timesheet.TestServlet" key="test">
+		<url-pattern>/test</url-pattern>
+		<url-pattern>/test/</url-pattern>
+	</servlet>
+    <servlet name="teammanagement" class="org.catrobat.confluence.timesheet.TeamManagementServlet" key="teammanagement">
+        <url-pattern>/teams</url-pattern>
+        <url-pattern>/teams/</url-pattern>
+    </servlet>
 	<!-- import from the product container -->
 	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
 	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
+	<component-import key="groupManager" interface="com.atlassian.user.GroupManager" filter=""/>
 	<component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
 	<component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
 	<component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
 	<component-import key="ao" name="Active Objects service" interface="com.atlassian.activeobjects.external.ActiveObjects">
 		<description>Component to access Active Objects functionality from the plugin</description>
 	</component-import>
+	<component-import key="ApplicationLinkService">
+		<interface>com.atlassian.applinks.api.ApplicationLinkService</interface>
+	</component-import>
 	<component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
 		<decription>Processes @Transactional annotations.</decription>
 	</component>
-	<component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.timesheet.TimesheetEntryServiceImpl"/>
+    <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.imp.TeamServiceImpl"/>
+	<component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.imp.TimesheetServiceImpl"/>
+    <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl"/>
 
-    <ao key="ao-module">
-        <description>The module configuring the Active Objects service used by this plugin</description>
-        <entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
-        <entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
-        <entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
-        <entity>org.catrobat.confluence.activeobjects.Project</entity>
-        <entity>org.catrobat.confluence.activeobjects.Category</entity>
-        <entity>org.catrobat.confluence.activeobjects.CategoryToProject</entity>
-    </ao>
+	<ao key="ao-module">
+		<description>The module configuring the Active Objects service used by this plugin</description>
+		<entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
+		<entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
+		<entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
+		<entity>org.catrobat.confluence.activeobjects.Team</entity>
+        <entity>org.catrobat.confluence.activeobjects.Group</entity>
+        <entity>org.catrobat.confluence.activeobjects.GroupToTeam</entity>
+		<entity>org.catrobat.confluence.activeobjects.Category</entity>
+		<entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
+	</ao>
 </atlassian-plugin>

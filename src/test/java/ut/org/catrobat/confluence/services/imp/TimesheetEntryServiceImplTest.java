@@ -18,6 +18,7 @@ package ut.org.catrobat.confluence.services.imp;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import net.java.ao.EntityManager;
+import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.services.TimesheetEntryService;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -29,7 +30,6 @@ import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Category;
-import org.catrobat.confluence.activeobjects.Project;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;
 import org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl;
@@ -57,7 +57,7 @@ public class TimesheetEntryServiceImplTest {
 		public void update(EntityManager em) throws Exception {
 			em.migrate(Timesheet.class);
 			em.migrate(Category.class);
-			em.migrate(Project.class);
+			em.migrate(Team.class);
 			em.migrate(TimesheetEntry.class);
 		}
 	}
@@ -69,21 +69,21 @@ public class TimesheetEntryServiceImplTest {
 		long oneHourInMS   = 60 * 60 * 1000;
 		Timesheet sheet    = ao.create(Timesheet.class);
 		Category  category = ao.create(Category.class);
-		Project   project  = ao.create(Project.class);
+		Team team = ao.create(Team.class);
 		Date      begin    = new Date();
 		Date      end      = new Date(begin.getTime() + oneHourInMS);
 		String    desc     = "Debugged this thingy...";
 		int       pause		 = 0;
 
 		//Act
-		service.add(sheet, begin, end, category, desc, pause, project);
+		service.add(sheet, begin, end, category, desc, pause, team);
 		TimesheetEntry[] entries = ao.find(TimesheetEntry.class);
 
 		//Assert
 		assertEquals(1,        entries.length);
 		assertEquals(sheet,    entries[0].getTimeSheet());
 		assertEquals(category, entries[0].getCategory());
-		assertEquals(project,  entries[0].getProject());
+		assertEquals(team,  entries[0].getTeam());
 		assertEquals(begin,    entries[0].getBeginDate());
 		assertEquals(end,      entries[0].getEndDate());
 		assertEquals(desc,     entries[0].getDescription());

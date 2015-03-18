@@ -3,6 +3,8 @@ package ut.org.catrobat.confluence.activeobjects;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import net.java.ao.EntityManager;
 import static org.junit.Assert.*;
+
+import org.catrobat.confluence.activeobjects.Team;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +14,6 @@ import java.util.TimeZone;
 import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Category;
-import org.catrobat.confluence.activeobjects.Project;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;
 
@@ -36,21 +37,21 @@ public class ActiveObjectsTest {
 	}
 
 	@Test
-	public void testProjectToCategoryMapping() throws Exception
+	public void testTeamToCategoryMapping() throws Exception
 	{
-		Project[] projects = ao.find(Project.class, "PROJECT_KEY = ?", "CATROBAT");
+		Team[] teams = ao.find(Team.class, "TEAM_NAME = ?", "CATROBAT");
 
-		assertEquals(projects.length, 1);
+		assertEquals(teams.length, 1);
 
-		Project catrobatProject = projects[0];
+		Team catrobatTeam = teams[0];
 
-		assertEquals(catrobatProject.getEntries().length, 1);
-		assertEquals(catrobatProject.getCategories().length, 2);
+		assertEquals(catrobatTeam.getEntries().length, 1);
+		assertEquals(catrobatTeam.getCategories().length, 2);
 
 	}
 
 	@Test
-	public void testSheetToProjectMapping() throws Exception
+	public void testSheetToTeamMapping() throws Exception
 	{
 		Timesheet[] sheets = ao.find(Timesheet.class, "USER_KEY = ?", "chris");
 
@@ -63,17 +64,17 @@ public class ActiveObjectsTest {
 
 		TimesheetEntry entry1 = entries[0];
 
-		assertEquals(entry1.getDescription(), "Besprechung: Project Fetcher");
+		assertEquals(entry1.getDescription(), "Besprechung: Team Fetcher");
 
-		Project scratchProject = entry1.getProject();
+		Team scratchTeam = entry1.getTeam();
 
-		assertEquals(scratchProject.getProjectKey(), "SCRATCH");
+		assertEquals(scratchTeam.getTeamName(), "SCRATCH");
 
 		Category meetingCategory = entry1.getCategory();
 
 		assertEquals(meetingCategory.getName(), "Meeting");
 
-		Project[] projectsOfMeeting = meetingCategory.getProjects();
+		Team[] projectsOfMeeting = meetingCategory.getTeams();
 
 		assertEquals(projectsOfMeeting.length, 2);
 	}

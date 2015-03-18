@@ -3,11 +3,8 @@ package ut.org.catrobat.confluence.activeobjects;
 import java.text.SimpleDateFormat;
 import net.java.ao.EntityManager;
 import net.java.ao.test.jdbc.DatabaseUpdater;
-import org.catrobat.confluence.activeobjects.Category;
-import org.catrobat.confluence.activeobjects.CategoryToProject;
-import org.catrobat.confluence.activeobjects.Project;
-import org.catrobat.confluence.activeobjects.Timesheet;
-import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.activeobjects.*;
+import org.catrobat.confluence.activeobjects.CategoryToTeam;
 
 public class MySampleDatabaseUpdater implements DatabaseUpdater {
 
@@ -15,8 +12,10 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 		public void update(EntityManager em) throws Exception {
 			em.migrate(Timesheet.class);
 			em.migrate(Category.class);
-			em.migrate(CategoryToProject.class);
-			em.migrate(Project.class);
+			em.migrate(CategoryToTeam.class);
+			em.migrate(Team.class);
+			em.migrate(Group.class);
+			em.migrate(GroupToTeam.class);
 			em.migrate(TimesheetEntry.class);
 
 			Timesheet chrisSheet = em.create(Timesheet.class);
@@ -27,17 +26,17 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 			johSheet.setUserKey("joh");
 			johSheet.save();
 
-			Project scratchProject = em.create(Project.class);
-			scratchProject.setProjectKey("SCRATCH");
-			scratchProject.save();
+			Team scratchTeam = em.create(Team.class);
+			scratchTeam.setTeamName("SCRATCH");
+			scratchTeam.save();
 
-			Project confluenceProject = em.create(Project.class);
-			confluenceProject.setProjectKey("CONFLUENCE");
-			confluenceProject.save();
+			Team confluenceTeam = em.create(Team.class);
+			confluenceTeam.setTeamName("CONFLUENCE");
+			confluenceTeam.save();
 
-			Project catrobatProject = em.create(Project.class);
-			catrobatProject.setProjectKey("CATROBAT");
-			catrobatProject.save();
+			Team catrobatTeam = em.create(Team.class);
+			catrobatTeam.setTeamName("CATROBAT");
+			catrobatTeam.save();
 
 			Category meetingCategory = em.create(Category.class);
 			meetingCategory.setName("Meeting");
@@ -47,23 +46,23 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 			programmingCategory.setName("Programming");
 			programmingCategory.save();
 
-			CategoryToProject catHasMee = em.create(CategoryToProject.class);
-			catHasMee.setProject(catrobatProject);
+			CategoryToTeam catHasMee = em.create(CategoryToTeam.class);
+			catHasMee.setTeam(catrobatTeam);
 			catHasMee.setCategory(meetingCategory);
 			catHasMee.save();
 
-			CategoryToProject catHasPro = em.create(CategoryToProject.class);
-			catHasPro.setProject(catrobatProject);
+			CategoryToTeam catHasPro = em.create(CategoryToTeam.class);
+			catHasPro.setTeam(catrobatTeam);
 			catHasPro.setCategory(programmingCategory);
 			catHasPro.save();
 
-			CategoryToProject conHasPro = em.create(CategoryToProject.class);
-			conHasPro.setProject(confluenceProject);
+			CategoryToTeam conHasPro = em.create(CategoryToTeam.class);
+			conHasPro.setTeam(confluenceTeam);
 			conHasPro.setCategory(programmingCategory);
 			conHasPro.save();
 
-			CategoryToProject scrHasMee = em.create(CategoryToProject.class);
-			scrHasMee.setProject(scratchProject);
+			CategoryToTeam scrHasMee = em.create(CategoryToTeam.class);
+			scrHasMee.setTeam(scratchTeam);
 			scrHasMee.setCategory(meetingCategory);
 			scrHasMee.save();
 
@@ -74,9 +73,9 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 			entry1.setBeginDate(sdf.parse("01-01-2015 09:00"));
 			entry1.setEndDate(  sdf.parse("01-01-2015 10:00"));
 			entry1.setTimeSheet(chrisSheet);
-			entry1.setProject(scratchProject);
+			entry1.setTeam(scratchTeam);
 			entry1.setPauseMinutes(10);
-			entry1.setDescription("Besprechung: Project Fetcher");
+			entry1.setDescription("Besprechung: Team Fetcher");
 			entry1.save();
 
 			TimesheetEntry entry2 = em.create(TimesheetEntry.class);
@@ -85,7 +84,7 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 			entry2.setEndDate(  sdf.parse("02-01-2015 10:45"));
 			entry2.setPauseMinutes(5);
 			entry2.setTimeSheet(johSheet);
-			entry2.setProject(catrobatProject);
+			entry2.setTeam(catrobatTeam);
 			entry2.setDescription("Master Fixen");
 			entry2.save();
 

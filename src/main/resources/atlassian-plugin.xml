@@ -25,9 +25,6 @@
 		<context>timesheet</context>
 	</web-resource>
 	<!-- publish our component -->
-	<!--<component key="myPluginComponent" class="org.catrobat.confluence.timesheet.MyPluginComponentImpl" public="true">
-	<interface>org.catrobat.confluence.timesheet.MyPluginComponent</interface>
-	</component>-->
 	<servlet name="timesheet" class="org.catrobat.confluence.timesheet.MyPluginServlet" key="timesheet">
 		<url-pattern>/timesheet</url-pattern>
 		<url-pattern>/timesheet/*</url-pattern>
@@ -41,10 +38,10 @@
 		<url-pattern>/test</url-pattern>
 		<url-pattern>/test/</url-pattern>
 	</servlet>
-    <servlet name="teammanagement" class="org.catrobat.confluence.timesheet.TeamManagementServlet" key="teammanagement">
-        <url-pattern>/teams</url-pattern>
-        <url-pattern>/teams/</url-pattern>
-    </servlet>
+	<servlet name="teammanagement" class="org.catrobat.confluence.timesheet.TeamManagementServlet" key="teammanagement">
+			<url-pattern>/teams</url-pattern>
+			<url-pattern>/teams/</url-pattern>
+	</servlet>
 	<!-- import from the product container -->
 	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
 	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>

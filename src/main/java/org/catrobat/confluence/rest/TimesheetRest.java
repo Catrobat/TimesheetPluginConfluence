@@ -10,7 +10,7 @@ import javax.ws.rs.core.*;
 
 @Path("/")
 @Produces({MediaType.APPLICATION_JSON})
-public class RestHelloWorldService {
+public class TimesheetRest {
     @GET
     @Path("timesheets")
     public Response getUncompletedUsers() {

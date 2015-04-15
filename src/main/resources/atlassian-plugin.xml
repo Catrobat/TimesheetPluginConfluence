@@ -76,4 +76,8 @@
 		<entity>org.catrobat.confluence.activeobjects.Category</entity>
 		<entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
 	</ao>
+	
+	<rest key="timesheetRest" path="/timesheet" version="1.0">
+		<description>Provides hello world services.</description>
+	</rest>
 </atlassian-plugin>

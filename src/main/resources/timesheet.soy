@@ -1,0 +1,19 @@
+{namespace Confluence.Templates.Timesheet}
+
+/**
+ * Renders a table of selected AJS.params
+ * @param entry
+ */
+{template .timesheetEntry}
+   <tr>
+    <td>{$entry.date}</td>
+    <td>{$entry.begin}</td>
+    <td>{$entry.end}</td>
+    <td>{$entry.pause}</td>
+    <td>{$entry.duration}</td>
+    <td>{$entry.category}</td>
+    <td>{$entry.team}</td>
+    <td>{$entry.description}</td>
+  </tr>
+{/template}
+

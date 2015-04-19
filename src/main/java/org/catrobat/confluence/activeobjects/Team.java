@@ -12,8 +12,8 @@ public interface Team extends Entity {
   @ManyToMany(value=CategoryToTeam.class, through="getCategory", reverse = "getTeam")
   Category[] getCategories();
 
-  @ManyToMany(value=GroupToTeam.class, through="getGroup", reverse = "getTeam")
-  Group[] getGroups();
+//  @ManyToMany(value=GroupToTeam.class, through="getGroup", reverse = "getTeam")
+//  Group[] getGroups();
 
   @OneToMany(reverse = "getTeam")
   TimesheetEntry[] getEntries();

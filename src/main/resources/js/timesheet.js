@@ -68,7 +68,7 @@ function populateTable(timesheetData) {
   timesheetTableBody.empty();
 
   prepareForm(timesheetTableBody, {id : "newId"}, timesheetData.teams, 
-          StimesheetData.categories ); 
+          timesheetData.categories ); 
 
   //prepare view
   timesheetData.entries.map( function(entry) {

@@ -42,14 +42,14 @@ function initTable() {
     ], 
     teams: {
       7: {teamName: "Scratch MIT Html5", teamCategories : [1, 7, 8]},
-      8: {teamName: "Catrobat", teamCategories : [1, 3]}
+      8: {teamName: "Catrobat", teamCategories : [3, 8]}
     },
     categories : {
-      1: {categoryName : "Händewaschen"}, 
+      1: {categoryName : "Hoffen"}, 
       3: {categoryName : "Beten"}, 
       7: {categoryName : "Klatschen"}, 
       8: {categoryName : "Luftdruckchecken"}, 
-      5: {categoryName : "Glück haben"} 
+      5: {categoryName : "Denken"} 
     }
   };
   
@@ -58,29 +58,134 @@ function initTable() {
 }
 
 function populateTable(timesheetData) {
+
+  var timesheetTableHeader = timesheetTable.find("thead");
+  timesheetTableHeader.append(Confluence.Templates.Timesheet.timesheetHeader(
+          {teams : timesheetData.teams}
+      ));
   
-//  timesheetTable.find("tbody:last-child").remove();
   var timesheetTableBody = timesheetTable.find("tbody");
   timesheetTableBody.empty();
-  
+
+  prepareForm(timesheetTableBody, {id : "newId"}, timesheetData.teams, 
+          StimesheetData.categories ); 
+
+  //prepare view
   timesheetData.entries.map( function(entry) {
     
     entry.date  = entry.beginDate.toLocaleDateString();
-    entry.begin = entry.beginDate.toLocaleTimeString();
-    entry.end   = entry.endDate.toLocaleTimeString();
+    entry.begin = toTimeString(entry.beginDate);
+    entry.end   = toTimeString(entry.endDate);
     
-    var pauseDate = new Date(entry.pauseMinutes * 1000 * 60);
-    entry.pause = pauseDate.getUTCHours() + ":" + pauseDate.getUTCMinutes();
-    entry.duration = entry.duration.getUTCHours() + ":" + entry.duration.getUTCMinutes();
+    var pauseDate  = new Date(entry.pauseMinutes * 1000 * 60);
+    entry.pause    = toTimeString(pauseDate);
+    entry.duration = toTimeString(entry.duration);
     
     entry.category = timesheetData.categories[entry.categoryID].categoryName;
     entry.team     = timesheetData.teams[entry.teamID].teamName;
     
-    var entryTemplate = Confluence.Templates.Timesheet.timesheetEntry({entry : entry});		
+    var entryTemplate = Confluence.Templates.Timesheet.timesheetEntry(
+            {entry : entry, teams : timesheetData.teams});		
     timesheetTableBody.append(entryTemplate);
     
-  });
+  });  
+  
+}
+
+function prepareForm(tableBody, entry, teams, categories) {
+  
+  var newEntryTemplate = Confluence.Templates.Timesheet.timesheetEntryForm(
+      {
+        entry : entry, 
+        teams : teams
+      }
+  );
+  
+  //prepare empty form
+  tableBody.append(newEntryTemplate);
+  var newEntryTR = tableBody.last();
+
+  newEntryTR.find('.aui-date-picker').datePicker(
+    {overrideBrowserDefault: true, languageCode : 'de'}
+  );
+  
+  var startTime = newEntryTR.find('input.time.start');
+  var endTime   = newEntryTR.find('input.time.end');
+  var pauseTime = newEntryTR.find('input.time.pause');
+  
+  newEntryTR.find('input.time')
+    .timepicker({
+      showDuration: true,
+      timeFormat: 'H:i',
+      step: 15
+    }); 
     
+  pauseTime
+    .change(function(){
+      if(this.value === '') {
+        this.value = '00:00';
+      }
+    })
+    .on('timeFormatError', function() {
+      this.value = '00:00';
+    })
+  ;
+    
+  newEntryTR.find('input.time').change(function(){
+      datepair.refresh(); 
+      
+      var pause = new Date(pauseTime.timepicker('getTime'));
+      var duration = new Date(
+        endTime.timepicker('getTime') 
+        - startTime.timepicker('getTime')
+        - (pause.getHours() * 60 + pause.getMinutes()) * 60 * 1000
+      );
+      
+      if (duration < 0) duration = new Date(0);
+          
+      newEntryTR.find('.duration').val(toTimeString(duration)); 
+    })
+  ;
   
+//  var now = new Date(); 
+  startTime.timepicker(
+//      "setTime" , new Date(new Date() - new Date())
+//      "setTime" , new Date(new Date() - (new Date() % (5 * 60 * 1000)))
+      "setTime" , new Date("1 1 1970 09:00")
+//      "setTime" , new Date((now.getUTCHours() * 60 + now.getUTCMinutes()) * 60 * 1000 )
+  );
   
+  var datepair = new Datepair(newEntryTR.find(".time-picker")[0]);  
+  
+  var categorySelect = newEntryTR.find("span.category");
+  
+  var updateCategoryOptions = function(selectedTeamID){
+    if(selectedTeamID !== null && teams[selectedTeamID] !== undefined) {
+      var categoriesPerTeam = [];
+      teams[selectedTeamID].teamCategories.map( function(categoryID) {
+        categoriesPerTeam.push({id : categoryID, text : categories[categoryID].categoryName});
+      });
+      categorySelect.auiSelect2({data : categoriesPerTeam});
+      categorySelect.auiSelect2("val", teams[selectedTeamID].teamCategories[0]);
+    } else {
+      categorySelect.auiSelect2();
+    }
+  };
+  
+  newEntryTR.find("select.team")
+    .auiSelect2()
+    .change(function(){
+      updateCategoryOptions(this.value);
+    });
+  
+  updateCategoryOptions(Object.keys(teams)[0]);
+ 
+}
+
+function toTimeString(date) {
+  var h = date.getUTCHours(), m = date.getUTCMinutes();
+  var string = 
+    ((h < 10) ? "0" : "") + h + ":" +  
+    ((m < 10) ? "0" : "") + m;
+  return string;
 }

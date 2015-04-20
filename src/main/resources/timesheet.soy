@@ -1,19 +1,77 @@
 {namespace Confluence.Templates.Timesheet}
 
 /**
+ * @param teams
+ */
+{template .timesheetHeader}
+  <tr>
+    <th class="date">Datum</th>
+    <th>Von</th>
+    <th>Bis</th>
+    <th>Pause</th>
+    <th>Dauer</th>
+    {if length(keys($teams)) > 1} 
+      <th>Team</th>
+    {/if}
+    <th>Kategorie</th>
+    <th class="aui-table-column-unsortable">T&auml;tigkeit</th>
+  </tr>
+{/template}
+
+/**
  * Renders a table of selected AJS.params
  * @param entry
+ * @param teams
  */
 {template .timesheetEntry}
    <tr>
-    <td>{$entry.date}</td>
-    <td>{$entry.begin}</td>
-    <td>{$entry.end}</td>
-    <td>{$entry.pause}</td>
-    <td>{$entry.duration}</td>
+    <td class="date">{$entry.date}</td>
+    <td class="begin">{$entry.begin}</td>
+    <td class="end">{$entry.end}</td>
+    <td class="pause">{$entry.pause}</td>
+    <td class="duration">{$entry.duration}</td>
+    {if length(keys($teams)) > 1} 
+      <td>{$entry.team}</td>
+    {/if}
     <td>{$entry.category}</td>
-    <td>{$entry.team}</td>
     <td>{$entry.description}</td>
   </tr>
 {/template}
 
+/**
+ * Renders a table of selected AJS.params
+ * @param entry
+ * @param teams
+ */
+{template .timesheetEntryForm}
+  <tr id="entry-{$entry.ID}" class="aui">
+    <td>
+      <input class="aui-date-picker text" type="date" >
+    </td>
+    <td colspan="2" class="time-picker">
+      <input class="time start text" type="text"> &nbsp;
+      <input class="time end text" type="text">
+    </td>
+    <td class="pause">
+      <input class="time pause text" type="text" value="00:00">
+    </td>
+    <td>
+      <input class="duration text" type="text" disabled="disabled" value="" />
+    </td>
+    {if length(keys($teams)) > 1} 
+      <td class="team">
+        <select class="team">
+        {foreach $key in keys($teams)}
+          <option value="{$key}">{$teams[$key].teamName}</option>
+        {/foreach}
+        </select>
+      </td>
+    {/if} 
+    <td>
+      <span class="category"></span>
+    </td>
+    <td>
+      <input class="description text" type="text" /> 
+    </td>
+  </tr>
+{/template}

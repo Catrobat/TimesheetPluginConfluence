@@ -1,0 +1,31 @@
+#timesheet-table .time-picker, 
+#timesheet-table td.begin, 
+#timesheet-table td.end, 
+#timesheet-table td.pause, 
+#timesheet-table td.duration 
+{
+  text-align:center;
+}
+
+#timesheet-table .time {
+  width: 50px;
+}
+
+#timesheet-table .duration {
+  width: 50px;
+  border: none;
+  background-color: inherit;
+  cursor: inherit;
+  color: inherit;
+}
+
+#timesheet-table .date {
+  width:87px;
+}
+
+#timesheet-table td.start, 
+#timesheet-table td.end
+{
+  /*min-width:*/ 
+/*TODO*/  
+}

@@ -1,7 +1,9 @@
 #timesheet-table .time-picker, 
-#timesheet-table td.begin, 
-#timesheet-table td.end, 
+#timesheet-table th.range, 
+#timesheet-table td.range, 
+#timesheet-table th.pause, 
 #timesheet-table td.pause, 
+#timesheet-table th.duration 
 #timesheet-table td.duration 
 {
   text-align:center;
@@ -11,7 +13,7 @@
   width: 50px;
 }
 
-#timesheet-table .duration {
+#timesheet-table input.duration {
   width: 50px;
   border: none;
   background-color: inherit;
@@ -19,13 +21,13 @@
   color: inherit;
 }
 
-#timesheet-table .date {
-  width:87px;
-}
+#timesheet-table th.date     {width:87px;}
+#timesheet-table th.range    {width:115px;}
+#timesheet-table th.pause, 
+#timesheet-table th.duration {width:55px;}
+#timesheet-table th.team,
+#timesheet-table th.category {min-width:150px;}
 
-#timesheet-table td.start, 
-#timesheet-table td.end
-{
-  /*min-width:*/ 
-/*TODO*/  
-}
+#timesheet-table td.team aui-select2-container,
+#timesheet-table td.category aui-select2-container{width:200px;}
+

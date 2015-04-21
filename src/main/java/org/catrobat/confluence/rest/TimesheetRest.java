@@ -7,13 +7,20 @@ package org.catrobat.confluence.rest;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import org.catrobat.confluence.rest.json.JsonTimesheetEntry;
 
 @Path("/")
 @Produces({MediaType.APPLICATION_JSON})
 public class TimesheetRest {
     @GET
     @Path("timesheets")
-    public Response getUncompletedUsers() {
+    public Response doHelloWorld() {
         return Response.ok("hello world").build();
+    }
+
+    @POST
+    @Path("timesheets/{timesheetID}/entries")
+    public Response postTimesheetEntry(final JsonTimesheetEntry entry, @PathParam("timesheetID") String timesheetID) {
+      return Response.ok(entry).build();
     }
 }

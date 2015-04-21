@@ -6,14 +6,13 @@
 {template .timesheetHeader}
   <tr>
     <th class="date">Datum</th>
-    <th>Von</th>
-    <th>Bis</th>
-    <th>Pause</th>
-    <th>Dauer</th>
+    <th class="range">Von - Bis</th>
+    <th class="pause">Pause</th>
+    <th class="duration">Dauer</th>
     {if length(keys($teams)) > 1} 
-      <th>Team</th>
+      <th class="team">Team</th>
     {/if}
-    <th>Kategorie</th>
+    <th class="category">Kategorie</th>
     <th class="aui-table-column-unsortable">T&auml;tigkeit</th>
   </tr>
 {/template}
@@ -26,8 +25,7 @@
 {template .timesheetEntry}
    <tr>
     <td class="date">{$entry.date}</td>
-    <td class="begin">{$entry.begin}</td>
-    <td class="end">{$entry.end}</td>
+    <td class="range">{$entry.begin} - {$entry.end}</td>
     <td class="pause">{$entry.pause}</td>
     <td class="duration">{$entry.duration}</td>
     {if length(keys($teams)) > 1} 
@@ -44,11 +42,11 @@
  * @param teams
  */
 {template .timesheetEntryForm}
-  <tr id="entry-{$entry.ID}" class="aui">
+  <tr id="entry-{$entry.entryID}" class="aui">
     <td>
       <input class="aui-date-picker text" type="date" >
     </td>
-    <td colspan="2" class="time-picker">
+    <td class="time-picker">
       <input class="time start text" type="text"> &nbsp;
       <input class="time end text" type="text">
     </td>
@@ -72,6 +70,16 @@
     </td>
     <td>
       <input class="description text" type="text" /> 
+    </td>
+    <td>
+      {call aui.buttons.button}
+          {param id: 'save' /}
+          {param type: 'subtle' /}
+          {param text: '' /}
+          {param iconType: 'aui' /}
+          {param iconClass: 'aui-icon-success' /}
+      {/call}
+      <span class="aui-icon aui-icon-wait">Loading...</span>
     </td>
   </tr>
 {/template}

@@ -5,8 +5,9 @@
     $webResourceManager.requireResource("org.catrobat.confluence.timesheet:timesheet-resources")
   </head>
   <body>
+    <div id="aui-message-bar"></div>
     <h3>Timesheet</h3>
-    <form class="aui">
+    <form id="timesheet-form" class="aui">
       <table id="timesheet-table" class="aui aui-table-interactive aui-table-sortable">
         <thead>
         </thead>

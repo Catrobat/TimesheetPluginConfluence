@@ -39,4 +39,10 @@ public class TimesheetServiceImpl implements TimesheetService {
 		return (found.length > 0)? found[0] : null;
 	}
 
+  @Override
+  public Timesheet getTimesheetByID(int id) {
+		Timesheet[] found = ao.find(Timesheet.class, "ID = ?", id);
+		assert(found.length <= 1);
+		return (found.length > 0)? found[0] : null;
+  }
 }

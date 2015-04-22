@@ -64,18 +64,18 @@
 	<component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
 		<decription>Processes @Transactional annotations.</decription>
 	</component>
-    <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.imp.TeamServiceImpl"/>
+  
+  <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.imp.TeamServiceImpl"/>
 	<component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.imp.TimesheetServiceImpl"/>
-    <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl"/>
+  <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl"/>
 
 	<ao key="ao-module">
 		<description>The module configuring the Active Objects service used by this plugin</description>
-		<entity>org.catrobat.confluence.timesheet.TimesheetEntry</entity>
 		<entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
 		<entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
 		<entity>org.catrobat.confluence.activeobjects.Team</entity>
-        <entity>org.catrobat.confluence.activeobjects.Group</entity>
-        <entity>org.catrobat.confluence.activeobjects.GroupToTeam</entity>
+    <entity>org.catrobat.confluence.activeobjects.Group</entity>
+    <entity>org.catrobat.confluence.activeobjects.GroupToTeam</entity>
 		<entity>org.catrobat.confluence.activeobjects.Category</entity>
 		<entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
 	</ao>

@@ -20,10 +20,11 @@
 /**
  * Renders a table of selected AJS.params
  * @param entry
+ * @param entrySerialized
  * @param teams
  */
 {template .timesheetEntry}
-   <tr>
+   <tr data-entry="{$entrySerialized}">
     <td class="date">{$entry.date}</td>
     <td class="range">{$entry.begin} - {$entry.end}</td>
     <td class="pause">{$entry.pause}</td>
@@ -33,6 +34,14 @@
     {/if}
     <td>{$entry.category}</td>
     <td>{$entry.description}</td>
+    <td>
+      <button class="aui-button aui-button-subtle edit">
+        {call aui.icons.icon}
+          {param useIconFont: true /}
+          {param icon: 'edit' /}
+        {/call}
+      </button>
+    </td>
   </tr>
 {/template}
 
@@ -47,14 +56,14 @@
       <input class="aui-date-picker text" type="date" >
     </td>
     <td class="time-picker">
-      <input class="time start text" type="text"> &nbsp;
-      <input class="time end text" type="text">
+      <input class="time start text" type="text" value="{$entry.begin}"> &nbsp;
+      <input class="time end text" type="text" value="{$entry.end}">
     </td>
     <td class="pause">
-      <input class="time pause text" type="text" value="00:00">
+      <input class="time pause text" type="text" value="{$entry.pause}">
     </td>
     <td>
-      <input class="duration text" type="text" disabled="disabled" value="" />
+      <input class="duration text" type="text" disabled="disabled" value="{$entry.duration}" />
     </td>
     {if length(keys($teams)) > 1} 
       <td class="team">
@@ -72,13 +81,12 @@
       <input class="description text" type="text" /> 
     </td>
     <td>
-      {call aui.buttons.button}
-          {param id: 'save' /}
-          {param type: 'subtle' /}
-          {param text: '' /}
-          {param iconType: 'aui' /}
-          {param iconClass: 'aui-icon-success' /}
-      {/call}
+      <button class="aui-button aui-button-subtle save">
+        {call aui.icons.icon}
+          {param useIconFont: true /}
+          {param icon: 'success' /}
+        {/call}
+      </button>
       <span class="aui-icon aui-icon-wait">Loading...</span>
     </td>
   </tr>

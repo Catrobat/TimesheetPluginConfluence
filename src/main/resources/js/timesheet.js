@@ -74,9 +74,19 @@ function populateTable(timesheetData) {
   var timesheetTableBody = timesheetTable.find("tbody");
   timesheetTableBody.empty();
 
-  prepareForm(timesheetTableBody, {entryID : "new-id"}, timesheetData.teams, 
+  var firstForm = prepareForm({
+      entryID : "new-id",
+      date    : "",
+      begin   : "",
+      end     : "",
+      pause   : "00:00",
+      description: "",
+      duration: ""
+    }, timesheetData.teams, 
           timesheetData.categories ); 
-
+  
+  timesheetTableBody.append(firstForm);
+  
   //prepare view
   timesheetData.entries.map( function(entry) {
     var entryRow = renderEntryRow(entry, timesheetData.categories, timesheetData.teams); 
@@ -85,37 +95,37 @@ function populateTable(timesheetData) {
   
 }
 
-function prepareForm(tableBody, entry, teams, categories) {
+function prepareForm(entry, teams, categories, mode) {
   
-  var newEntryTemplate = Confluence.Templates.Timesheet.timesheetEntryForm(
-      {
-        entry : entry, 
-        teams : teams
-      }
+  var entryFormTR = $(Confluence.Templates.Timesheet.timesheetEntryForm(
+      {entry : entry, teams : teams})
   );
   
-  //prepare empty form
-  tableBody.append(newEntryTemplate);
-  var entryFormTR = tableBody.find("#entry-" + entry.entryID);
-
   //date time columns
   var dateField = entryFormTR.find('.aui-date-picker').datePicker(
     {overrideBrowserDefault: true, languageCode : 'de'}
   );
   
+  //todo: fix setDate problem. 
+  if(entry.beginDate !== undefined) {
+    dateField.setDate(entry.beginDate);
+  }
+  
   var beginTimeField = entryFormTR.find('input.time.start');
   var endTimeField   = entryFormTR.find('input.time.end');
   var pauseTimeField = entryFormTR.find('input.time.pause');
   
-  entryFormTR.find('input.time')
+  entryFormTR
+    .find('input.time.start, input.time.end')
     .timepicker({
       showDuration: true,
       timeFormat: 'H:i',
       scrollDefault: 'now',
       step: 15
     }); 
-    
+  
   pauseTimeField
+    .timepicker({timeFormat: 'H:i',step: 15})
     .change(function(){
       if(this.value === '') {
         this.value = '00:00';
@@ -123,8 +133,7 @@ function prepareForm(tableBody, entry, teams, categories) {
     })
     .on('timeFormatError', function() {
       this.value = '00:00';
-    })
-  ;
+    });
   
   var datepair = new Datepair(entryFormTR.find(".time-picker")[0]);  
 
@@ -147,13 +156,23 @@ function prepareForm(tableBody, entry, teams, categories) {
   var categorySelect = entryFormTR.find("span.category");
   
   var updateCategoryOptions = function(selectedTeamID){
+    
     if(selectedTeamID !== null && teams[selectedTeamID] !== undefined) {
+      
       var categoriesPerTeam = [];
+      
       teams[selectedTeamID].teamCategories.map( function(categoryID) {
-        categoriesPerTeam.push({id : categoryID, text : categories[categoryID].categoryName});
+        categoriesPerTeam.push(
+          {id : categoryID, text : categories[categoryID].categoryName}
+        );
       });
       categorySelect.auiSelect2({data : categoriesPerTeam});
-      categorySelect.auiSelect2("val", teams[selectedTeamID].teamCategories[0]);
+      
+      var selectedCategoryID = (entry.categoryID === undefined)
+          ? teams[selectedTeamID].teamCategories[0]
+          : entry.categoryID;
+      
+      categorySelect.auiSelect2("val", selectedCategoryID);
     } else {
       categorySelect.auiSelect2();
     }
@@ -170,22 +189,28 @@ function prepareForm(tableBody, entry, teams, categories) {
   var descriptionField = entryFormTR.find("input.description");
  
   //buttons
-  var saveButton = entryFormTR.find("button#save");
-  var loadingSpinner = entryFormTR.find("span.aui-icon-wait");
+  var saveButton = entryFormTR.find("button.save");
+  var loadingSpinner = entryFormTR.find("span.aui-icon-wait").hide();
   
   saveButton.click(function() {
     
-    var date = dateField.getDate();
-    var beginDate = new Date(date.toDateString() + " " + toTimeString(beginTimeField.timepicker('getTime')));
-    var endDate   = new Date(date.toDateString() + " " + toTimeString(endTimeField.timepicker('getTime')));
-    var pauseMinutes = pauseTimeField.timepicker('getTime').getHours() * 60 + pauseTimeField.timepicker('getTime').getMinutes();
-    var duration = calculateDuration(beginTimeField.timepicker('getTime'), endTimeField.timepicker('getTime'), pauseTimeField.timepicker('getTime'));
+    saveButton.prop('disabled', true);
+    
+    var date      = dateField.getDate().toDateString();
+    var beginTime = beginTimeField.timepicker('getTime');
+    var endTime   = endTimeField.timepicker('getTime');
+    var pauseTime = pauseTimeField.timepicker('getTime');
+    
+    var beginDate = new Date(date + " " + toTimeString(beginTime));
+    var endDate   = new Date(date + " " + toTimeString(endTime));
+    var pauseMin  = pauseTime.getHours() * 60 + pauseTime.getMinutes();
+    var duration  = calculateDuration(beginTime, endTime, pauseTime);
     
     var entry = {
         beginDate : beginDate,
         endDate : endDate,
         description : descriptionField.val(),
-        pauseMinutes : pauseMinutes,
+        pauseMinutes : pauseMin,
         duration : duration,
         teamID : teamSelect.val(),
         categoryID : categorySelect.val()
@@ -202,9 +227,16 @@ function prepareForm(tableBody, entry, teams, categories) {
       data: JSON.stringify(entry)
     })
     .then(function(entry){
-      loadingSpinner.hide();
       var entryRow = renderEntryRow(entry, categories, teams);
-      entryFormTR.after(entryRow);      
+      entryFormTR.after(entryRow); 
+      
+      if (mode === 'close_after_save') {
+        entryFormTR.remove(); 
+      } 
+      
+      beginTimeField.timepicker('setTime', endTime);
+      endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
+      datepair.refresh();
     })
     .fail(function(error){
       AJS.messages.error({
@@ -212,17 +244,20 @@ function prepareForm(tableBody, entry, teams, categories) {
           body: '<p>Your record could not be saved... :(.</p>'
       });
       console.log(error);
+    }) 
+    .always(function(){
       loadingSpinner.hide();
-    }); 
+      saveButton.prop('disabled', false);
+    });
   });
 
-  loadingSpinner.hide();
+  return entryFormTR;
   
 }
 
 function renderEntryRow(entry, categories, teams) {
 
-  entry.date  = new Date(entry.beginDate).toLocaleDateString();
+  entry.date  = toDateString(new Date(entry.beginDate));
   entry.begin = toTimeString(new Date(entry.beginDate));
   entry.end   = toTimeString(new Date(entry.endDate));
 
@@ -232,10 +267,20 @@ function renderEntryRow(entry, categories, teams) {
 
   entry.category = categories[entry.categoryID].categoryName;
   entry.team     = teams[entry.teamID].teamName;
+  var entrySerialized = JSON.stringify(entry);
 
-  return Confluence.Templates.Timesheet.timesheetEntry(
-          {entry : entry, teams : teams});		
-
+  var entryView = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
+          {entry : entry, entrySerialized : entrySerialized, teams : teams}));		
+   
+  var editButton = entryView.find("button.edit");
+  
+  editButton.click(function() {
+    var entry = entryView.data("entry");
+    var form = prepareForm(entry, teams, categories, 'close_after_save'); 
+    entryView.after(form).hide();
+  });
+   
+  return entryView;
 }
 
 function toUTCTimeString(date) {
@@ -251,6 +296,14 @@ function toTimeString(date) {
   var string = 
     ((h < 10) ? "0" : "") + h + ":" +  
     ((m < 10) ? "0" : "") + m;
+  return string;
+}
+
+function toDateString(date) {
+  var y = date.getFullYear(), d = date.getDate(), m = date.getMonth() + 1;
+  var string = y + "-" + 
+    ((m < 10) ? "0" : "") + m + "-" +  
+    ((d < 10) ? "0" : "") + d;
   return string;
 }
 

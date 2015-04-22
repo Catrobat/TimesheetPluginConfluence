@@ -16,6 +16,7 @@
 		<dependency>com.atlassian.auiplugin:ajs</dependency>
 		<dependency>com.atlassian.auiplugin:aui-select2</dependency>
     <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>
+    <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
         
 		<resource type="download" name="timesheet.css" location="/css/timesheet.css"/>
 		<resource type="download" name="timesheet.js" location="/js/timesheet.js"/>

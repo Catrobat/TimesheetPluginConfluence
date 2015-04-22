@@ -23,4 +23,10 @@ public class TimesheetRest {
     public Response postTimesheetEntry(final JsonTimesheetEntry entry, @PathParam("timesheetID") String timesheetID) {
       return Response.ok(entry).build();
     }
+    
+    @PUT
+    @Path("timesheets/{timesheetID}/entries/{entryID}")
+    public Response postTimesheetEntry(final JsonTimesheetEntry entry, @PathParam("timesheetID") String timesheetID, @PathParam("entryID") String entryID) {
+      return Response.ok(entry).build();
+    }
 }

@@ -20,11 +20,10 @@
 /**
  * Renders a table of selected AJS.params
  * @param entry
- * @param entrySerialized
  * @param teams
  */
 {template .timesheetEntry}
-   <tr data-entry="{$entrySerialized}">
+   <tr>
     <td class="date">{$entry.date}</td>
     <td class="range">{$entry.begin} - {$entry.end}</td>
     <td class="pause">{$entry.pause}</td>
@@ -53,7 +52,7 @@
 {template .timesheetEntryForm}
   <tr id="entry-{$entry.entryID}" class="aui">
     <td>
-      <input class="aui-date-picker text" type="date" >
+      <input class="date aui-date-picker text" type="date" value="{$entry.date}">
     </td>
     <td class="time-picker">
       <input class="time start text" type="text" value="{$entry.begin}"> &nbsp;
@@ -78,7 +77,7 @@
       <span class="category"></span>
     </td>
     <td>
-      <input class="description text" type="text" /> 
+      <input class="description text" type="text" value="{$entry.description}"/> 
     </td>
     <td>
       <button class="aui-button aui-button-subtle save">

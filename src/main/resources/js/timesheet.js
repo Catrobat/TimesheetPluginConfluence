@@ -30,9 +30,9 @@ function initTable() {
         entryID: 1,
         beginDate : new Date(0),
         endDate : new Date(1000),
-        description : "so und so hab ich gemacht",
+        description : "fuer team 7 (mit) 7 (klatschen)",
         pauseMinutes : 200,
-        duration : new Date(1000),
+        durationDate : new Date(1000),
         teamID : 7,
         categoryID : 7
       },
@@ -40,16 +40,16 @@ function initTable() {
         entryID: 2,
         beginDate : new Date(1000),
         endDate : new Date(1000 + 60 * 60 * 1000),
-        description : "und was anderes",
+        description : "fuer team 8 (catrobat) hoffen (1)",
         pauseMinutes : 50,
-        duration : new Date(60 * 60 * 1000),
+        durationDate : new Date(60 * 60 * 1000),
         teamID : 8,
         categoryID : 1
       }
     ], 
     teams: {
       7: {teamName: "Scratch MIT Html5", teamCategories : [1, 7, 8]},
-      8: {teamName: "Catrobat", teamCategories : [3, 8]}
+      8: {teamName: "Catrobat", teamCategories : [1, 8]}
     },
     categories : {
       1: {categoryName : "Hoffen"}, 
@@ -74,7 +74,7 @@ function populateTable(timesheetData) {
   var timesheetTableBody = timesheetTable.find("tbody");
   timesheetTableBody.empty();
 
-  var firstForm = prepareForm({
+  var firstForm = renderFormRow({
       entryID : "new-id",
       date    : "",
       begin   : "",
@@ -82,50 +82,156 @@ function populateTable(timesheetData) {
       pause   : "00:00",
       description: "",
       duration: ""
-    }, timesheetData.teams, 
-          timesheetData.categories ); 
+    }, timesheetData.teams, timesheetData.categories, 'post'); 
   
   timesheetTableBody.append(firstForm);
   
   //prepare view
-  timesheetData.entries.map( function(entry) {
+  timesheetData.entries.map(function(entry) {
     var entryRow = renderEntryRow(entry, timesheetData.categories, timesheetData.teams); 
-    timesheetTableBody.append(entryRow);
+    timesheetTableBody.append(entryRow.viewRow);
+    timesheetTableBody.append(entryRow.formRow);
   });  
+}
+
+/**
+ * creates a form with working ui components and instrumented buttons
+ * @param {object} entry
+ * @param {object} teams
+ * @param {object} categories
+ * @param {string} mode
+ *      'post': creates a new entry
+ *      'put' : updates an existing entry
+ * @returns {jquery} form
+ */
+function renderFormRow(entry, teams, categories, mode) {
+  
+  var timesheetID = 123, ajaxUrl, saveCallback;
+  
+  var form = prepareFormTemplate(entry, teams, categories);
+ 
+  if(mode === 'post') {
+    
+    ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries"; 
+
+    saveCallback = function(entry) {
+      var entryRow = renderEntryRow(entry, categories, teams);
+      var beginTime = form.beginTimeField.timepicker('getTime');
+      var endTime   = form.endTimeField.timepicker('getTime');
+      form.row.after(entryRow.formRow); 
+      form.row.after(entryRow.viewRow); 
+      form.beginTimeField.timepicker('setTime', endTime);
+      form.endTimeField.timepicker(  'setTime', new Date(2 * endTime - beginTime));
+      form.pauseTimeField.val("00:00").trigger('change');
+      
+    };
+    
+  } else if (mode === 'put') {
+    
+    ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entry.entryID;
+    
+    saveCallback = function(entry) {
+      var newViewRow = renderViewRow(entry, categories, teams); 
+           
+      form.row.prev().remove();
+      form.row.before(newViewRow).hide();
+
+      newViewRow.find("button.edit").click(function() {
+        newViewRow.hide();
+        form.row.show();
+      });
+    };
+    
+  }
+  
+  form.saveButton.click(function() {
+    
+    form.saveButton.prop('disabled', true);
+    
+    var date      = form.dateField.val();
+    var beginTime = form.beginTimeField.timepicker('getTime');
+    var endTime   = form.endTimeField.timepicker('getTime');
+    var pauseTime = form.pauseTimeField.timepicker('getTime');
+    
+    var beginDate     = new Date(date + " " + toTimeString(beginTime));
+    var endDate       = new Date(date + " " + toTimeString(endTime));
+    var pauseMin      = pauseTime.getHours() * 60 + pauseTime.getMinutes();
+    var durationDate  = calculateDuration(beginTime, endTime, pauseTime);
+    
+    var entry = {
+        beginDate    : beginDate,
+        endDate      : endDate,
+        description  : form.descriptionField.val(),
+        pauseMinutes : pauseMin,
+        durationDate : durationDate,
+        teamID       : form.teamSelect.val(),
+        categoryID   : form.categorySelect.val()
+    };
+    
+    form.loadingSpinner.show();
+    
+    AJS.$.ajax({
+      type: mode,
+      url: ajaxUrl,
+      contentType: "application/json",
+      data: JSON.stringify(entry)
+    })
+    .then(saveCallback)
+    .fail(function(error){
+      AJS.messages.error({
+          title: 'There was an error',
+          body: '<p>Your record could not be saved... :(.</p>'
+      });
+      console.log(error);
+    }) 
+    .always(function(){
+      form.loadingSpinner.hide();
+      form.saveButton.prop('disabled', false);
+    });
+  });
+  
+  return form.row;
   
 }
 
-function prepareForm(entry, teams, categories, mode) {
+/**
+ * create form for editing a entry & instrument ui components
+ * @param {object} entry
+ * @param {object} teams
+ * @param {object} categories
+ * @returns {object of jquery objects} 
+ */
+function prepareFormTemplate(entry, teams, categories) {
   
-  var entryFormTR = $(Confluence.Templates.Timesheet.timesheetEntryForm(
+  var row = $(Confluence.Templates.Timesheet.timesheetEntryForm(
       {entry : entry, teams : teams})
   );
   
+  var loadingSpinner   = row.find('span.aui-icon-wait').hide();
+  var saveButton       = row.find('button.save');
+  var dateField        = row.find('input.date');
+  var beginTimeField   = row.find('input.time.start');
+  var endTimeField     = row.find('input.time.end');
+  var pauseTimeField   = row.find('input.time.pause');
+  var durationField    = row.find('input.duration');
+  var descriptionField = row.find('input.description');
+  var categorySelect   = row.find('span.category');
+  var teamSelect       = row.find('select.team');
+  
   //date time columns
-  var dateField = entryFormTR.find('.aui-date-picker').datePicker(
+  dateField.datePicker(
     {overrideBrowserDefault: true, languageCode : 'de'}
   );
-  
-  //todo: fix setDate problem. 
-  if(entry.beginDate !== undefined) {
-    dateField.setDate(entry.beginDate);
-  }
-  
-  var beginTimeField = entryFormTR.find('input.time.start');
-  var endTimeField   = entryFormTR.find('input.time.end');
-  var pauseTimeField = entryFormTR.find('input.time.pause');
-  
-  entryFormTR
-    .find('input.time.start, input.time.end')
+    
+  row.find('input.time.start, input.time.end')
     .timepicker({
-      showDuration: true,
+      showDuration: false,
       timeFormat: 'H:i',
       scrollDefault: 'now',
       step: 15
     }); 
   
-  pauseTimeField
-    .timepicker({timeFormat: 'H:i',step: 15})
+  pauseTimeField.timepicker({timeFormat: 'H:i',step: 15})
     .change(function(){
       if(this.value === '') {
         this.value = '00:00';
@@ -135,9 +241,9 @@ function prepareForm(entry, teams, categories, mode) {
       this.value = '00:00';
     });
   
-  var datepair = new Datepair(entryFormTR.find(".time-picker")[0]);  
+  new Datepair(row.find(".time-picker")[0]);  
 
-  entryFormTR.find('input.time').change(function(){
+  row.find('input.time').change(function(){
     
     //todo: fix duration update without setTimeout
     setTimeout(function() {
@@ -148,13 +254,11 @@ function prepareForm(entry, teams, categories, mode) {
 
       if (duration < 0) duration = new Date(0);
 
-      entryFormTR.find('.duration').val(toUTCTimeString(duration)); 
+      durationField.val(toUTCTimeString(duration)); 
     }, 10);
   });  
  
   //team and category select
-  var categorySelect = entryFormTR.find("span.category");
-  
   var updateCategoryOptions = function(selectedTeamID){
     
     if(selectedTeamID !== null && teams[selectedTeamID] !== undefined) {
@@ -166,9 +270,10 @@ function prepareForm(entry, teams, categories, mode) {
           {id : categoryID, text : categories[categoryID].categoryName}
         );
       });
+      
       categorySelect.auiSelect2({data : categoriesPerTeam});
       
-      var selectedCategoryID = (entry.categoryID === undefined)
+      var selectedCategoryID = (entry.categoryID === undefined || selectedTeamID != entry.teamID )
           ? teams[selectedTeamID].teamCategories[0]
           : entry.categoryID;
       
@@ -178,110 +283,80 @@ function prepareForm(entry, teams, categories, mode) {
     }
   };
   
-  var teamSelect = entryFormTR.find("select.team")
+  var initTeamId = (entry.teamID !== undefined) ? entry.teamID : Object.keys(teams)[0]; 
+  
+  teamSelect
     .auiSelect2()
     .change(function(){
       updateCategoryOptions(this.value);
-    });
-  
-  updateCategoryOptions(Object.keys(teams)[0]);
- 
-  var descriptionField = entryFormTR.find("input.description");
- 
-  //buttons
-  var saveButton = entryFormTR.find("button.save");
-  var loadingSpinner = entryFormTR.find("span.aui-icon-wait").hide();
-  
-  saveButton.click(function() {
-    
-    saveButton.prop('disabled', true);
-    
-    var date      = dateField.getDate().toDateString();
-    var beginTime = beginTimeField.timepicker('getTime');
-    var endTime   = endTimeField.timepicker('getTime');
-    var pauseTime = pauseTimeField.timepicker('getTime');
-    
-    var beginDate = new Date(date + " " + toTimeString(beginTime));
-    var endDate   = new Date(date + " " + toTimeString(endTime));
-    var pauseMin  = pauseTime.getHours() * 60 + pauseTime.getMinutes();
-    var duration  = calculateDuration(beginTime, endTime, pauseTime);
-    
-    var entry = {
-        beginDate : beginDate,
-        endDate : endDate,
-        description : descriptionField.val(),
-        pauseMinutes : pauseMin,
-        duration : duration,
-        teamID : teamSelect.val(),
-        categoryID : categorySelect.val()
-    };
-    
-    loadingSpinner.show();
-    
-    var timesheetID = 123;
-    
-    AJS.$.ajax({
-      type: "post",
-      url: restBaseUrl + "timesheets/" + timesheetID + "/entries",
-      contentType: "application/json",
-      data: JSON.stringify(entry)
     })
-    .then(function(entry){
-      var entryRow = renderEntryRow(entry, categories, teams);
-      entryFormTR.after(entryRow); 
-      
-      if (mode === 'close_after_save') {
-        entryFormTR.remove(); 
-      } 
-      
-      beginTimeField.timepicker('setTime', endTime);
-      endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
-      datepair.refresh();
-    })
-    .fail(function(error){
-      AJS.messages.error({
-          title: 'There was an error',
-          body: '<p>Your record could not be saved... :(.</p>'
-      });
-      console.log(error);
-    }) 
-    .always(function(){
-      loadingSpinner.hide();
-      saveButton.prop('disabled', false);
-    });
-  });
-
-  return entryFormTR;
-  
+    .auiSelect2("val", initTeamId)
+    .trigger('change');
+    
+  return  {
+    row              : row,
+    loadingSpinner   : loadingSpinner,
+    saveButton       : saveButton,
+    dateField        : dateField,
+    beginTimeField   : beginTimeField,
+    endTimeField     : endTimeField,
+    pauseTimeField   : pauseTimeField, 
+    durationField    : durationField,
+    descriptionField : descriptionField,
+    categorySelect   : categorySelect,
+    teamSelect       : teamSelect
+  };
 }
 
+/**
+ * creates a view row (for viewing) and a form row (for editing)
+ * @param {type} entry
+ * @param {type} categories
+ * @param {type} teams
+ * @returns {viewrow : jquery, formrow : jquery}
+ */
 function renderEntryRow(entry, categories, teams) {
 
+  prepareEntryObjectForView(entry, categories, teams);
+  
+  var viewRow = renderViewRow(entry, categories, teams);
+  var formRow = renderFormRow(entry, teams, categories, 'put');
+  formRow.hide();
+  
+  viewRow.find("button.edit").click(function() {
+    viewRow.hide();
+    formRow.show();
+  });
+   
+  return {viewRow: viewRow, formRow: formRow };
+}
+
+function prepareEntryObjectForView(entry, categories, teams) {
   entry.date  = toDateString(new Date(entry.beginDate));
   entry.begin = toTimeString(new Date(entry.beginDate));
   entry.end   = toTimeString(new Date(entry.endDate));
 
   var pauseDate  = new Date(entry.pauseMinutes * 1000 * 60);
   entry.pause    = toUTCTimeString(pauseDate);
-  entry.duration = toUTCTimeString(new Date(entry.duration));
+  entry.duration = toUTCTimeString(new Date(entry.durationDate));
 
   entry.category = categories[entry.categoryID].categoryName;
   entry.team     = teams[entry.teamID].teamName;
-  var entrySerialized = JSON.stringify(entry);
-
-  var entryView = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
-          {entry : entry, entrySerialized : entrySerialized, teams : teams}));		
-   
-  var editButton = entryView.find("button.edit");
-  
-  editButton.click(function() {
-    var entry = entryView.data("entry");
-    var form = prepareForm(entry, teams, categories, 'close_after_save'); 
-    entryView.after(form).hide();
-  });
-   
-  return entryView;
 }
+
+/**
+ * Updates the viewrow
+ * @param {type} entry
+ * @param {type} categories
+ * @param {type} teams
+ */
+function renderViewRow(entry, categories, teams) {
+  
+  prepareEntryObjectForView(entry, categories, teams);
+  
+  return AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
+          {entry : entry, teams : teams}));
+} 
 
 function toUTCTimeString(date) {
   var h = date.getUTCHours(), m = date.getUTCMinutes();

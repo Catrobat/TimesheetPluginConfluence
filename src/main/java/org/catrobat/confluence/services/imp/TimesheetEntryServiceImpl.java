@@ -1,8 +1,8 @@
 package org.catrobat.confluence.services.imp;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
-import static com.google.common.collect.Lists.newArrayList;
 import java.util.Date;
+import javax.annotation.Nullable;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.Timesheet;
@@ -31,6 +31,38 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 		entry.setPauseMinutes(pause);
 		entry.setTeam(team);
 
+		entry.save();
+
+		return entry;
+		
+	}
+
+  @Override
+  @Nullable
+  public TimesheetEntry getEntryByID(int entryID) {
+    TimesheetEntry[] found = ao.find(TimesheetEntry.class, "ID = ?", entryID);
+		assert(found.length <= 1);
+		return (found.length > 0)? found[0] : null;
+  }
+  
+  @Override
+  @Nullable
+	public TimesheetEntry edit(int entryId, Timesheet sheet, Date begin, Date end, 
+					Category category, String description, int pause, Team team) {
+		
+		TimesheetEntry entry = getEntryByID(entryId);
+    
+    if(entry == null) {
+      return null;
+    }
+
+		entry.setTimeSheet(sheet);
+		entry.setBeginDate(begin);
+		entry.setEndDate(end);
+		entry.setCategory(category);
+		entry.setDescription(description);
+		entry.setPauseMinutes(pause);
+		entry.setTeam(team);
 		entry.save();
 
 		return entry;

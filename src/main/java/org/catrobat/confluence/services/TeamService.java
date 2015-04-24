@@ -11,4 +11,6 @@ public interface TeamService {
 	Team add(String name);
 
 	List<Team> all();
+  
+  Team getTeamByID(int id);
 }

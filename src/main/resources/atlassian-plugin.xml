@@ -52,6 +52,7 @@
 	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
 	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
 	<component-import key="groupManager" interface="com.atlassian.user.GroupManager" filter=""/>
+	<component-import key="userAccessor" interface="com.atlassian.confluence.user.UserAccessor" filter=""/>
 	<component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
 	<component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
 	<component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
@@ -68,6 +69,7 @@
   <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.imp.TeamServiceImpl"/>
 	<component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.imp.TimesheetServiceImpl"/>
   <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl"/>
+  <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.imp.CategoryServiceImpl"/>
 
 	<ao key="ao-module">
 		<description>The module configuring the Active Objects service used by this plugin</description>

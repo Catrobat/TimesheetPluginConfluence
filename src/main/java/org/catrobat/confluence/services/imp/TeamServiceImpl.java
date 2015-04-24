@@ -31,5 +31,10 @@ public class TeamServiceImpl implements TeamService{
 		return newArrayList(ao.find(Team.class, Query.select().order("\"TEAM_NAME\" ASC")));
 	}
 
-
+  @Override
+  public Team getTeamByID(int id) {
+    Team[] found = ao.find(Team.class, "ID = ?", id);
+		assert(found.length <= 1);
+		return (found.length > 0)? found[0] : null;
+  }
 }

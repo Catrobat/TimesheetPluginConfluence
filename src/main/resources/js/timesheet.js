@@ -28,35 +28,35 @@ function initTable() {
     entries: [
       {
         entryID: 1,
-        beginDate : new Date(0),
-        endDate : new Date(1000),
-        description : "fuer team 7 (mit) 7 (klatschen)",
-        pauseMinutes : 200,
-        durationDate : new Date(1000),
+        beginDate : new Date("2015-03-02 09:00"),
+        endDate   : new Date("2015-03-02 10:30"),
+        description : "Weekly Meeting",
+        pauseMinutes : 15,
+        durationDate : new Date(75 * 60 * 1000),
         teamID : 7,
         categoryID : 7
       },
       {
         entryID: 2,
-        beginDate : new Date(1000),
-        endDate : new Date(1000 + 60 * 60 * 1000),
-        description : "fuer team 8 (catrobat) hoffen (1)",
-        pauseMinutes : 50,
-        durationDate : new Date(60 * 60 * 1000),
+        beginDate : new Date("2015-03-02 10:30"),
+        endDate :   new Date("2015-03-02 12:30"),
+        description : "Pair Programming with X",
+        pauseMinutes : 0,
+        durationDate : new Date(120 * 60 * 1000),
         teamID : 8,
         categoryID : 1
       }
     ], 
     teams: {
-      7: {teamName: "Scratch MIT Html5", teamCategories : [1, 7, 8]},
-      8: {teamName: "Catrobat", teamCategories : [1, 8]}
+      7: {teamName: "Pocket Code", teamCategories : [1, 3, 7, 8, 5]},
+      8: {teamName: "Scratch MIT HTML5", teamCategories : [1, 3, 7]}
     },
     categories : {
-      1: {categoryName : "Hoffen"}, 
-      3: {categoryName : "Beten"}, 
-      7: {categoryName : "Klatschen"}, 
-      8: {categoryName : "Luftdruckchecken"}, 
-      5: {categoryName : "Denken"} 
+      1: {categoryName : "Pair Programming"}, 
+      3: {categoryName : "Programming"}, 
+      7: {categoryName : "Meeting"}, 
+      8: {categoryName : "Theory (MT)"}, 
+      5: {categoryName : "Other"} 
     }
   };
   
@@ -74,7 +74,7 @@ function populateTable(timesheetData) {
   var timesheetTableBody = timesheetTable.find("tbody");
   timesheetTableBody.empty();
 
-  var firstForm = renderFormRow({
+  var firstForm = renderFormRow(timesheetData.timesheetID, {
       entryID : "new-id",
       date    : "",
       begin   : "",
@@ -88,7 +88,7 @@ function populateTable(timesheetData) {
   
   //prepare view
   timesheetData.entries.map(function(entry) {
-    var entryRow = renderEntryRow(entry, timesheetData.categories, timesheetData.teams); 
+    var entryRow = renderEntryRow(timesheetData.timesheetID, entry, timesheetData.categories, timesheetData.teams); 
     timesheetTableBody.append(entryRow.viewRow);
     timesheetTableBody.append(entryRow.formRow);
   });  
@@ -96,6 +96,7 @@ function populateTable(timesheetData) {
 
 /**
  * creates a form with working ui components and instrumented buttons
+ * @param {int} timesheetID
  * @param {object} entry
  * @param {object} teams
  * @param {object} categories
@@ -104,9 +105,9 @@ function populateTable(timesheetData) {
  *      'put' : updates an existing entry
  * @returns {jquery} form
  */
-function renderFormRow(entry, teams, categories, mode) {
+function renderFormRow(timesheetID, entry, teams, categories, mode) {
   
-  var timesheetID = 123, ajaxUrl, saveCallback;
+  var ajaxUrl, saveCallback;
   
   var form = prepareFormTemplate(entry, teams, categories);
  
@@ -115,7 +116,7 @@ function renderFormRow(entry, teams, categories, mode) {
     ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries"; 
 
     saveCallback = function(entry) {
-      var entryRow = renderEntryRow(entry, categories, teams);
+      var entryRow = renderEntryRow(timesheetID, entry, categories, teams);
       var beginTime = form.beginTimeField.timepicker('getTime');
       var endTime   = form.endTimeField.timepicker('getTime');
       form.row.after(entryRow.formRow); 
@@ -179,8 +180,8 @@ function renderFormRow(entry, teams, categories, mode) {
     .then(saveCallback)
     .fail(function(error){
       AJS.messages.error({
-          title: 'There was an error',
-          body: '<p>Your record could not be saved... :(.</p>'
+          title: 'There was an error while saving.',
+          body: '<p>Reason: ' + error.responseText + '</p>'
       });
       console.log(error);
     }) 
@@ -310,17 +311,18 @@ function prepareFormTemplate(entry, teams, categories) {
 
 /**
  * creates a view row (for viewing) and a form row (for editing)
+ * @param {type} timesheetID
  * @param {type} entry
  * @param {type} categories
  * @param {type} teams
  * @returns {viewrow : jquery, formrow : jquery}
  */
-function renderEntryRow(entry, categories, teams) {
+function renderEntryRow(timesheetID, entry, categories, teams) {
 
   prepareEntryObjectForView(entry, categories, teams);
   
   var viewRow = renderViewRow(entry, categories, teams);
-  var formRow = renderFormRow(entry, teams, categories, 'put');
+  var formRow = renderFormRow(timesheetID, entry, teams, categories, 'put');
   formRow.hide();
   
   viewRow.find("button.edit").click(function() {

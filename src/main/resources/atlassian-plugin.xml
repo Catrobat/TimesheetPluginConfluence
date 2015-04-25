@@ -76,8 +76,6 @@
 		<entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
 		<entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
 		<entity>org.catrobat.confluence.activeobjects.Team</entity>
-    <entity>org.catrobat.confluence.activeobjects.Group</entity>
-    <entity>org.catrobat.confluence.activeobjects.GroupToTeam</entity>
 		<entity>org.catrobat.confluence.activeobjects.Category</entity>
 		<entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
 	</ao>

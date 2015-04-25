@@ -70,6 +70,7 @@
 	<component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.imp.TimesheetServiceImpl"/>
   <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl"/>
   <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.imp.CategoryServiceImpl"/>
+  <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.imp.PermissionServiceImpl"/>
 
 	<ao key="ao-module">
 		<description>The module configuring the Active Objects service used by this plugin</description>

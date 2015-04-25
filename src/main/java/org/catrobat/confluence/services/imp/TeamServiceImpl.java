@@ -54,7 +54,7 @@ public class TeamServiceImpl implements TeamService{
 	}
     
   @Override
-  public Team[] getTeamsOfUser(String userName) {
+  public Set<Team> getTeamsOfUser(String userName) {
     
     Set<Team> teams = new HashSet<Team>();
     
@@ -66,8 +66,30 @@ public class TeamServiceImpl implements TeamService{
       }
     }
     
-    Team[] teamArray = new Team[teams.size()]; 
+    return teams;
+  }
+
+  @Override
+  public Set<Team> getCoordinatorTeamsOfUser(String userName) {
+    Set<Team> teams = new HashSet<Team>();
     
-    return teams.toArray(teamArray);
+    for(String groupName : userAccessor.getGroupNamesForUserName(userName)) {
+      String[] pieces = groupName.split("-");
+      
+      String teamName = pieces[0].toLowerCase();
+      String roleName = (pieces.length > 1) ? pieces[1].toLowerCase() : "";
+      
+      if (!roleName.equalsIgnoreCase("administrators") 
+          && !roleName.equalsIgnoreCase("coordinators")) {
+        continue; 
+      }
+      
+      Team team = getTeamByName(teamName);
+      if(team != null) {
+        teams.add(team);
+      }
+    }
+    
+    return teams;
   }
 }

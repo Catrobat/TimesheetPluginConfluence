@@ -2,8 +2,11 @@ package org.catrobat.confluence.services;
 
 import com.atlassian.activeobjects.tx.Transactional;
 import org.catrobat.confluence.activeobjects.Team;
+import javax.annotation.Nonnull;
+
 
 import java.util.List;
+import java.util.Set;
 
 @Transactional
 public interface TeamService {
@@ -16,6 +19,10 @@ public interface TeamService {
   
   Team getTeamByName(String name);
   
-  Team[] getTeamsOfUser(String userName);
+  @Nonnull
+  Set<Team> getTeamsOfUser(String userName);
+  
+  @Nonnull
+  Set<Team> getCoordinatorTeamsOfUser(String userName);
   
 }

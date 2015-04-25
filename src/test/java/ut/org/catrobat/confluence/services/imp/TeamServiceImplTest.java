@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.atlassian.activeobjects.test.TestActiveObjects;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
@@ -76,15 +78,30 @@ public class TeamServiceImplTest {
     //arrange
     String userName = "user_x";
     Mockito.when(userAccessor.getGroupNamesForUserName(userName)).thenReturn(groups);
-    Team[] expectedTeams = new Team[2];
-    expectedTeams[0] = catroid;
-    expectedTeams[1] = html5;
+    Set<Team> expectedTeams = new HashSet<Team>(2);
+    expectedTeams.add(catroid);
+    expectedTeams.add(html5);
     
-    //act
-    Team[] teams = service.getTeamsOfUser(userName);
+    Set<Team> teams = service.getTeamsOfUser(userName);
     
     //assert
-    Assert.assertArrayEquals(expectedTeams, teams);
+    Assert.assertEquals(expectedTeams, teams);
+	}
+	
+  @Test
+	public void testGetCoordinatorTeamsOfUser() throws Exception
+	{
+    //arrange
+    String userName = "user_x";
+    Mockito.when(userAccessor.getGroupNamesForUserName(userName)).thenReturn(groups);
+    Set<Team> expectedTeams = new HashSet<Team>(1);
+    expectedTeams.add(html5);
+    
+    //act
+    Set<Team> teams = service.getCoordinatorTeamsOfUser(userName);
+    
+    //assert
+    Assert.assertEquals(expectedTeams, teams);
     
 	}
 }

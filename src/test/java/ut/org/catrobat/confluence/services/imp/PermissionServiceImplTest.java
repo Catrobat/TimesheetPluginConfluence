@@ -1,4 +1,4 @@
-package ut.org.catrobat.confluence.rest;
+package ut.org.catrobat.confluence.services.imp;
 
 import net.java.ao.EntityManager;
 import static org.junit.Assert.*;

@@ -46,7 +46,14 @@ public class TimesheetServlet extends HttpServlet {
     }
 
     Map<String, Object> paramMap = Maps.newHashMap();
+    
     Timesheet sheet = sheetService.getTimesheetByUser(userKey.getStringValue());
+    
+    if(sheet == null) {
+      //todo: check if user is in timesheet group
+      sheet = sheetService.add(userKey.getStringValue(), 150, 0, "");
+    }
+    
     paramMap.put("timesheetid", sheet.getID());
     response.setContentType("text/html;charset=utf-8");
     templateRenderer.render("timesheet.vm", paramMap, response.getWriter());

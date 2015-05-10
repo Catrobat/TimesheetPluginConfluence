@@ -59,7 +59,7 @@ public class TeamServiceImpl implements TeamService{
     Set<Team> teams = new HashSet<Team>();
     
     for(String groupName : userAccessor.getGroupNamesForUserName(userName)) {
-      String teamName = groupName.split("-")[0].toLowerCase();
+      String teamName = groupName.split("-")[0];
       Team team = getTeamByName(teamName);
       if(team != null) {
         teams.add(team);

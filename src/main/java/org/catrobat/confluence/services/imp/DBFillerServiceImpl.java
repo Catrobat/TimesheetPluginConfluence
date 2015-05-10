@@ -53,7 +53,8 @@ public class DBFillerServiceImpl implements DBFillerService{
     Category c8 = cs.add("Refactoring");
     
     Team t1 = ts.add("Catroid");
-    Team t2 = ts.add("HTML5");
+    Team t2 = ts.add("HTML5Scratch");
+    Team t3 = ts.add("IRC");
 
     //categories of team1
     CategoryToTeam c2t1 = ao.create(CategoryToTeam.class);
@@ -98,6 +99,12 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t9.setTeam(t2);
     c2t9.setCategory(c8);
     c2t9.save();
+    
+    //team 4
+    CategoryToTeam c2t10 = ao.create(CategoryToTeam.class);
+    c2t10.setTeam(t3);
+    c2t10.setCategory(c6);
+    c2t10.save();
     
     UserKey key = um.getRemoteUserKey();
     if(key != null) {

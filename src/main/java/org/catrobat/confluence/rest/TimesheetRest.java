@@ -73,7 +73,9 @@ public class TimesheetRest {
     
     List<JsonTeam> teams = new LinkedList<JsonTeam>();
     
-    for(Team team : teamService.all()) {
+    String userName = userManager.getRemoteUser().getUsername();
+
+    for(Team team : teamService.getTeamsOfUser(userName)) {
       Category[] categories = team.getCategories();
       int[] categoryIDs = new int[categories.length];
       for(int i = 0; i < categories.length; i++) {

@@ -59,15 +59,15 @@ public class TeamServiceImplTest {
 		public void update(EntityManager em) throws Exception {
 			em.migrate(Team.class);
       catroid = em.create(Team.class);
-      catroid.setTeamName("catroid");
+      catroid.setTeamName("Catroid");
       catroid.save();
       
       html5 = em.create(Team.class);
-      html5.setTeamName("html5");
+      html5.setTeamName("HTML5");
       html5.save();
       
       drone = em.create(Team.class);
-      drone.setTeamName("drone");
+      drone.setTeamName("Drone");
       drone.save();
 		}
 	}

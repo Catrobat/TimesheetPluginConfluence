@@ -76,7 +76,7 @@ public class TeamServiceImpl implements TeamService{
     for(String groupName : userAccessor.getGroupNamesForUserName(userName)) {
       String[] pieces = groupName.split("-");
       
-      String teamName = pieces[0].toLowerCase();
+      String teamName = pieces[0];
       String roleName = (pieces.length > 1) ? pieces[1].toLowerCase() : "";
       
       if (!roleName.equalsIgnoreCase("administrators") 

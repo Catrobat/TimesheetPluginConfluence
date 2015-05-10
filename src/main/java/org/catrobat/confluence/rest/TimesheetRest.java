@@ -133,7 +133,7 @@ public class TimesheetRest {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
     
-    TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet)
+    TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet);
     
     List<JsonTimesheetEntry> jsonEntries = new ArrayList<JsonTimesheetEntry>(entries.length); 
     

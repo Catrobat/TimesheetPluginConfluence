@@ -19,7 +19,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 @SuppressWarnings("unused")
 @XmlRootElement
@@ -29,7 +28,7 @@ public final class JsonTimesheet {
 	@XmlElement
 	private int timesheetID;
 	@XmlElement
-	private String userKey;
+	private String lectures;
 	@XmlElement
 	private int targetHourPractice;
 	@XmlElement
@@ -37,55 +36,52 @@ public final class JsonTimesheet {
 	@XmlElement
 	private boolean isActive;
 
-	public JsonTimesheet() {
-	}
-	
-	public JsonTimesheet(int timesheetID, String userKey, int targetHourPractice, int targetHourTheory, boolean isActive) {
-		this.timesheetID = timesheetID;
-		this.userKey = userKey;
-		this.targetHourPractice = targetHourPractice;
-		this.targetHourTheory = targetHourTheory;
-		this.isActive = isActive;
-	}
-	
-	public int getTimesheetID() {
-		return timesheetID;
-	}
+  public JsonTimesheet(int timesheetID, int targetHourPractice, int targetHourTheory, String lectures, boolean isActive) {
+    this.timesheetID = timesheetID;
+    this.targetHourPractice = targetHourPractice;
+    this.targetHourTheory = targetHourTheory;
+    this.lectures = lectures;
+    this.isActive = isActive;
+  }
+  
+  public int getTimesheetID() {
+    return timesheetID;
+  }
 
-	public void setTimesheetID(int timesheetID) {
-		this.timesheetID = timesheetID;
-	}
+  public void setTimesheetID(int timesheetID) {
+    this.timesheetID = timesheetID;
+  }
 
-	public String getUserKey() {
-		return userKey;
-	}
+  public int getTargetHourPractice() {
+    return targetHourPractice;
+  }
 
-	public void setUserKey(String userKey) {
-		this.userKey = userKey;
-	}
+  public void setTargetHourPractice(int targetHourPractice) {
+    this.targetHourPractice = targetHourPractice;
+  }
 
-	public int getTargetHourPractice() {
-		return targetHourPractice;
-	}
+  public int getTargetHourTheory() {
+    return targetHourTheory;
+  }
 
-	public void setTargetHourPractice(int targetHourPractice) {
-		this.targetHourPractice = targetHourPractice;
-	}
+  public void setTargetHourTheory(int targetHourTheory) {
+    this.targetHourTheory = targetHourTheory;
+  }
 
-	public int getTargetHourTheory() {
-		return targetHourTheory;
-	}
+  public String getLectures() {
+    return lectures;
+  }
 
-	public void setTargetHourTheory(int targetHourTheory) {
-		this.targetHourTheory = targetHourTheory;
-	}
+  public void setLectures(String lectures) {
+    this.lectures = lectures;
+  }
 
-	public boolean isIsActive() {
-		return isActive;
-	}
+  public boolean isIsActive() {
+    return isActive;
+  }
 
-	public void setIsActive(boolean isActive) {
-		this.isActive = isActive;
-	}
+  public void setIsActive(boolean isActive) {
+    this.isActive = isActive;
+  }
 
 }

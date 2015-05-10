@@ -11,7 +11,7 @@ public interface PermissionService {
 
   public Response checkPermission(HttpServletRequest request);
   
-  public boolean userCanEditTimesheet(UserProfile user, Timesheet sheet);
+  public boolean userCanViewTimesheet(UserProfile user, Timesheet sheet);
 
   public Response userCanAddTimesheetEntry(UserProfile user, Timesheet sheet, JsonTimesheetEntry entry);
   

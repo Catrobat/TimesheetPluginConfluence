@@ -69,13 +69,11 @@ public class PermissionServiceImpl implements PermissionService {
   }
   
   @Override
-  //probably rename this method. its view timesheet.
-  //and change return type
-  public boolean userCanEditTimesheet(UserProfile user, Timesheet sheet) {
-    if (userOwnsSheet(user, sheet) || userIsAdmin(user))
-      return true; 
-    
-    return userCoordinatesTeamsOfSheet(user, sheet);
+  public boolean userCanViewTimesheet(UserProfile user, Timesheet sheet) {
+    return user != null && sheet != null && 
+        (userOwnsSheet(user, sheet) 
+        || userIsAdmin(user) 
+        || userCoordinatesTeamsOfSheet(user, sheet));
   } 
   
   @Override

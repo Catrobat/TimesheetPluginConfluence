@@ -19,48 +19,109 @@ AJS.toInit(function () {
 function initTable() {
   //do something with ajax over here
   //sample data
-  var timesheetData = {
-    timesheetID: 1,
-    userKey: "admin",
-    targetHourPractice: 150,
-    targetHourTheory: 0,
-    lecture: "Project Softwaretechnologie",
-    entries: [
-      {
-        entryID: 1,
-        beginDate : new Date("2015-03-02 09:00"),
-        endDate   : new Date("2015-03-02 10:30"),
-        description : "Weekly Meeting",
-        pauseMinutes : 15,
-        durationDate : new Date(75 * 60 * 1000),
-        teamID : 7,
-        categoryID : 7
-      },
-      {
-        entryID: 2,
-        beginDate : new Date("2015-03-02 10:30"),
-        endDate :   new Date("2015-03-02 12:30"),
-        description : "Pair Programming with X",
-        pauseMinutes : 0,
-        durationDate : new Date(120 * 60 * 1000),
-        teamID : 8,
-        categoryID : 1
-      }
-    ], 
-    teams: {
-      7: {teamName: "Pocket Code", teamCategories : [1, 3, 7, 8, 5]},
-      8: {teamName: "Scratch MIT HTML5", teamCategories : [1, 3, 7]}
-    },
-    categories : {
-      1: {categoryName : "Pair Programming"}, 
-      3: {categoryName : "Programming"}, 
-      7: {categoryName : "Meeting"}, 
-      8: {categoryName : "Theory (MT)"}, 
-      5: {categoryName : "Other"} 
-    }
-  };
+//  var timesheetID = 1;
   
-  populateTable(timesheetData);
+  var timesheetFetched = AJS.$.ajax({
+      type: 'GET',
+      url: restBaseUrl + 'timesheets/' + timesheetID,
+      contentType: "application/json"
+    });
+    
+  var entriesFetched = AJS.$.ajax({
+      type: 'GET',
+      url: restBaseUrl + 'timesheets/' + timesheetID + '/entries' ,
+      contentType: "application/json"
+    });
+    
+  var categoriesFetched = AJS.$.ajax({
+      type: 'GET',
+      url: restBaseUrl + 'categories',
+      contentType: "application/json"
+    });
+
+  var teamsFetched = AJS.$.ajax({
+      type: 'GET',
+      url: restBaseUrl + 'teams',
+      contentType: "application/json"
+    });
+    
+  var allPromises = AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched);
+  
+  allPromises
+    .done(function(timesheetReply, categoriesReply, teamsReply, entriesReply) {
+      var timesheetData = timesheetReply[0];
+      
+      timesheetData.entries    = entriesReply[0];
+      timesheetData.categories = [];
+      timesheetData.teams      = [];
+      
+      categoriesReply[0].map(function(category){
+        timesheetData.categories[category.categoryID] = {
+          categoryName: category.categoryName
+        }; 
+      }); 
+      
+      teamsReply[0].map(function(team){
+        timesheetData.teams[team.teamID] = {
+          teamName       : team.teamName, 
+          teamCategories : team.teamCategories 
+        }; 
+      }); 
+      
+      populateTable(timesheetData);
+    })
+    .fail(function(error){
+      AJS.messages.error({
+          title: 'There was an error.',
+          body: '<p>Reason: ' + error.responseText + '</p>'
+      });
+      console.log(error);
+    }); 
+//    .always(function(){
+//    });
+  
+//  var timesheetData = {
+//    timesheetID: 1,
+//    userKey: "admin",
+//    targetHourPractice: 150,
+//    targetHourTheory: 0,
+//    lecture: "Project Softwaretechnologie",
+//    entries: [
+//      {
+//        entryID: 1,
+//        beginDate : new Date("2015-03-02 09:00"),
+//        endDate   : new Date("2015-03-02 10:30"),
+//        description : "Weekly Meeting",
+//        pauseMinutes : 15,
+//        durationDate : new Date(75 * 60 * 1000),
+//        teamID : 7,
+//        categoryID : 7
+//      },
+//      {
+//        entryID: 2,
+//        beginDate : new Date("2015-04-10 10:30"),
+//        endDate :   new Date("2015-04-10 12:30"),
+//        description : "Pair Programming with X",
+//        pauseMinutes : 0,
+//        durationDate : new Date(120 * 60 * 1000),
+//        teamID : 8,
+//        categoryID : 1
+//      }
+//    ], 
+//    teams: {
+//      7: {teamName: "Pocket Code", teamCategories : [1, 3, 7, 8, 5]},
+//      8: {teamName: "Scratch MIT HTML5", teamCategories : [1, 3, 7]}
+//    },
+//    categories : {
+//      1: {categoryName : "Pair Programming"}, 
+//      3: {categoryName : "Programming"}, 
+//      7: {categoryName : "Meeting"}, 
+//      8: {categoryName : "Theory (MT)"}, 
+//      5: {categoryName : "Other"} 
+//    }
+//  };
+//  
+//  populateTable(timesheetData);
   
 }
 

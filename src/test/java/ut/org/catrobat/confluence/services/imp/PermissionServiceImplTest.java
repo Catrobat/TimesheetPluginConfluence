@@ -123,25 +123,25 @@ public class PermissionServiceImplTest {
 	@Test
 	public void testOwnerCanEditTimesheet() throws Exception
 	{
-    assertTrue(permissionService.userCanEditTimesheet(owner, sheet));
+    assertTrue(permissionService.userCanViewTimesheet(owner, sheet));
 	}
   
 	@Test
 	public void testCoordinatorCanEditTimesheet() throws Exception
 	{
-    assertTrue(permissionService.userCanEditTimesheet(coord, sheet));
+    assertTrue(permissionService.userCanViewTimesheet(coord, sheet));
 	}
   
 	@Test
 	public void testAdminCanEditTimesheet() throws Exception
 	{
-    assertTrue(permissionService.userCanEditTimesheet(admin, sheet));
+    assertTrue(permissionService.userCanViewTimesheet(admin, sheet));
 	}
   
 	@Test
 	public void testEveCantEditTimesheet() throws Exception
 	{
-    assertFalse(permissionService.userCanEditTimesheet(eve, sheet));
+    assertFalse(permissionService.userCanViewTimesheet(eve, sheet));
 	}
 	
 }

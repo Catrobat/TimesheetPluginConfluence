@@ -34,7 +34,7 @@ public class TeamServiceImpl implements TeamService{
 
 	@Override
 	public List<Team> all() {
-		return newArrayList(ao.find(Team.class, Query.select().order("\"TEAM_NAME\" ASC")));
+		return newArrayList(ao.find(Team.class, Query.select().order("TEAM_NAME ASC")));
 	}
 
   @Override

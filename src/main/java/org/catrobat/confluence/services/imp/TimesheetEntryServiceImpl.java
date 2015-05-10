@@ -3,6 +3,7 @@ package org.catrobat.confluence.services.imp;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import java.util.Date;
 import javax.annotation.Nullable;
+import net.java.ao.Query;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.Timesheet;
@@ -68,4 +69,16 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 		return entry;
 		
 	}
+
+  @Override
+  public TimesheetEntry[] getEntriesBySheet(Timesheet sheet) {
+    if(sheet == null) return new TimesheetEntry[0];
+    return ao.find(
+        TimesheetEntry.class, 
+        Query.select()
+            .where("TIME_SHEET_ID = ?", sheet.getID())
+            .order("BEGIN_DATE DESC")
+    );
+  }
+  
 }

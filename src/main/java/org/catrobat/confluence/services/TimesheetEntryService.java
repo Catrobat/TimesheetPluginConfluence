@@ -20,4 +20,7 @@ public interface TimesheetEntryService
       Category category, String description, int pause, Team team);
   
   TimesheetEntry getEntryByID(int entryID);
+  
+  TimesheetEntry[] getEntriesBySheet(Timesheet sheet);
+  
 }

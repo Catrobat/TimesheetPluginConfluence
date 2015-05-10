@@ -34,9 +34,6 @@ public final class JsonTimesheetEntry {
 
   @XmlElement
 	private Date endDate;
-  
-  @XmlElement
-	private Date durationDate;
 
   @XmlElement
 	private int pauseMinutes;
@@ -53,11 +50,10 @@ public final class JsonTimesheetEntry {
   public JsonTimesheetEntry() {
   }
 
-  public JsonTimesheetEntry(int entryID, Date beginDate, Date endDate, Date duration, int pauseMinutes, String description, int teamID, int categoryID) {
+  public JsonTimesheetEntry(int entryID, Date beginDate, Date endDate, int pauseMinutes, String description, int teamID, int categoryID) {
     this.entryID = entryID;
     this.beginDate = beginDate;
     this.endDate = endDate;
-    this.durationDate = duration;
     this.pauseMinutes = pauseMinutes;
     this.description = description;
     this.teamID = teamID;
@@ -86,14 +82,6 @@ public final class JsonTimesheetEntry {
 
   public void setEndDate(Date endDate) {
     this.endDate = endDate;
-  }
-
-  public Date getDurationDate() {
-    return durationDate;
-  }
-
-  public void setDurationDate(Date durationDate) {
-    this.durationDate = durationDate;
   }
 
   public int getPauseMinutes() {

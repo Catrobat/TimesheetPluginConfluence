@@ -131,17 +131,18 @@ public class TimesheetRest {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
     
-    List<JsonTimesheetEntry> entries = new ArrayList<JsonTimesheetEntry>(sheet.getEntries().length); 
+    TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet)
     
-    for(TimesheetEntry entry : sheet.getEntries()) {
-      entries.add(new JsonTimesheetEntry(entry.getID(), entry.getBeginDate(), 
-          entry.getEndDate(), null, entry.getPauseMinutes(), 
+    List<JsonTimesheetEntry> jsonEntries = new ArrayList<JsonTimesheetEntry>(entries.length); 
+    
+    for(TimesheetEntry entry : entries) {
+      jsonEntries.add(new JsonTimesheetEntry(entry.getID(), entry.getBeginDate(), 
+          entry.getEndDate(), entry.getPauseMinutes(), 
           entry.getDescription(), entry.getTeam().getID(), 
           entry.getCategory().getID()));
     }
     
-    
-    return Response.ok(entries).build();
+    return Response.ok(jsonEntries).build();
   }
   
   @POST

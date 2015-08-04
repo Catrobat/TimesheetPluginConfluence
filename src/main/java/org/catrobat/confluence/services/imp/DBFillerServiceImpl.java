@@ -55,6 +55,7 @@ public class DBFillerServiceImpl implements DBFillerService{
     Team t1 = ts.add("Catroid");
     Team t2 = ts.add("HTML5Scratch");
     Team t3 = ts.add("IRC");
+    Team t4 = ts.add("Arduino");
 
     //categories of team1
     CategoryToTeam c2t1 = ao.create(CategoryToTeam.class);
@@ -100,11 +101,34 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t9.setCategory(c8);
     c2t9.save();
     
-    //team 4
+    //team3
     CategoryToTeam c2t10 = ao.create(CategoryToTeam.class);
     c2t10.setTeam(t3);
     c2t10.setCategory(c6);
     c2t10.save();
+    
+    CategoryToTeam c2t11 = ao.create(CategoryToTeam.class);
+    c2t11.setTeam(t3);
+    c2t11.setCategory(c7);
+    c2t11.save();
+    
+    //team arduino
+    CategoryToTeam c2t12 = ao.create(CategoryToTeam.class);
+    c2t12.setTeam(t4);
+    c2t12.setCategory(c1);
+    c2t12.save();
+    CategoryToTeam c2t13 = ao.create(CategoryToTeam.class);
+    c2t13.setTeam(t4);
+    c2t13.setCategory(c2);
+    c2t13.save();
+    CategoryToTeam c2t14 = ao.create(CategoryToTeam.class);
+    c2t14.setTeam(t4);
+    c2t14.setCategory(c3);
+    c2t14.save();
+    CategoryToTeam c2t15 = ao.create(CategoryToTeam.class);
+    c2t15.setTeam(t4);
+    c2t15.setCategory(c4);
+    c2t15.save();
     
     UserKey key = um.getRemoteUserKey();
     if(key != null) {

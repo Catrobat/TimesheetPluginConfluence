@@ -221,7 +221,9 @@ public class TimesheetRest {
 
       System.out.println("after default data: ");
       dbfiller.printDBStatus();
+      return Response.ok("cleanandinitdb").build();
+    } else {
+      return Response.ok("youre not admin").build();
     }
-    return Response.ok("cleanandinitdb").build();
   }
 }

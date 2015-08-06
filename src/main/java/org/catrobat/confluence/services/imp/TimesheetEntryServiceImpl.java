@@ -80,5 +80,10 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
             .order("BEGIN_DATE DESC")
     );
   }
+
+  @Override
+  public void delete(TimesheetEntry entry) {
+    ao.delete(entry);
+  }
   
 }

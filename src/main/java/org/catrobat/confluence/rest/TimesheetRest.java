@@ -9,6 +9,7 @@ import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -162,8 +163,16 @@ public class TimesheetRest {
     if(unauthorized != null) return unauthorized;
 
     Category category = categoryService.getCategoryByID(entry.getCategoryID());
-    Team team         = teamService.getTeamByID(entry.getTeamID());
+    Team team = teamService.getTeamByID(entry.getTeamID());
 
+    if(team == null) {
+      return Response.status(Response.Status.FORBIDDEN).entity("Team does not exist.").build();
+    }
+    
+    if(!Arrays.asList(team.getCategories()).contains(category)) {
+      return Response.status(Response.Status.FORBIDDEN).entity("Category is not associated with Team.").build();
+    }
+    
     TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(), 
         entry.getEndDate(), category, entry.getDescription(), 
         entry.getPauseMinutes(), team);
@@ -196,12 +205,46 @@ public class TimesheetRest {
     
     Category category = categoryService.getCategoryByID(jsonEntry.getCategoryID());
     Team team         = teamService.getTeamByID(jsonEntry.getTeamID());
+    
+    if(team == null) {
+      return Response.status(Response.Status.FORBIDDEN).entity("Team does not exist.").build();
+    }
+    
+    if(!Arrays.asList(team.getCategories()).contains(category)) {
+      return Response.status(Response.Status.FORBIDDEN).entity("Category is not associated with Team.").build();
+    }
 
     entryService.edit(entryID, sheet, jsonEntry.getBeginDate(), 
         jsonEntry.getEndDate(), category, jsonEntry.getDescription(), 
         jsonEntry.getPauseMinutes(), team);
     
     return Response.ok(jsonEntry).build();
+  }
+  
+  @DELETE
+  @Path("timesheets/{timesheetID}/entries/{entryID}")
+  public Response deleteTimesheetEntry(@Context HttpServletRequest request, 
+      @PathParam("timesheetID") int timesheetID, 
+      @PathParam("entryID") int entryID) {
+    
+    Response unauthorized = permissionService.checkPermission(request);
+    if(unauthorized != null) return unauthorized;
+    
+    UserProfile    user  = userManager.getRemoteUser(request); 
+    TimesheetEntry entry = entryService.getEntryByID(entryID);
+    Timesheet      sheet = sheetService.getTimesheetByID(timesheetID);
+    
+    if(!entry.getTimeSheet().equals(sheet)) {
+      return Response.status(Response.Status.FORBIDDEN)
+        .entity("You cannot delete an entry of a different timesheet").build();
+    }
+    
+    unauthorized = permissionService.userCanEditTimesheetEntry(user, entry);
+    if(unauthorized != null) return unauthorized;
+    
+    entryService.delete(entry);
+    
+    return Response.ok().build();
   }
   
   @GET

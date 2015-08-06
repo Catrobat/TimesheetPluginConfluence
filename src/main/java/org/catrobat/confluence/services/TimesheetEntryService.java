@@ -23,4 +23,6 @@ public interface TimesheetEntryService
   
   TimesheetEntry[] getEntriesBySheet(Timesheet sheet);
   
+  void delete(TimesheetEntry entry);
+  
 }

@@ -40,6 +40,13 @@
           {param icon: 'edit' /}
         {/call}
       </button>
+      <button class="aui-button aui-button-subtle delete"> 
+        {call aui.icons.icon} 
+          {param useIconFont: true /} 
+          {param icon: 'remove-label' /} 
+        {/call} 
+      </button>
+      <span class="aui-icon aui-icon-wait">Loading...</span>
     </td>
   </tr>
 {/template}
@@ -64,15 +71,13 @@
     <td>
       <input class="duration text" type="text" disabled="disabled" value="{$entry.duration}" />
     </td>
-    {if length(keys($teams)) > 1} 
-      <td class="team">
-        <select class="team">
+    <td class="team">
+      <select class="team">
         {foreach $key in keys($teams)}
           <option value="{$key}">{$teams[$key].teamName}</option>
         {/foreach}
-        </select>
-      </td>
-    {/if} 
+      </select>
+    </td>
     <td>
       <span class="category"></span>
     </td>

@@ -297,13 +297,17 @@ function prepareFormTemplate(entry, teams, categories) {
   
   var initTeamId = (entry.teamID !== undefined) ? entry.teamID : Object.keys(teams)[0]; 
   
-  teamSelect
-    .auiSelect2()
-    .change(function(){
-      updateCategoryOptions(this.value);
-    })
-    .auiSelect2("val", initTeamId)
-    .trigger('change');
+  var amountOfTeams = teams.filter(function(v) {return v !== undefined}).length;
+  if(amountOfTeams > 2) {
+    teamSelect
+      .auiSelect2()
+      .change(function(){ updateCategoryOptions(this.value); })
+      .auiSelect2("val", initTeamId);
+  } else {
+    row.find("td.team").hide();
+  }
+  
+  updateCategoryOptions(initTeamId);
     
   return  {
     row              : row,
@@ -320,28 +324,64 @@ function prepareFormTemplate(entry, teams, categories) {
   };
 }
 
+function editEntryClicked(entryRow) {
+  entryRow.viewRow.hide();
+  entryRow.formRow.show();
+} 
+
+function deleteEntryClicked(entryRow, timesheetID, entryID ) {
+  
+  var ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entryID;  
+  
+  var spinner = entryRow.viewRow.find('span.aui-icon-wait');
+  spinner.show();
+  
+  AJS.$.ajax({
+    type: 'DELETE',
+    url: ajaxUrl,
+    contentType: "application/json"
+  })
+  .then(function() {
+    entryRow.viewRow.remove();
+    entryRow.formRow.remove();
+  })
+  .fail(function(error){
+    AJS.messages.error({
+        title: 'There was an error while deleting.',
+        body: '<p>Reason: ' + error.responseText + '</p>'
+    });
+    console.log(error);
+    spinner.hide();
+  });
+}
+
 /**
  * creates a view row (for viewing) and a form row (for editing)
- * @param {type} timesheetID
- * @param {type} entry
- * @param {type} categories
- * @param {type} teams
+ * @param {Number} timesheetID
+ * @param {Object} entry
+ * @param {Array} categories
+ * @param {Array} teams
  * @returns {viewrow : jquery, formrow : jquery}
  */
 function renderEntryRow(timesheetID, entry, categories, teams) {
 
   prepareEntryObjectForView(entry, categories, teams);
   
-  var viewRow = renderViewRow(entry, categories, teams);
-  var formRow = renderFormRow(timesheetID, entry, teams, categories, 'put');
-  formRow.hide();
+  var entryRow = {};
+  entryRow.viewRow = renderViewRow(entry, categories, teams);
+  entryRow.formRow = renderFormRow(timesheetID, entry, teams, categories, 'put');
   
-  viewRow.find("button.edit").click(function() {
-    viewRow.hide();
-    formRow.show();
+  entryRow.formRow.hide();
+  
+  entryRow.viewRow.find("button.edit").click(function() {
+    editEntryClicked(entryRow);
+  });
+  
+  entryRow.viewRow.find("button.delete").click(function() {
+    deleteEntryClicked(entryRow, timesheetID, entry.entryID);    
   });
    
-  return {viewRow: viewRow, formRow: formRow };
+  return entryRow;
 }
 
 function prepareEntryObjectForView(entry, categories, teams) {
@@ -368,8 +408,12 @@ function renderViewRow(entry, categories, teams) {
   
   prepareEntryObjectForView(entry, categories, teams);
   
-  return AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
+  var viewRow = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
           {entry : entry, teams : teams}));
+  
+  viewRow.find('span.aui-icon-wait').hide();
+  
+  return viewRow;
 } 
 
 function toUTCTimeString(date) {

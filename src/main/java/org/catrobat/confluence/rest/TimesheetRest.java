@@ -5,7 +5,6 @@
  */
 package org.catrobat.confluence.rest;
 
-import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import java.util.ArrayList;
@@ -43,8 +42,8 @@ public class TimesheetRest {
   private final DBFillerService dbfiller;
 
   public TimesheetRest(TimesheetEntryService es, TimesheetService ss, 
-      CategoryService cs, UserAccessor ua, TeamService teamService, 
-      UserManager um, TeamService ts, PermissionService ps, DBFillerService df) {
+      CategoryService cs, UserManager um, TeamService ts, 
+      PermissionService ps, DBFillerService df) {
     this.userManager = um;
     this.teamService = ts;
     this.entryService = es;
@@ -54,12 +53,6 @@ public class TimesheetRest {
     this.dbfiller = df;
   }
   
-  @GET
-  @Path("timesheets")
-  public Response getTimesheets() {
-    return Response.ok("Hello World").build();
-  }
-
   @GET
   @Path("helloworld")
   public Response doHelloWorld() {
@@ -74,8 +67,14 @@ public class TimesheetRest {
     
     List<JsonTeam> teams = new LinkedList<JsonTeam>();
     
-    String userName = userManager.getRemoteUser().getUsername();
+    UserProfile userProfile = userManager.getRemoteUser();
 
+    if(userProfile == null) {
+      return Response.status(Response.Status.FORBIDDEN).entity("Userprofile does not exist.").build();
+    }
+    
+    String userName = userProfile.getUsername();
+ 
     for(Team team : teamService.getTeamsOfUser(userName)) {
       Category[] categories = team.getCategories();
       int[] categoryIDs = new int[categories.length];

@@ -18,8 +18,8 @@ import org.catrobat.confluence.activeobjects.TimesheetEntry;
 
 public class TimesheetEntryImplTest {
 
-  private EntityManager entityManager;
-  private ActiveObjects ao;
+	private EntityManager entityManager;
+	private ActiveObjects ao;
 	private SimpleDateFormat sdf;
 	private TimesheetEntry entry;
 

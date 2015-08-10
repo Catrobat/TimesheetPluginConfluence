@@ -122,4 +122,26 @@ public class TimesheetServiceImplTest {
 		//Assert
 		assertNull(missingSheet);
 	}
+	
+  @Test
+	public void testGetTimesheetByID() throws Exception
+	{
+		//Act
+		Timesheet[] sheets = ao.find(Timesheet.class, "USER_KEY = ?", "USER_000");
+    Timesheet refSheet = sheets[0];
+    Timesheet checkSheet = service.getTimesheetByID(refSheet.getID());
+    
+		//Assert
+    assertEquals(refSheet, checkSheet);
+	}
+  
+  @Test
+	public void testGetTimesheetByMissingID() throws Exception
+	{
+		//Act
+    Timesheet sheet = service.getTimesheetByID(12345);
+    
+		//Assert
+    assertNull(sheet);
+	}
 }

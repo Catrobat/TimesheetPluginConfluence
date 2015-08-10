@@ -38,5 +38,13 @@ public interface TimesheetService
 	 */
 	@Nullable
 	Timesheet getTimesheetByUser(String userKey);
+  
+  /**
+   * Returns a timesheet with the corresponding id
+   * @param id
+   * @return 
+   */
+	@Nullable
+  Timesheet getTimesheetByID(int id);
 
 }

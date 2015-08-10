@@ -14,8 +14,6 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 			em.migrate(Category.class);
 			em.migrate(CategoryToTeam.class);
 			em.migrate(Team.class);
-			em.migrate(Group.class);
-			em.migrate(GroupToTeam.class);
 			em.migrate(TimesheetEntry.class);
 
 			Timesheet chrisSheet = em.create(Timesheet.class);

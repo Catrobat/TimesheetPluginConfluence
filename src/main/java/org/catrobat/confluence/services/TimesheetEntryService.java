@@ -15,4 +15,14 @@ public interface TimesheetEntryService
 {
 	TimesheetEntry add(Timesheet sheet, Date begin, Date end, Category category,
 					String description, int pause, Team team);
+	
+  TimesheetEntry edit(int entryID, Timesheet sheet, Date begin, Date end, 
+      Category category, String description, int pause, Team team);
+  
+  TimesheetEntry getEntryByID(int entryID);
+  
+  TimesheetEntry[] getEntriesBySheet(Timesheet sheet);
+  
+  void delete(TimesheetEntry entry);
+  
 }

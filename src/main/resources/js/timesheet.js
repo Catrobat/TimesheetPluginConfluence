@@ -85,7 +85,7 @@ function populateTable(timesheetData) {
 	var timesheetTableBody = timesheetTable.find("tbody");
 	timesheetTableBody.empty();
 
-	var firstForm = renderFormRow(timesheetData, {
+	var emptyEntry = {
 		entryID: "new-id",
 		date: "",
 		begin: "",
@@ -93,7 +93,15 @@ function populateTable(timesheetData) {
 		pause: "00:00",
 		description: "",
 		duration: ""
-	}, 'post');
+	};
+
+	var addNewEntryOptions = {
+		httpMethod : "post",
+		callback   : addNewEntryCallback,
+		ajaxUrl    : restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entries/"
+	};
+	
+	var firstForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
 
 	timesheetTableBody.append(firstForm);
 
@@ -106,58 +114,61 @@ function populateTable(timesheetData) {
 }
 
 /**
+ * Callback after creating new Entry
+ * @param {Object} entry
+ * @param {Object} timesheetData
+ * @param {jQuery} form
+ */
+function addNewEntryCallback(entry, timesheetData, form) {
+	var entryRow = renderEntryRow(timesheetData, entry);
+	var beginTime = form.beginTimeField.timepicker('getTime');
+	var endTime = form.endTimeField.timepicker('getTime');
+
+	form.row.after(entryRow.formRow);
+	form.row.after(entryRow.viewRow);
+	form.beginTimeField.timepicker('setTime', endTime);
+	form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
+	form.pauseTimeField.val("00:00").trigger('change');
+}
+
+/**
+ * Callback after editing an entry
+ * @param {Object} entry
+ * @param {Object} timesheetData
+ * @param {jQuery} form
+ */
+function editEntryCallback(entry, timesheetData, form) {
+	var newViewRow = renderViewRow(entry, timesheetData.categories, timesheetData.teams);
+
+	form.row.prev().remove();
+	form.row.before(newViewRow).hide();
+
+	newViewRow.find("button.edit").click(function () {
+		newViewRow.hide();
+		form.row.show();
+	});
+}
+
+/**
  * creates a form with working ui components and instrumented buttons
  * @param {Object} timesheetData
  * @param {Object} entry
- * @param {string} mode
- *      'post': creates a new entry
- *      'put' : updates an existing entry
+ * @param {Object} saveOptions
+ *           callback   : Function(entry, timesheetData, form)
+ *           ajaxUrl    : String
+ *           httpMethod : String
  * @returns {jquery} form
  */
-function renderFormRow(timesheetData, entry, mode) {
+function renderFormRow(timesheetData, entry, saveOptions) {
 
-	var ajaxUrl, saveCallback;
 	var teams = timesheetData.teams;
 	var categories = timesheetData.categories;
-	var timesheetID = timesheetData.timesheetID;
 
-	if (entry.pause === "")
+	if (entry.pause === "") {
 		entry.pause = "00:00";
+	}
 
 	var form = prepareFormTemplate(entry, teams, categories);
-
-	if (mode === 'post') {
-
-		ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries";
-
-		saveCallback = function (entry) {
-			var entryRow = renderEntryRow(timesheetData, entry);
-			var beginTime = form.beginTimeField.timepicker('getTime');
-			var endTime = form.endTimeField.timepicker('getTime');
-			form.row.after(entryRow.formRow);
-			form.row.after(entryRow.viewRow);
-			form.beginTimeField.timepicker('setTime', endTime);
-			form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
-			form.pauseTimeField.val("00:00").trigger('change');
-		};
-
-	} else if (mode === 'put') {
-
-		ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entry.entryID;
-
-		saveCallback = function (entry) {
-			var newViewRow = renderViewRow(entry, categories, teams);
-
-			form.row.prev().remove();
-			form.row.before(newViewRow).hide();
-
-			newViewRow.find("button.edit").click(function () {
-				newViewRow.hide();
-				form.row.show();
-			});
-		};
-
-	}
 
 	form.saveButton.click(function () {
 
@@ -184,12 +195,14 @@ function renderFormRow(timesheetData, entry, mode) {
 		form.loadingSpinner.show();
 
 		AJS.$.ajax({
-			type: mode,
-			url: ajaxUrl,
+			type: saveOptions.httpMethod,
+			url:  saveOptions.ajaxUrl,
 			contentType: "application/json",
 			data: JSON.stringify(entry)
 		})
-		.then(saveCallback)
+		.then(function(entry) {
+			saveOptions.callback(entry, timesheetData, form);
+		})
 		.fail(function (error) {
 			AJS.messages.error({
 				title: 'There was an error while saving.',
@@ -362,7 +375,7 @@ function deleteEntryClicked(entryRow, timesheetID, entryID) {
 
 /**
  * creates a view row (for viewing) and a form row (for editing)
- * @param {Number} timesheetData
+ * @param {Object} timesheetData
  * @param {Object} entry
  * @returns {viewrow : jquery, formrow : jquery}
  */
@@ -374,9 +387,15 @@ function renderEntryRow(timesheetData, entry) {
 
 	prepareEntryObjectForView(entry, categories, teams);
 
+	var editEntryOptions = {
+		httpMethod : "put",
+		callback   : editEntryCallback,
+		ajaxUrl    : restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entries/" + entry.entryID
+	};
+
 	var entryRow = {};
+	entryRow.formRow = renderFormRow(timesheetData, entry, editEntryOptions);
 	entryRow.viewRow = renderViewRow(entry, categories, teams);
-	entryRow.formRow = renderFormRow(timesheetData, entry, 'put');
 
 	entryRow.formRow.hide();
 

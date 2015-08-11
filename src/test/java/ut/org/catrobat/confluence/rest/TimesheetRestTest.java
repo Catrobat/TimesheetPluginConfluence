@@ -86,13 +86,15 @@ public class TimesheetRestTest {
     Mockito.when(team2.getCategories()).thenReturn(new Category[0]);
 
     Set<Team> teams = new HashSet<Team>();
-    teams.add(team2);
     teams.add(team1);
+    teams.add(team2);
 
     Mockito.when(teamService.getTeamsOfUser("testUser")).thenReturn(teams);
 
     response = timesheetRest.getTeams(request);
-    Assert.assertEquals(expectedTeams, response.getEntity());
+    List<JsonTeam> responseTeamList = (List<JsonTeam>)response.getEntity();
+    Assert.assertTrue(responseTeamList.contains(expectedTeams.get(0)));
+    Assert.assertTrue(responseTeamList.contains(expectedTeams.get(1)));
   }
 
   @Test

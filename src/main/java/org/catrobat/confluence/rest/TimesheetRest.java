@@ -7,6 +7,8 @@ package org.catrobat.confluence.rest;
 
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
+
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -98,7 +100,7 @@ public class TimesheetRest {
     for(Category category : categoryService.all()) {
       categories.add(new JsonCategory(category.getID(), category.getName()));
     }
-    
+
     return Response.ok(categories).build();
   }
 
@@ -265,7 +267,7 @@ public class TimesheetRest {
       dbfiller.printDBStatus();
       return Response.ok("cleanandinitdb").build();
     } else {
-      return Response.ok("youre not admin").build();
+      return Response.ok("you're not admin").build();
     }
   }
 }

@@ -5,7 +5,9 @@ import com.atlassian.sal.api.user.UserProfile;
 import junit.framework.Assert;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
+import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.rest.TimesheetRest;
+import org.catrobat.confluence.rest.json.JsonCategory;
 import org.catrobat.confluence.rest.json.JsonTeam;
 import org.catrobat.confluence.services.*;
 import org.junit.Before;
@@ -36,6 +38,7 @@ public class TimesheetRestTest {
   private Response response;
   private HttpServletRequest request;
   private UserProfile userProfile;
+  private Timesheet timeSheet;
 
   @Before
   public void setUp() throws Exception
@@ -49,11 +52,14 @@ public class TimesheetRestTest {
     dbfiller = Mockito.mock(DBFillerService.class);
     request = Mockito.mock(HttpServletRequest.class);
     userProfile = Mockito.mock(UserProfile.class);
+    timeSheet = Mockito.mock(Timesheet.class);
 
     timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller);
 
     Mockito.when(userManager.getRemoteUser()).thenReturn(userProfile);
     Mockito.when(userProfile.getUsername()).thenReturn("testUser");
+
+    Mockito.when(timeSheet.getUserKey()).thenReturn("owner_key");
   }
 
   @Test
@@ -93,6 +99,31 @@ public class TimesheetRestTest {
   @Test
   public void testGetCategories() throws Exception
   {
+    List<JsonCategory> expectedCategories = new LinkedList<JsonCategory>();
+    expectedCategories.add(new JsonCategory(1, "Programming"));
+    expectedCategories.add(new JsonCategory(2, "Meeting"));
 
+    Category category1 = Mockito.mock(Category.class);
+    Mockito.when(category1.getID()).thenReturn(2);
+    Mockito.when(category1.getName()).thenReturn("Meeting");
+
+    Category category2 = Mockito.mock(Category.class);
+    Mockito.when(category2.getID()).thenReturn(1);
+    Mockito.when(category2.getName()).thenReturn("Programming");
+
+    List<Category> categories = new LinkedList<Category>();
+    categories.add(category2);
+    categories.add(category1);
+
+    Mockito.when(categoryService.all()).thenReturn(categories);
+
+    response = timesheetRest.getCategories(request);
+    Assert.assertEquals(expectedCategories, response.getEntity());
+  }
+
+  @Test
+  public void testGetTimesheet() throws Exception
+  {
+    //already implemented in TimesheetServiceImplTest.java
   }
 }

@@ -138,7 +138,7 @@ function addNewEntryCallback(entry, timesheetData, form) {
  * @param {jQuery} form
  */
 function editEntryCallback(entry, timesheetData, form) {
-	var newViewRow = renderViewRow(entry, timesheetData.categories, timesheetData.teams);
+	var newViewRow = renderViewRow(timesheetData, entry);
 
 	form.row.prev().remove();
 	form.row.before(newViewRow).hide();
@@ -162,14 +162,14 @@ function editEntryCallback(entry, timesheetData, form) {
 function saveEntryClicked(timesheetData, saveOptions, form) {
 	form.saveButton.prop('disabled', true);
 
-	var date = form.dateField.val();
+	var date      = form.dateField.val();
 	var beginTime = form.beginTimeField.timepicker('getTime');
-	var endTime = form.endTimeField.timepicker('getTime');
+	var endTime   = form.endTimeField.timepicker('getTime');
 	var pauseTime = form.pauseTimeField.timepicker('getTime');
 
 	var beginDate = new Date(date + " " + toTimeString(beginTime));
-	var endDate = new Date(date + " " + toTimeString(endTime));
-	var pauseMin = pauseTime.getHours() * 60 + pauseTime.getMinutes();
+	var endDate   = new Date(date + " " + toTimeString(endTime));
+	var pauseMin  = pauseTime.getHours() * 60 + pauseTime.getMinutes();
 
 	var entry = {
 		beginDate: beginDate,
@@ -227,7 +227,6 @@ function renderFormRow(timesheetData, entry, saveOptions) {
 	});
 
 	return form.row;
-
 }
 
 /**
@@ -370,11 +369,9 @@ function changePauseTimeField() {
  */
 function renderEntryRow(timesheetData, entry) {
 
-	var categories = timesheetData.categories;
-	var teams = timesheetData.teams;
 	var timesheetID = timesheetData.timesheetID;
 
-	prepareEntryObjectForView(entry, categories, teams);
+	var augmentedEntry = augmentEntryObject(timesheetData, entry);
 
 	var editEntryOptions = {
 		httpMethod : "put",
@@ -383,8 +380,8 @@ function renderEntryRow(timesheetData, entry) {
 	};
 
 	var entryRow = {};
-	entryRow.formRow = renderFormRow(timesheetData, entry, editEntryOptions);
-	entryRow.viewRow = renderViewRow(entry, categories, teams);
+	entryRow.formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions);
+	entryRow.viewRow = renderViewRow(timesheetData, augmentedEntry);
 
 	entryRow.formRow.hide();
 
@@ -430,32 +427,46 @@ function deleteEntryClicked(entryRow, timesheetID, entryID) {
 	});
 }
 
-function prepareEntryObjectForView(entry, categories, teams) {
-	entry.date  = toDateString(new Date(entry.beginDate));
-	entry.begin = toTimeString(new Date(entry.beginDate));
-	entry.end   = toTimeString(new Date(entry.endDate));
+/**
+ * Augments an entry object wth a few attributes by deriving them from its
+ * original attributes
+ * @param {Object} timesheetData
+ * @param {Object} entry
+ * @returns {Object} augmented entry
+ */
+function augmentEntryObject(timesheetData, entry) {
 
 	var pauseDate = new Date(entry.pauseMinutes * 1000 * 60);
 
-	entry.pause = (entry.pauseMinutes > 0) ? toUTCTimeString(pauseDate) : "";
-	entry.duration = toTimeString(calculateDuration(entry.beginDate, entry.endDate, pauseDate));
-
-	entry.category = categories[entry.categoryID].categoryName;
-	entry.team = teams[entry.teamID].teamName;
+	return {
+		date         : toDateString(new Date(entry.beginDate)),
+		begin        : toTimeString(new Date(entry.beginDate)),
+	  end          : toTimeString(new Date(entry.endDate)),
+		pause        : (entry.pauseMinutes > 0) ? toUTCTimeString(pauseDate) : "",
+		duration     : toTimeString(calculateDuration(entry.beginDate, entry.endDate, pauseDate)),
+		category     : timesheetData.categories[entry.categoryID].categoryName,
+		team         : timesheetData.teams[entry.teamID].teamName,
+		entryID      : entry.entryID,
+		beginDate    : entry.beginDate,
+		endDate      : entry.endDate,
+		description  : entry.description ,
+		pauseMinutes : entry.pauseMinutes ,
+		teamID       : entry.teamID ,
+		categoryID   : entry.categoryID
+	};
 }
 
 /**
- * Updates the viewrow
- * @param {type} entry
- * @param {type} categories
- * @param {type} teams
+ * Creates the viewrow
+ * @param {Object} timesheetData
+ * @param {Object} entry
  */
-function renderViewRow(entry, categories, teams) {
+function renderViewRow(timesheetData, entry) {
 
-	prepareEntryObjectForView(entry, categories, teams);
+	var augmentedEntry = augmentEntryObject(timesheetData, entry);
 
 	var viewRow = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
-					{entry: entry, teams: teams}));
+					{entry: augmentedEntry, teams: timesheetData.teams}));
 
 	viewRow.find('span.aui-icon-wait').hide();
 

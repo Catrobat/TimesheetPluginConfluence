@@ -85,7 +85,7 @@ function populateTable(timesheetData) {
   var timesheetTableBody = timesheetTable.find("tbody");
   timesheetTableBody.empty();
 
-  var firstForm = renderFormRow(timesheetData.timesheetID, {
+  var firstForm = renderFormRow(timesheetData, {
       entryID : "new-id",
       date    : "",
       begin   : "",
@@ -93,13 +93,13 @@ function populateTable(timesheetData) {
       pause   : "00:00",
       description: "",
       duration: ""
-    }, timesheetData.teams, timesheetData.categories, 'post'); 
+    }, 'post'); 
   
   timesheetTableBody.append(firstForm);
   
   //prepare view
   timesheetData.entries.map(function(entry) {
-    var entryRow = renderEntryRow(timesheetData.timesheetID, entry, timesheetData.categories, timesheetData.teams); 
+		var entryRow = renderEntryRow(timesheetData, entry);
     timesheetTableBody.append(entryRow.viewRow);
     timesheetTableBody.append(entryRow.formRow);
   });  
@@ -107,44 +107,46 @@ function populateTable(timesheetData) {
 
 /**
  * creates a form with working ui components and instrumented buttons
- * @param {int} timesheetID
- * @param {object} entry
- * @param {object} teams
- * @param {object} categories
+ * @param {Object} timesheetData
+ * @param {Object} entry
  * @param {string} mode
  *      'post': creates a new entry
  *      'put' : updates an existing entry
  * @returns {jquery} form
  */
-function renderFormRow(timesheetID, entry, teams, categories, mode) {
-  
+function renderFormRow(timesheetData, entry, mode) {
+
   var ajaxUrl, saveCallback;
-  
-  if(entry.pause === "") entry.pause = "00:00";
-  
+	var teams = timesheetData.teams;
+	var categories = timesheetData.categories;
+	var timesheetID = timesheetData.timesheetID;
+
+	if (entry.pause === "")
+		entry.pause = "00:00";
+
   var form = prepareFormTemplate(entry, teams, categories);
  
   if(mode === 'post') {
     
-    ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries"; 
+    ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries";
 
-    saveCallback = function(entry) {
-      var entryRow = renderEntryRow(timesheetID, entry, categories, teams);
-      var beginTime = form.beginTimeField.timepicker('getTime');
-      var endTime   = form.endTimeField.timepicker('getTime');
-      form.row.after(entryRow.formRow); 
-      form.row.after(entryRow.viewRow); 
-      form.beginTimeField.timepicker('setTime', endTime);
-      form.endTimeField.timepicker(  'setTime', new Date(2 * endTime - beginTime));
-      form.pauseTimeField.val("00:00").trigger('change');
-      
-    };
-    
-  } else if (mode === 'put') {
-    
-    ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entry.entryID;
-    
-    saveCallback = function(entry) {
+    saveCallback = function (entry) {
+			var entryRow = renderEntryRow(timesheetData, entry);
+			var beginTime = form.beginTimeField.timepicker('getTime');
+			var endTime = form.endTimeField.timepicker('getTime');
+			form.row.after(entryRow.formRow);
+			form.row.after(entryRow.viewRow);
+			form.beginTimeField.timepicker('setTime', endTime);
+			form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
+			form.pauseTimeField.val("00:00").trigger('change');
+
+		}
+
+	} else if (mode === 'put') {
+
+		ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entry.entryID;
+
+		saveCallback = function(entry) {
       var newViewRow = renderViewRow(entry, categories, teams); 
            
       form.row.prev().remove();
@@ -214,7 +216,7 @@ function renderFormRow(timesheetID, entry, teams, categories, mode) {
  * @returns {object of jquery objects} 
  */
 function prepareFormTemplate(entry, teams, categories) {
-  
+
   var row = $(Confluence.Templates.Timesheet.timesheetEntryForm(
       {entry : entry, teams : teams})
   );
@@ -357,19 +359,21 @@ function deleteEntryClicked(entryRow, timesheetID, entryID ) {
 
 /**
  * creates a view row (for viewing) and a form row (for editing)
- * @param {Number} timesheetID
+ * @param {Number} timesheetData
  * @param {Object} entry
- * @param {Array} categories
- * @param {Array} teams
  * @returns {viewrow : jquery, formrow : jquery}
  */
-function renderEntryRow(timesheetID, entry, categories, teams) {
+function renderEntryRow(timesheetData, entry) {
+
+	var categories = timesheetData.categories;
+	var teams = timesheetData.teams;
+	var timesheetID = timesheetData.timesheetID;
 
   prepareEntryObjectForView(entry, categories, teams);
   
   var entryRow = {};
   entryRow.viewRow = renderViewRow(entry, categories, teams);
-  entryRow.formRow = renderFormRow(timesheetID, entry, teams, categories, 'put');
+  entryRow.formRow = renderFormRow(timesheetData, entry, 'put');
   
   entryRow.formRow.hide();
   

@@ -5,10 +5,10 @@
  */
 package org.catrobat.confluence.rest;
 
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -54,6 +54,12 @@ public class TimesheetRest {
     this.permissionService = ps;
     this.dbfiller = df;
   }
+
+  public void checkIfCategoryIsAssociatedWithTeam(Team team, Category category) {
+    if(!Arrays.asList(team.getCategories()).contains(category)) {
+      throw new NotAuthorizedException("Category is not associated with Team.");
+    }
+  }
   
   @GET
   @Path("helloworld")
@@ -64,18 +70,17 @@ public class TimesheetRest {
   @GET
   @Path("teams")
   public Response getTeams(@Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);  
-    if(unauthorized != null) return unauthorized;
-    
-    List<JsonTeam> teams = new LinkedList<JsonTeam>();
-    
-    UserProfile userProfile = userManager.getRemoteUser();
 
-    if(userProfile == null) {
-      return Response.status(Response.Status.FORBIDDEN).entity("Userprofile does not exist.").build();
+    List<JsonTeam> teams = new LinkedList<JsonTeam>();
+    UserProfile user;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
     }
     
-    String userName = userProfile.getUsername();
+    String userName = user.getUsername();
  
     for(Team team : teamService.getTeamsOfUser(userName)) {
       Category[] categories = team.getCategories();
@@ -92,9 +97,7 @@ public class TimesheetRest {
   @GET
   @Path("categories")
   public Response getCategories(@Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);  
-    if(unauthorized != null) return unauthorized;
-    
+
     List<JsonCategory> categories = new LinkedList<JsonCategory>();
     
     for(Category category : categoryService.all()) {
@@ -108,9 +111,16 @@ public class TimesheetRest {
   @Path("timesheets/{timesheetID}")
   public Response getTimesheet(@Context HttpServletRequest request, 
       @PathParam("timesheetID") int timesheetID) {
-    
-    Timesheet sheet  = sheetService.getTimesheetByID(timesheetID);
-    UserProfile user = userManager.getRemoteUser(request); 
+
+    Timesheet sheet;
+    UserProfile user;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+      sheet = sheetService.getTimesheetByID(timesheetID);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
     
     if(sheet == null || !permissionService.userCanViewTimesheet(user, sheet)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -127,9 +137,16 @@ public class TimesheetRest {
   @Path("timesheets/{timesheetID}/entries")
   public Response getTimesheetEntries(@Context HttpServletRequest request, 
       @PathParam("timesheetID") int timesheetID) {
-    
-    Timesheet sheet  = sheetService.getTimesheetByID(timesheetID);
-    UserProfile user = userManager.getRemoteUser(request); 
+
+    Timesheet sheet;
+    UserProfile user;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+      sheet = sheetService.getTimesheetByID(timesheetID);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
     
     if(sheet == null || !permissionService.userCanViewTimesheet(user, sheet)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -145,7 +162,6 @@ public class TimesheetRest {
           entry.getDescription(), entry.getTeam().getID(), 
           entry.getCategory().getID()));
     }
-    
     return Response.ok(jsonEntries).build();
   }
   
@@ -154,26 +170,22 @@ public class TimesheetRest {
   public Response postTimesheetEntry(@Context HttpServletRequest request, 
       final JsonTimesheetEntry entry, @PathParam("timesheetID") int timesheetID) {
     
-    Response unauthorized = permissionService.checkPermission(request);
-    if(unauthorized != null) return unauthorized;
-    
-    Timesheet sheet = sheetService.getTimesheetByID(timesheetID);
-    UserProfile user = userManager.getRemoteUser(request); 
-    
-    unauthorized = permissionService.userCanAddTimesheetEntry(user, sheet, entry);
-    if(unauthorized != null) return unauthorized;
+    Timesheet sheet;
+    UserProfile user;
+    Category category;
+    Team team;
 
-    Category category = categoryService.getCategoryByID(entry.getCategoryID());
-    Team team = teamService.getTeamByID(entry.getTeamID());
+    try {
+      user = permissionService.checkIfUserExists(request);
+      sheet = sheetService.getTimesheetByID(timesheetID);
+      category = categoryService.getCategoryByID(entry.getCategoryID());
+      team = teamService.getTeamByID(entry.getTeamID());
+      checkIfCategoryIsAssociatedWithTeam(team, category);
+      permissionService.userCanEditTimesheetEntry(user, sheet, entry);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
 
-    if(team == null) {
-      return Response.status(Response.Status.FORBIDDEN).entity("Team does not exist.").build();
-    }
-    
-    if(!Arrays.asList(team.getCategories()).contains(category)) {
-      return Response.status(Response.Status.FORBIDDEN).entity("Category is not associated with Team.").build();
-    }
-    
     TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(), 
         entry.getEndDate(), category, entry.getDescription(), 
         entry.getPauseMinutes(), team);
@@ -184,38 +196,26 @@ public class TimesheetRest {
   }
 
   @PUT
-  @Path("timesheets/{timesheetID}/entries/{entryID}")
+  @Path("entries/{entryID}")
   public Response putTimesheetEntry(@Context HttpServletRequest request, 
-      final JsonTimesheetEntry jsonEntry, @PathParam("timesheetID") int timesheetID, 
-      @PathParam("entryID") int entryID) {
-    
-    Response unauthorized = permissionService.checkPermission(request);
-    if(unauthorized != null) return unauthorized;
-    
-    UserProfile    user  = userManager.getRemoteUser(request); 
-    TimesheetEntry entry = entryService.getEntryByID(entryID);
-    Timesheet      sheet = sheetService.getTimesheetByID(timesheetID);
-    
-    if(!entry.getTimeSheet().equals(sheet)) {
-      return Response.status(Response.Status.FORBIDDEN)
-        .entity("You cannot add a timesheet entry to a different timesheet").build();
-    }
-    
-    unauthorized = permissionService.userCanEditTimesheetEntry(user, entry);
-    if(unauthorized != null) return unauthorized;
-    
-    Category category = categoryService.getCategoryByID(jsonEntry.getCategoryID());
-    Team team         = teamService.getTeamByID(jsonEntry.getTeamID());
-    
-    if(team == null) {
-      return Response.status(Response.Status.FORBIDDEN).entity("Team does not exist.").build();
-    }
-    
-    if(!Arrays.asList(team.getCategories()).contains(category)) {
-      return Response.status(Response.Status.FORBIDDEN).entity("Category is not associated with Team.").build();
-    }
+      final JsonTimesheetEntry jsonEntry, @PathParam("entryID") int entryID) {
+    UserProfile user;
+    TimesheetEntry entry;
+    Category category;
+    Team team;
 
-    entryService.edit(entryID, sheet, jsonEntry.getBeginDate(), 
+    try {
+      user = permissionService.checkIfUserExists(request);
+      entry = entryService.getEntryByID(entryID);
+      category = categoryService.getCategoryByID(jsonEntry.getCategoryID());
+      team = teamService.getTeamByID(jsonEntry.getTeamID());
+      checkIfCategoryIsAssociatedWithTeam(team, category);
+      permissionService.userCanEditTimesheetEntry(user, entry.getTimeSheet(), jsonEntry);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
+    
+    entryService.edit(entryID, entry.getTimeSheet(), jsonEntry.getBeginDate(),
         jsonEntry.getEndDate(), category, jsonEntry.getDescription(), 
         jsonEntry.getPauseMinutes(), team);
     
@@ -223,28 +223,20 @@ public class TimesheetRest {
   }
   
   @DELETE
-  @Path("timesheets/{timesheetID}/entries/{entryID}")
-  public Response deleteTimesheetEntry(@Context HttpServletRequest request, 
-      @PathParam("timesheetID") int timesheetID, 
+  @Path("entries/{entryID}")
+  public Response deleteTimesheetEntry(@Context HttpServletRequest request,
       @PathParam("entryID") int entryID) {
-    
-    Response unauthorized = permissionService.checkPermission(request);
-    if(unauthorized != null) return unauthorized;
-    
-    UserProfile    user  = userManager.getRemoteUser(request); 
-    TimesheetEntry entry = entryService.getEntryByID(entryID);
-    Timesheet      sheet = sheetService.getTimesheetByID(timesheetID);
-    
-    if(!entry.getTimeSheet().equals(sheet)) {
-      return Response.status(Response.Status.FORBIDDEN)
-        .entity("You cannot delete an entry of a different timesheet").build();
+    UserProfile    user;
+    TimesheetEntry entry;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+      entry = entryService.getEntryByID(entryID);
+      permissionService.userCanDeleteTimesheetEntry(user, entry);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
     }
-    
-    unauthorized = permissionService.userCanEditTimesheetEntry(user, entry);
-    if(unauthorized != null) return unauthorized;
-    
     entryService.delete(entry);
-    
     return Response.ok().build();
   }
   

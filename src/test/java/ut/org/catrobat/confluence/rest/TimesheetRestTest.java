@@ -57,9 +57,8 @@ public class TimesheetRestTest {
     timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller);
 
     Mockito.when(userManager.getRemoteUser()).thenReturn(userProfile);
+    Mockito.when(permissionService.checkIfUserExists(request)).thenReturn(userProfile);
     Mockito.when(userProfile.getUsername()).thenReturn("testUser");
-
-    Mockito.when(timeSheet.getUserKey()).thenReturn("owner_key");
   }
 
   @Test
@@ -77,18 +76,18 @@ public class TimesheetRestTest {
     expectedTeams.add(new JsonTeam(2, "IRC", new int[0]));
 
     Team team1 = Mockito.mock(Team.class);
-    Mockito.when(team1.getID()).thenReturn(2);
-    Mockito.when(team1.getTeamName()).thenReturn("IRC");
+    Mockito.when(team1.getID()).thenReturn(1);
+    Mockito.when(team1.getTeamName()).thenReturn("Catroid");
     Mockito.when(team1.getCategories()).thenReturn(new Category[0]);
 
     Team team2 = Mockito.mock(Team.class);
-    Mockito.when(team2.getID()).thenReturn(1);
-    Mockito.when(team2.getTeamName()).thenReturn("Catroid");
+    Mockito.when(team2.getID()).thenReturn(2);
+    Mockito.when(team2.getTeamName()).thenReturn("IRC");
     Mockito.when(team2.getCategories()).thenReturn(new Category[0]);
 
     Set<Team> teams = new HashSet<Team>();
-    teams.add(team1);
     teams.add(team2);
+    teams.add(team1);
 
     Mockito.when(teamService.getTeamsOfUser("testUser")).thenReturn(teams);
 
@@ -119,11 +118,5 @@ public class TimesheetRestTest {
 
     response = timesheetRest.getCategories(request);
     Assert.assertEquals(expectedCategories, response.getEntity());
-  }
-
-  @Test
-  public void testGetTimesheet() throws Exception
-  {
-    //already implemented in TimesheetServiceImplTest.java
   }
 }

@@ -142,7 +142,7 @@ function renderFormRow(timesheetID, entry, teams, categories, mode) {
     
   } else if (mode === 'put') {
     
-    ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entry.entryID;
+    ajaxUrl = restBaseUrl + "entries/" + entry.entryID;
     
     saveCallback = function(entry) {
       var newViewRow = renderViewRow(entry, categories, teams); 
@@ -298,7 +298,7 @@ function prepareFormTemplate(entry, teams, categories) {
   var initTeamId = (entry.teamID !== undefined) ? entry.teamID : Object.keys(teams)[0]; 
   
   var amountOfTeams = teams.filter(function(v) {return v !== undefined}).length;
-  if(amountOfTeams > 2) {
+  if(amountOfTeams > 1) {
     teamSelect
       .auiSelect2()
       .change(function(){ updateCategoryOptions(this.value); })
@@ -331,7 +331,7 @@ function editEntryClicked(entryRow) {
 
 function deleteEntryClicked(entryRow, timesheetID, entryID ) {
   
-  var ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entryID;  
+  var ajaxUrl = restBaseUrl + "entries/" + entryID;
   
   var spinner = entryRow.viewRow.find('span.aui-icon-wait');
   spinner.show();

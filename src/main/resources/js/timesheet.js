@@ -150,6 +150,61 @@ function editEntryCallback(entry, timesheetData, form) {
 }
 
 /**
+ * Handles saving an entry
+ * @param {Object} timesheetData
+ * @param {Object} saveOptions
+ *           callback   : Function(entry, timesheetData, form)
+ *           ajaxUrl    : String
+ *           httpMethod : String
+ * @param {jQuery} form
+ * @returns {undefined}
+ */
+function saveEntryClicked(timesheetData, saveOptions, form) {
+	form.saveButton.prop('disabled', true);
+
+	var date = form.dateField.val();
+	var beginTime = form.beginTimeField.timepicker('getTime');
+	var endTime = form.endTimeField.timepicker('getTime');
+	var pauseTime = form.pauseTimeField.timepicker('getTime');
+
+	var beginDate = new Date(date + " " + toTimeString(beginTime));
+	var endDate = new Date(date + " " + toTimeString(endTime));
+	var pauseMin = pauseTime.getHours() * 60 + pauseTime.getMinutes();
+
+	var entry = {
+		beginDate: beginDate,
+		endDate: endDate,
+		description: form.descriptionField.val(),
+		pauseMinutes: pauseMin,
+		teamID: form.teamSelect.val(),
+		categoryID: form.categorySelect.val()
+	};
+
+	form.loadingSpinner.show();
+
+	AJS.$.ajax({
+		type: saveOptions.httpMethod,
+		url:  saveOptions.ajaxUrl,
+		contentType: "application/json",
+		data: JSON.stringify(entry)
+	})
+	.then(function(entry) {
+		saveOptions.callback(entry, timesheetData, form);
+	})
+	.fail(function (error) {
+		AJS.messages.error({
+			title: 'There was an error while saving.',
+			body: '<p>Reason: ' + error.responseText + '</p>'
+		});
+		console.log(error);
+	})
+	.always(function () {
+		form.loadingSpinner.hide();
+		form.saveButton.prop('disabled', false);
+	});
+}
+
+/**
  * creates a form with working ui components and instrumented buttons
  * @param {Object} timesheetData
  * @param {Object} entry
@@ -161,59 +216,14 @@ function editEntryCallback(entry, timesheetData, form) {
  */
 function renderFormRow(timesheetData, entry, saveOptions) {
 
-	var teams = timesheetData.teams;
-	var categories = timesheetData.categories;
-
 	if (entry.pause === "") {
 		entry.pause = "00:00";
 	}
 
-	var form = prepareFormTemplate(entry, teams, categories);
+	var form = prepareFormTemplate(entry, timesheetData.teams, timesheetData.categories);
 
 	form.saveButton.click(function () {
-
-		form.saveButton.prop('disabled', true);
-
-		var date = form.dateField.val();
-		var beginTime = form.beginTimeField.timepicker('getTime');
-		var endTime = form.endTimeField.timepicker('getTime');
-		var pauseTime = form.pauseTimeField.timepicker('getTime');
-
-		var beginDate = new Date(date + " " + toTimeString(beginTime));
-		var endDate = new Date(date + " " + toTimeString(endTime));
-		var pauseMin = pauseTime.getHours() * 60 + pauseTime.getMinutes();
-
-		var entry = {
-			beginDate: beginDate,
-			endDate: endDate,
-			description: form.descriptionField.val(),
-			pauseMinutes: pauseMin,
-			teamID: form.teamSelect.val(),
-			categoryID: form.categorySelect.val()
-		};
-
-		form.loadingSpinner.show();
-
-		AJS.$.ajax({
-			type: saveOptions.httpMethod,
-			url:  saveOptions.ajaxUrl,
-			contentType: "application/json",
-			data: JSON.stringify(entry)
-		})
-		.then(function(entry) {
-			saveOptions.callback(entry, timesheetData, form);
-		})
-		.fail(function (error) {
-			AJS.messages.error({
-				title: 'There was an error while saving.',
-				body: '<p>Reason: ' + error.responseText + '</p>'
-			});
-			console.log(error);
-		})
-		.always(function () {
-			form.loadingSpinner.hide();
-			form.saveButton.prop('disabled', false);
-		});
+		saveEntryClicked(timesheetData, saveOptions, form);
 	});
 
 	return form.row;

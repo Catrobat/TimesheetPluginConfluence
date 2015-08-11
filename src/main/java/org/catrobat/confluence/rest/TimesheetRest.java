@@ -55,7 +55,7 @@ public class TimesheetRest {
     this.dbfiller = df;
   }
 
-  public void checkIfCategoryIsAssociatedWithTeam(Team team, Category category) {
+  private void checkIfCategoryIsAssociatedWithTeam(Team team, Category category) {
     if(!Arrays.asList(team.getCategories()).contains(category)) {
       throw new NotAuthorizedException("Category is not associated with Team.");
     }
@@ -186,7 +186,7 @@ public class TimesheetRest {
       return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
     }
 
-    TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(), 
+    TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(),
         entry.getEndDate(), category, entry.getDescription(), 
         entry.getPauseMinutes(), team);
     

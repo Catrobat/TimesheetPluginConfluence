@@ -115,4 +115,46 @@ public final class JsonTimesheetEntry {
   public void setCategoryID(int categoryID) {
     this.categoryID = categoryID;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    JsonTimesheetEntry that = (JsonTimesheetEntry) o;
+
+    if (entryID != that.entryID) return false;
+    if (pauseMinutes != that.pauseMinutes) return false;
+    if (teamID != that.teamID) return false;
+    if (categoryID != that.categoryID) return false;
+    if (!beginDate.equals(that.beginDate)) return false;
+    if (!endDate.equals(that.endDate)) return false;
+    return description.equals(that.description);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = entryID;
+    result = 31 * result + beginDate.hashCode();
+    result = 31 * result + endDate.hashCode();
+    result = 31 * result + pauseMinutes;
+    result = 31 * result + description.hashCode();
+    result = 31 * result + teamID;
+    result = 31 * result + categoryID;
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "JsonTimesheetEntry{" +
+            "entryID=" + entryID +
+            ", beginDate=" + beginDate +
+            ", endDate=" + endDate +
+            ", pauseMinutes=" + pauseMinutes +
+            ", description='" + description + '\'' +
+            ", teamID=" + teamID +
+            ", categoryID=" + categoryID +
+            '}';
+  }
 }

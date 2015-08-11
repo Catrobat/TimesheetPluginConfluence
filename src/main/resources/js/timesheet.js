@@ -13,10 +13,10 @@ AJS.toInit(function () {
 		return false;
 	});
 	timesheetTable = AJS.$("#timesheet-table");
-	initTable();
+	fetchData();
 });
 
-function initTable() {
+function fetchData() {
 	var timesheetFetched = AJS.$.ajax({
 		type: 'GET',
 		url: restBaseUrl + 'timesheets/' + timesheetID,
@@ -41,31 +41,8 @@ function initTable() {
 		contentType: "application/json"
 	});
 
-	var allPromises = AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched);
-
-	allPromises
-		.done(function (timesheetReply, categoriesReply, teamsReply, entriesReply) {
-			var timesheetData = timesheetReply[0];
-
-			timesheetData.entries = entriesReply[0];
-			timesheetData.categories = [];
-			timesheetData.teams = [];
-
-			categoriesReply[0].map(function (category) {
-				timesheetData.categories[category.categoryID] = {
-					categoryName: category.categoryName
-				};
-			});
-
-			teamsReply[0].map(function (team) {
-				timesheetData.teams[team.teamID] = {
-					teamName: team.teamName,
-					teamCategories: team.teamCategories
-				};
-			});
-
-			populateTable(timesheetData);
-		})
+	AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched)
+		.done(handletimesheetData)
 		.fail(function (error) {
 			AJS.messages.error({
 				title: 'There was an error.',
@@ -73,6 +50,29 @@ function initTable() {
 			});
 			console.log(error);
 		});
+}
+
+function handletimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
+	var timesheetData = timesheetReply[0];
+
+	timesheetData.entries = entriesReply[0];
+	timesheetData.categories = [];
+	timesheetData.teams = [];
+
+	categoriesReply[0].map(function (category) {
+		timesheetData.categories[category.categoryID] = {
+			categoryName: category.categoryName
+		};
+	});
+
+	teamsReply[0].map(function (team) {
+		timesheetData.teams[team.teamID] = {
+			teamName: team.teamName,
+			teamCategories: team.teamCategories
+		};
+	});
+
+	populateTable(timesheetData);
 }
 
 function populateTable(timesheetData) {
@@ -101,9 +101,9 @@ function populateTable(timesheetData) {
 		ajaxUrl    : restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entries/"
 	};
 	
-	var firstForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
+	var emptyForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
 
-	timesheetTableBody.append(firstForm);
+	timesheetTableBody.append(emptyForm);
 
 	//prepare view
 	timesheetData.entries.map(function (entry) {
@@ -220,7 +220,7 @@ function renderFormRow(timesheetData, entry, saveOptions) {
 		entry.pause = "00:00";
 	}
 
-	var form = prepareFormTemplate(entry, timesheetData.teams, timesheetData.categories);
+	var form = prepareForm(entry, timesheetData);
 
 	form.saveButton.click(function () {
 		saveEntryClicked(timesheetData, saveOptions, form);
@@ -231,31 +231,34 @@ function renderFormRow(timesheetData, entry, saveOptions) {
 }
 
 /**
- * create form for editing a entry & instrument ui components
+ * Create form for editing a entry & instrument ui components
  * @param {object} entry
- * @param {object} teams
- * @param {object} categories
+ * @param {object} timesheetData
  * @returns {object of jquery objects} 
  */
-function prepareFormTemplate(entry, teams, categories) {
+function prepareForm(entry, timesheetData) {
 
+	var teams = timesheetData.teams;
 	var row = $(Confluence.Templates.Timesheet.timesheetEntryForm(
 					{entry: entry, teams: teams})
-					);
+	);
 
-	var loadingSpinner = row.find('span.aui-icon-wait').hide();
-	var saveButton = row.find('button.save');
-	var dateField = row.find('input.date');
-	var beginTimeField = row.find('input.time.start');
-	var endTimeField = row.find('input.time.end');
-	var pauseTimeField = row.find('input.time.pause');
-	var durationField = row.find('input.duration');
-	var descriptionField = row.find('input.description');
-	var categorySelect = row.find('span.category');
-	var teamSelect = row.find('select.team');
+	var form = {
+		row: row,
+		loadingSpinner:   row.find('span.aui-icon-wait').hide(),
+		saveButton:       row.find('button.save'),
+		dateField:        row.find('input.date'),
+		beginTimeField:   row.find('input.time.start'),
+		endTimeField:     row.find('input.time.end'),
+		pauseTimeField:   row.find('input.time.pause'),
+		durationField:    row.find('input.duration'),
+		descriptionField: row.find('input.description'),
+		categorySelect:   row.find('span.category'),
+		teamSelect:       row.find('select.team')
+	};
 
 	//date time columns
-	dateField.datePicker(
+	form.dateField.datePicker(
 		{overrideBrowserDefault: true, languageCode: 'de'}
 	);
 
@@ -267,12 +270,8 @@ function prepareFormTemplate(entry, teams, categories) {
 			step: 15
 		});
 
-	pauseTimeField.timepicker({timeFormat: 'H:i', step: 15})
-		.change(function () {
-			if (this.value === '') {
-				this.value = '00:00';
-			}
-		})
+	form.pauseTimeField.timepicker({timeFormat: 'H:i', step: 15})
+		.change(changePauseTimeField)
 		.on('timeFormatError', function () {
 			this.value = '00:00';
 		});
@@ -280,107 +279,87 @@ function prepareFormTemplate(entry, teams, categories) {
 	new Datepair(row.find(".time-picker")[0]);
 
 	row.find('input.time').change(function () {
-
-		//todo: fix duration update without setTimeout
-		setTimeout(function () {
-			var duration = calculateDuration(
-							beginTimeField.timepicker('getTime'),
-							endTimeField.timepicker('getTime'),
-							pauseTimeField.timepicker('getTime'));
-
-			if (duration < 0)
-				duration = new Date(0);
-
-			durationField.val(toUTCTimeString(duration));
-		}, 10);
+		updateTimeField(form);
 	});
 
-	//team and category select
-	var updateCategoryOptions = function (selectedTeamID) {
+	var initTeamID = (entry.teamID !== undefined)
+				? entry.teamID : Object.keys(teams)[0];
 
-		if (selectedTeamID !== null && teams[selectedTeamID] !== undefined) {
+	form.teamSelect.auiSelect2()
+		.change(function() {
+			var selectedTeamID = this.value;
+			updateCategorySelect(form.categorySelect, selectedTeamID, entry, timesheetData);
+		})
+		.auiSelect2("val", initTeamID)
+		.trigger("change");
 
-			var categoriesPerTeam = [];
-
-			teams[selectedTeamID].teamCategories.map(function (categoryID) {
-				categoriesPerTeam.push(
-								{id: categoryID, text: categories[categoryID].categoryName}
-				);
-			});
-
-			categorySelect.auiSelect2({data: categoriesPerTeam});
-
-			var selectedCategoryID = (entry.categoryID === undefined || selectedTeamID != entry.teamID)
-							? teams[selectedTeamID].teamCategories[0]
-							: entry.categoryID;
-
-			categorySelect.auiSelect2("val", selectedCategoryID);
-		} else {
-			categorySelect.auiSelect2();
-		}
-	};
-
-	var initTeamId = (entry.teamID !== undefined) ? entry.teamID : Object.keys(teams)[0];
-
-	var amountOfTeams = teams.filter(function (v) {return v !== undefined}).length;
-
-	if (amountOfTeams > 2) {
-		teamSelect
-			.auiSelect2()
-			.change(function () {
-				updateCategoryOptions(this.value);
-			})
-			.auiSelect2("val", initTeamId);
-	} else {
+	if (countDefinedElementsInArray(teams) < 2) {
 		row.find("td.team").hide();
 	}
-
-	updateCategoryOptions(initTeamId);
-
-	return  {
-		row: row,
-		loadingSpinner: loadingSpinner,
-		saveButton: saveButton,
-		dateField: dateField,
-		beginTimeField: beginTimeField,
-		endTimeField: endTimeField,
-		pauseTimeField: pauseTimeField,
-		durationField: durationField,
-		descriptionField: descriptionField,
-		categorySelect: categorySelect,
-		teamSelect: teamSelect
-	};
+	
+	return form;
 }
 
-function editEntryClicked(entryRow) {
-	entryRow.viewRow.hide();
-	entryRow.formRow.show();
-} 
+/**
+ * Updates the Category Seletion Box depending on the selected team
+ * @param {jQuery} categorySelect
+ * @param {int} selectedTeamID
+ * @param {Object} entry
+ * @param {Object} timesheetData
+ */
+function updateCategorySelect(categorySelect, selectedTeamID, entry, timesheetData) {
 
-function deleteEntryClicked(entryRow, timesheetID, entryID) {
+	var selectedTeam = timesheetData.teams[selectedTeamID];
+	var categoryPerTeam = filterCategoriesPerTeam(selectedTeam, timesheetData.categories);
 
-	var ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entryID;
+	categorySelect.auiSelect2({data : categoryPerTeam});
 
-	var spinner = entryRow.viewRow.find('span.aui-icon-wait');
-	spinner.show();
+	var selectedCategoryID = (entry.categoryID === undefined || selectedTeamID != entry.teamID)
+		? selectedTeam.teamCategories[0]
+		: entry.categoryID;
 
-	AJS.$.ajax({
-		type: 'DELETE',
-		url: ajaxUrl,
-		contentType: "application/json"
-	})
-	.then(function () {
-		entryRow.viewRow.remove();
-		entryRow.formRow.remove();
-	})
-	.fail(function (error) {
-		AJS.messages.error({
-			title: 'There was an error while deleting.',
-			body: '<p>Reason: ' + error.responseText + '</p>'
-		});
-		console.log(error);
-		spinner.hide();
+	categorySelect.val(selectedCategoryID).trigger("change");
+}
+
+/**
+ * Creates an array with the categories of seletedTeam
+ * @param {Object} selectedTeam
+ * @param {Object} categories
+ * @returns {Array of Objects}
+ */
+function filterCategoriesPerTeam(selectedTeam, categories) {
+
+	var categoriesPerTeam = [];
+
+	selectedTeam.teamCategories.map(function (categoryID) {
+		categoriesPerTeam.push(
+						{id: categoryID, text: categories[categoryID].categoryName}
+		);
 	});
+
+	return categoriesPerTeam;
+}
+
+function updateTimeField(form) {
+	//todo: fix duration update without setTimeout
+	setTimeout(function () {
+		var duration = calculateDuration(
+						form.beginTimeField.timepicker('getTime'),
+						form.endTimeField.timepicker('getTime'),
+						form.pauseTimeField.timepicker('getTime'));
+
+		if (duration < 0) {
+			duration = new Date(0);
+		}
+
+		form.durationField.val(toUTCTimeString(duration));
+	}, 10);
+}
+
+function changePauseTimeField() {
+	if (this.value === '') {
+		this.value = '00:00';
+	}
 }
 
 /**
@@ -418,6 +397,37 @@ function renderEntryRow(timesheetData, entry) {
 	});
 
 	return entryRow;
+}
+
+function editEntryClicked(entryRow) {
+	entryRow.viewRow.hide();
+	entryRow.formRow.show();
+}
+
+function deleteEntryClicked(entryRow, timesheetID, entryID) {
+
+	var ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entryID;
+
+	var spinner = entryRow.viewRow.find('span.aui-icon-wait');
+	spinner.show();
+
+	AJS.$.ajax({
+		type: 'DELETE',
+		url: ajaxUrl,
+		contentType: "application/json"
+	})
+	.then(function () {
+		entryRow.viewRow.remove();
+		entryRow.formRow.remove();
+	})
+	.fail(function (error) {
+		AJS.messages.error({
+			title: 'There was an error while deleting.',
+			body: '<p>Reason: ' + error.responseText + '</p>'
+		});
+		console.log(error);
+		spinner.hide();
+	});
 }
 
 function prepareEntryObjectForView(entry, categories, teams) {
@@ -479,4 +489,8 @@ function toDateString(date) {
 function calculateDuration(begin, end, pause) {
 	var pauseDate = new Date(pause);
 	return new Date(end - begin - (pauseDate.getHours() * 60 + pauseDate.getMinutes()) * 60 * 1000);
+}
+
+function countDefinedElementsInArray(array) {
+	return array.filter(function (v) {return v !== undefined}).length;
 }

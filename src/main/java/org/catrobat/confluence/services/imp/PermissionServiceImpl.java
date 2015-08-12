@@ -83,9 +83,7 @@ public class PermissionServiceImpl implements PermissionService {
       if (dateIsOld(entry.getBeginDate()) || dateIsOld(entry.getEndDate())) {
         throw new NotAuthorizedException("You can not add an old entry.");
       }
-    }
-
-    if (!userIsAdmin(user)) {
+    } else if (!userIsAdmin(user)) {
       throw new NotAuthorizedException("You are not Admin.");
     }
   }
@@ -97,9 +95,7 @@ public class PermissionServiceImpl implements PermissionService {
       if (dateIsOld(entry.getBeginDate()) || dateIsOld(entry.getEndDate())) {
         throw new NotAuthorizedException("You can not add an old entry.");
       }
-    }
-
-    if (!userIsAdmin(user)) {
+    } else if (!userIsAdmin(user)) {
       throw new NotAuthorizedException("You are not Admin");
     }
   }

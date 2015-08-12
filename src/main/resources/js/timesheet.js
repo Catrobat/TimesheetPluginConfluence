@@ -376,7 +376,7 @@ function renderEntryRow(timesheetData, entry) {
 	var editEntryOptions = {
 		httpMethod : "put",
 		callback   : editEntryCallback,
-		ajaxUrl    : restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entries/" + entry.entryID
+		ajaxUrl    : restBaseUrl + "entries/" + entry.entryID
 	};
 
 	var entryRow = {};
@@ -403,7 +403,7 @@ function editEntryClicked(entryRow) {
 
 function deleteEntryClicked(entryRow, timesheetID, entryID) {
 
-	var ajaxUrl = restBaseUrl + "timesheets/" + timesheetID + "/entries/" + entryID;
+	var ajaxUrl = restBaseUrl + "entries/" + entryID;
 
 	var spinner = entryRow.viewRow.find('span.aui-icon-wait');
 	spinner.show();

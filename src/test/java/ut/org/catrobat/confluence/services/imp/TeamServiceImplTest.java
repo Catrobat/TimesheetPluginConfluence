@@ -29,7 +29,7 @@ import org.mockito.junit.MockitoJUnit;
 public class TeamServiceImplTest {
 
   private EntityManager entityManager;
-	private TeamService service;
+  private TeamService service;
   private ActiveObjects ao;
   private UserAccessor userAccessor;
   private List<String> groups;

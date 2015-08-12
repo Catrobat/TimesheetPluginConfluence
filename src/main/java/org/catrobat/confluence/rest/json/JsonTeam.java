@@ -1,5 +1,6 @@
 package org.catrobat.confluence.rest.json;
 
+import java.util.Arrays;
 import javax.xml.bind.annotation.XmlElement;
 
 public class JsonTeam {
@@ -39,5 +40,41 @@ public class JsonTeam {
 
   public void setTeamCategories(int[] teamCategories) {
     this.teamCategories = teamCategories;
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final JsonTeam other = (JsonTeam) obj;
+    if (this.teamID != other.teamID) {
+      return false;
+    }
+    if ((this.teamName == null) ? (other.teamName != null) : !this.teamName.equals(other.teamName)) {
+      return false;
+    }
+    if (!Arrays.equals(this.teamCategories, other.teamCategories)) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "JsonTeam{" +
+            "teamID=" + teamID +
+            ", teamName='" + teamName + '\'' +
+            ", teamCategories=" + Arrays.toString(teamCategories) +
+            '}';
   }
 }

@@ -40,10 +40,6 @@
 		<url-pattern>/timesheet</url-pattern>
 		<url-pattern>/timesheet/</url-pattern>
 	</servlet>
-	<servlet name="test" class="org.catrobat.confluence.timesheet.TestServlet" key="test">
-		<url-pattern>/test</url-pattern>
-		<url-pattern>/test/</url-pattern>
-	</servlet>
 	<servlet name="teammanagement" class="org.catrobat.confluence.timesheet.TeamManagementServlet" key="teammanagement">
 			<url-pattern>/teams</url-pattern>
 			<url-pattern>/teams/</url-pattern>

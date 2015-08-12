@@ -1,6 +1,6 @@
 package org.catrobat.confluence.timesheet;
 
-import com.atlassian.sal.api.user.UserKey;
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserProfile;
 import com.google.common.collect.Maps;
 import javax.servlet.*;
@@ -12,51 +12,44 @@ import java.net.URI;
 import java.util.Map;
 
 import com.atlassian.sal.api.auth.LoginUriProvider;
-import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import org.catrobat.confluence.activeobjects.Timesheet;
+import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TimesheetService;
 
 public class TimesheetServlet extends HttpServlet {
 
-  private final UserManager userManager;
   private final LoginUriProvider loginUriProvider;
   private final TemplateRenderer templateRenderer;
   private final TimesheetService sheetService; 
+	private final PermissionService permissionService;
 
-  public TimesheetServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService) {
-    this.userManager = userManager;
-    this.loginUriProvider = loginUriProvider;
-    this.templateRenderer = templateRenderer;
-    this.sheetService = sheetService;
-  }
+	public TimesheetServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
+		this.loginUriProvider = loginUriProvider;
+		this.templateRenderer = templateRenderer;
+		this.sheetService = sheetService;
+		this.permissionService = permissionService;
+	}
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    
-    UserKey userKey = userManager.getRemoteUserKey(request);
-    UserProfile userProfile = userManager.getUserProfile(userKey);
-    String loggedInUsername = (userProfile != null) ? userProfile.getUsername() : null;
-
-    if (loggedInUsername == null) {
-      redirectToLogin(request, response);
-      return;
-    } else if (userManager.isSystemAdmin(userKey)) {
-      System.out.println("SHOW ADMIN PAGE");
-    }
-
-    Map<String, Object> paramMap = Maps.newHashMap();
-    
-    Timesheet sheet = sheetService.getTimesheetByUser(userKey.getStringValue());
-    
-    if(sheet == null) {
-      //todo: check if user is in timesheet group
-      sheet = sheetService.add(userKey.getStringValue(), 150, 0, "");
-    }
-    
-    paramMap.put("timesheetid", sheet.getID());
-    response.setContentType("text/html;charset=utf-8");
-    templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
+    try {
+			UserProfile userProfile = permissionService.checkIfUserExists(request);
+			String userKey = userProfile.getUserKey().getStringValue(); 
+			Timesheet sheet = sheetService.getTimesheetByUser(userKey);
+			
+			if(sheet == null) {
+				sheet = sheetService.add(userKey, 150, 0, "");
+			}
+			
+			Map<String, Object> paramMap = Maps.newHashMap();
+			paramMap.put("timesheetid", sheet.getID());
+			response.setContentType("text/html;charset=utf-8");
+			templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
+		
+		} catch (NotAuthorizedException e) {
+			redirectToLogin(request, response);
+		}
   }
 
   private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {

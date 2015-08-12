@@ -1,6 +1,7 @@
 package org.catrobat.confluence.services.imp;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.confluence.user.UserAccessor;
 import net.java.ao.Query;
 import org.catrobat.confluence.activeobjects.Team;
@@ -41,7 +42,11 @@ public class TeamServiceImpl implements TeamService{
   @Nullable
   public Team getTeamByID(int id) {
     Team[] found = ao.find(Team.class, "ID = ?", id);
-		assert(found.length <= 1);
+
+    if (found.length > 1) {
+      throw new NotAuthorizedException("Multiple Teams with the same ID");
+    }
+
 		return (found.length > 0)? found[0] : null;
   }
 
@@ -49,7 +54,11 @@ public class TeamServiceImpl implements TeamService{
   @Nullable
   public Team getTeamByName(String name) {		
     Team[] found = ao.find(Team.class, "TEAM_NAME = ?", name);
-		assert(found.length <= 1);
+
+    if (found.length > 1) {
+      throw new NotAuthorizedException("Multiple Teams with the same Name");
+    }
+
 		return (found.length > 0)? found[0] : null;
 	}
     

@@ -3,6 +3,8 @@ package org.catrobat.confluence.services.imp;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import java.util.Date;
 import javax.annotation.Nullable;
+
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import net.java.ao.Query;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
@@ -42,13 +44,17 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
   @Nullable
   public TimesheetEntry getEntryByID(int entryID) {
     TimesheetEntry[] found = ao.find(TimesheetEntry.class, "ID = ?", entryID);
-		assert(found.length <= 1);
+
+		if (found.length > 1) {
+			throw new NotAuthorizedException("Multiple Timesheet Entries with the same ID.");
+		}
+
 		return (found.length > 0)? found[0] : null;
   }
   
   @Override
   @Nullable
-	public TimesheetEntry edit(int entryId, Timesheet sheet, Date begin, Date end, 
+	public TimesheetEntry edit(int entryId, Timesheet sheet, Date begin, Date end,
 					Category category, String description, int pause, Team team) {
 		
 		TimesheetEntry entry = getEntryByID(entryId);

@@ -84,4 +84,28 @@ public final class JsonTimesheet {
     this.isActive = isActive;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    JsonTimesheet that = (JsonTimesheet) o;
+
+    if (timesheetID != that.timesheetID) return false;
+    if (targetHourPractice != that.targetHourPractice) return false;
+    if (targetHourTheory != that.targetHourTheory) return false;
+    if (isActive != that.isActive) return false;
+    return lectures.equals(that.lectures);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = timesheetID;
+    result = 31 * result + lectures.hashCode();
+    result = 31 * result + targetHourPractice;
+    result = 31 * result + targetHourTheory;
+    result = 31 * result + (isActive ? 1 : 0);
+    return result;
+  }
 }

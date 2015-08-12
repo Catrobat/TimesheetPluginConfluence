@@ -1,5 +1,6 @@
 package org.catrobat.confluence.services.imp;
 
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
@@ -25,14 +26,13 @@ public class PermissionServiceImpl implements PermissionService {
     this.teamService = teamService;
   }
   
-  public Response checkPermission(HttpServletRequest request) {
-    UserKey userKey = userManager.getRemoteUserKey(request);
+  public UserProfile checkIfUserExists(HttpServletRequest request) {
+    UserProfile userProfile = userManager.getRemoteUser(request);
 
-    if (userKey == null) {
-      return Response.status(Response.Status.UNAUTHORIZED).build();
-    } 
-    
-    return null;
+    if (userProfile == null) {
+      throw new NotAuthorizedException("User does not exist.");
+    }
+    return userProfile;
   }
 
   private boolean userOwnsSheet(UserProfile user, Timesheet sheet) {
@@ -77,41 +77,30 @@ public class PermissionServiceImpl implements PermissionService {
   } 
   
   @Override
-  public Response userCanAddTimesheetEntry(UserProfile user, Timesheet sheet, JsonTimesheetEntry entry) {
+  public void userCanEditTimesheetEntry(UserProfile user, Timesheet sheet, JsonTimesheetEntry entry) {
   
     if (userOwnsSheet(user, sheet)) {
       if (dateIsOld(entry.getBeginDate()) || dateIsOld(entry.getEndDate())) {
-        return Response.status(Response.Status.FORBIDDEN).entity("You cant create records that are older than a month.").build();
-      } else {
-        return null;
+        throw new NotAuthorizedException("You can not add an old entry.");
       }
     }
-    
+
     if (!userIsAdmin(user)) {
-      return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to change this record.").build();
+      throw new NotAuthorizedException("You are not Admin.");
     }
-    
-    return null;
-    
   }
 
   @Override
-  public Response userCanEditTimesheetEntry(UserProfile user, TimesheetEntry entry) {
-    
-    Timesheet sheet = entry.getTimeSheet();
-    
-    if (userOwnsSheet(user, sheet)) {
+  public void userCanDeleteTimesheetEntry(UserProfile user, TimesheetEntry entry) {
+
+    if (userOwnsSheet(user, entry.getTimeSheet())) {
       if (dateIsOld(entry.getBeginDate()) || dateIsOld(entry.getEndDate())) {
-        return Response.status(Response.Status.FORBIDDEN).entity("You cant edit a record that is older than a month.").build();
-      } else {
-        return null;
+        throw new NotAuthorizedException("You can not add an old entry.");
       }
     }
-    
+
     if (!userIsAdmin(user)) {
-      return Response.status(Response.Status.FORBIDDEN).entity("You are not allowed to change this record.").build();
+      throw new NotAuthorizedException("You are not Admin");
     }
-    
-    return null;
   }
 }

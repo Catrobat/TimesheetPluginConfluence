@@ -84,6 +84,7 @@ public class TimesheetRestTest {
     Mockito.when(timeSheetEntry.getPauseMinutes()).thenReturn(30);
     Mockito.when(teamService.getTeamByID(1)).thenReturn(team);
     Mockito.when(sheetService.getTimesheetByID(1)).thenReturn(timeSheet);
+    Mockito.when(entryService.getEntryByID(1)).thenReturn(timeSheetEntry);
   }
 
   @Test
@@ -196,9 +197,64 @@ public class TimesheetRestTest {
             timeSheetEntry.getDescription(),
             timeSheetEntry.getPauseMinutes(), team);
 
+    Assert.assertEquals(expectedTimesheetEntry, response.getEntity());
+  }
+
+  @Test
+  public void testPutTimesheetEntry() throws Exception
+  {
+    String changedDescription = "My changed entry";
+
+    JsonTimesheetEntry expectedTimesheetEntry = new JsonTimesheetEntry(1,
+            timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(),
+            timeSheetEntry.getPauseMinutes(),
+            changedDescription, 1, 2);
+
+    Category category1 = Mockito.mock(Category.class);
+    Mockito.when(category1.getID()).thenReturn(1);
+    Mockito.when(category1.getName()).thenReturn("Meeting");
+
+    Category category2 = Mockito.mock(Category.class);
+    Mockito.when(category2.getID()).thenReturn(2);
+    Mockito.when(category2.getName()).thenReturn("Programming");
+
+    Category[] categories = new Category[2];
+    categories[0] = category1;
+    categories[1] = category2;
+
+    Mockito.when(team.getCategories()).thenReturn(categories);
+    Mockito.when(categoryService.getCategoryByID(1)).thenReturn(category1);
+    Mockito.when(categoryService.getCategoryByID(2)).thenReturn(category2);
+
+    TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
+    Mockito.when(newEntry.getID()).thenReturn(1);
+
+    Mockito.when(entryService.edit(1, timeSheetEntry.getTimeSheet(),
+            timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category2,
+            changedDescription,
+            timeSheetEntry.getPauseMinutes(), team)).thenReturn(newEntry);
+
+    response = timesheetRest.putTimesheetEntry(request, expectedTimesheetEntry, 1);
+
+    Mockito.verify(entryService).edit(1, timeSheetEntry.getTimeSheet(),
+            timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category2,
+            changedDescription,
+            timeSheetEntry.getPauseMinutes(), team);
+
     System.out.println(expectedTimesheetEntry);
     System.out.println(response.getEntity());
 
     Assert.assertEquals(expectedTimesheetEntry, response.getEntity());
+  }
+
+  @Test
+  public void testDeleteTimesheetEntry() throws Exception
+  {
+    TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
+    Mockito.when(newEntry.getID()).thenReturn(1);
+
+    response = timesheetRest.deleteTimesheetEntry(request, 1);
+
+    Mockito.verify(entryService).delete(timeSheetEntry);
   }
 }

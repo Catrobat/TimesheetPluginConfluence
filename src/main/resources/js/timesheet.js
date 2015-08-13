@@ -109,7 +109,7 @@ function populateTable(timesheetData) {
 	timesheetData.entries.map(function (entry) {
 		var entryRow = renderEntryRow(timesheetData, entry);
 		timesheetTableBody.append(entryRow.viewRow);
-		timesheetTableBody.append(entryRow.formRow);
+		timesheetTableBody.append(entryRow.formRow); //@todo fix
 	});
 }
 
@@ -124,7 +124,7 @@ function addNewEntryCallback(entry, timesheetData, form) {
 	var beginTime = form.beginTimeField.timepicker('getTime');
 	var endTime = form.endTimeField.timepicker('getTime');
 
-	form.row.after(entryRow.formRow);
+	form.row.after(entryRow.formRow); //@todo fix
 	form.row.after(entryRow.viewRow);
 	form.beginTimeField.timepicker('setTime', endTime);
 	form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
@@ -257,9 +257,14 @@ function prepareForm(entry, timesheetData) {
 	};
 
 	//date time columns
-	form.dateField.datePicker(
-		{overrideBrowserDefault: true, languageCode: 'de'}
-	);
+	form.dateField
+		.bind("input propertychange", function(){
+			var newValue = form.dateField.val();
+			handleDateChange(newValue, form);
+		})
+		.datePicker(
+			{overrideBrowserDefault: true, languageCode: 'de'}
+		);
 
 	row.find('input.time.start, input.time.end')
 		.timepicker({
@@ -297,6 +302,55 @@ function prepareForm(entry, timesheetData) {
 	}
 	
 	return form;
+}
+
+function handleDateChange(newValue, form) {
+	
+	var valueArray = newValue.split("\t");
+
+	while(valueArray.length > 0) {
+		var arrayLength = (valueArray.length > 8) ? 8 : valueArray.length;  
+		
+		var newLineDate = undefined; 
+		
+		switch(arrayLength) {
+			case 8: 
+				arrayLength--;
+				var descriptionAndDate = valueArray[6].split(" ");
+				newLineDate = new Date(descriptionAndDate.pop());
+				valueArray[6] = descriptionAndDate.join(" ");
+			case 7:
+				form.descriptionField.val(valueArray[6]);
+			case 6:
+			case 5:
+				var pauseVal = valueArray[4]; 
+				if(pauseVal.trim() === "") pauseVal = "00:00";
+				form.pauseTimeField.val(pauseVal);
+			case 4:
+			case 3:
+				form.endTimeField.val(valueArray[2]);
+			case 2:
+				form.beginTimeField.val(valueArray[1]);
+			case 1:
+				form.dateField.val(valueArray[0]);
+		}
+		
+		if(arrayLength === 7) {
+			form.saveButton.trigger("click");
+		}
+		
+		valueArray.reverse();
+		while(arrayLength > 0) {
+			valueArray.pop();
+			arrayLength--;
+		}
+		
+		if(isValidDate(newLineDate)) {
+			valueArray.push(toDateString(newLineDate));
+		}
+		
+		valueArray.reverse();
+	}
 }
 
 /**
@@ -380,10 +434,10 @@ function renderEntryRow(timesheetData, entry) {
 	};
 
 	var entryRow = {};
-	entryRow.formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions);
+	entryRow.formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions); //@todo fix
 	entryRow.viewRow = renderViewRow(timesheetData, augmentedEntry);
 
-	entryRow.formRow.hide();
+	entryRow.formRow.hide(); //@todo fix
 
 	entryRow.viewRow.find("button.edit").click(function () {
 		editEntryClicked(entryRow);
@@ -504,4 +558,24 @@ function calculateDuration(begin, end, pause) {
 
 function countDefinedElementsInArray(array) {
 	return array.filter(function (v) {return v !== undefined}).length;
+}
+
+/**
+ * 
+ * source: http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
+ * @param {type} date
+ * @returns {undefined} 
+ */
+function isValidDate(date) {
+	if ( Object.prototype.toString.call(date) === "[object Date]" ) {
+		if ( isNaN( date.getTime() ) ) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	else {
+		return false;
+	}
 }

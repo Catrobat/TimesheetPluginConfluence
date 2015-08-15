@@ -23,7 +23,7 @@
  * @param teams
  */
 {template .timesheetEntry}
-   <tr>
+   <tr class="entry-view" data-id="{$entry.entryID}">
     <td class="date">{$entry.date}</td>
     <td class="range">{$entry.begin} - {$entry.end}</td>
     <td class="pause">{$entry.pause}</td>
@@ -57,7 +57,7 @@
  * @param teams
  */
 {template .timesheetEntryForm}
-  <tr id="entry-{$entry.entryID}" class="aui">
+  <tr class="entry-form aui" data-id="{$entry.entryID}">
     <td>
       <input class="date aui-date-picker text" type="date" value="{$entry.date}">
     </td>

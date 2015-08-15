@@ -1,20 +1,30 @@
 "use strict";
 
-var baseUrl, timesheetTable, timesheetForm, restBaseUrl;
+//var baseUrl, timesheetTable, timesheetForm, restBaseUrl;
+var restBaseUrl;
 
 AJS.toInit(function () {
-	baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
+	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
 	restBaseUrl = baseUrl + "/rest/timesheet/1.0/";
 
-	timesheetForm = AJS.$("#timesheet-form");
-	timesheetForm.submit(function (event) {
-		//todo: validate
-		event.preventDefault();
-		return false;
-	});
-	timesheetTable = AJS.$("#timesheet-table");
+	var timesheetForm = AJS.$("#timesheet-form");
+	timesheetForm
+		.submit(preventFormSubmission)
+		.keydown(preventButtonClickOnEnter); 
+		
 	fetchData();
 });
+
+function preventFormSubmission(event) {
+	event.preventDefault();
+	return false;
+}
+	
+function preventButtonClickOnEnter(event){
+	if(event.keyCode === 13) {	 
+		return false;	
+	}
+}
 
 function fetchData() {
 	var timesheetFetched = AJS.$.ajax({
@@ -77,6 +87,7 @@ function handletimesheetData(timesheetReply, categoriesReply, teamsReply, entrie
 
 function populateTable(timesheetData) {
 
+	var timesheetTable = AJS.$("#timesheet-table");
 	var timesheetTableHeader = timesheetTable.find("thead");
 	timesheetTableHeader.append(Confluence.Templates.Timesheet.timesheetHeader(
 					{teams: timesheetData.teams}
@@ -107,9 +118,8 @@ function populateTable(timesheetData) {
 
 	//prepare view
 	timesheetData.entries.map(function (entry) {
-		var entryRow = renderEntryRow(timesheetData, entry);
-		timesheetTableBody.append(entryRow.viewRow);
-		timesheetTableBody.append(entryRow.formRow); //@todo fix
+		var viewRow = renderViewRow(timesheetData, entry);
+		timesheetTableBody.append(viewRow);
 	});
 }
 
@@ -120,12 +130,11 @@ function populateTable(timesheetData) {
  * @param {jQuery} form
  */
 function addNewEntryCallback(entry, timesheetData, form) {
-	var entryRow = renderEntryRow(timesheetData, entry);
+	var viewRow = renderViewRow(timesheetData, entry);
 	var beginTime = form.beginTimeField.timepicker('getTime');
 	var endTime = form.endTimeField.timepicker('getTime');
 
-	form.row.after(entryRow.formRow); //@todo fix
-	form.row.after(entryRow.viewRow);
+	form.row.after(viewRow);
 	form.beginTimeField.timepicker('setTime', endTime);
 	form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
 	form.pauseTimeField.val("00:00").trigger('change');
@@ -138,15 +147,25 @@ function addNewEntryCallback(entry, timesheetData, form) {
  * @param {jQuery} form
  */
 function editEntryCallback(entry, timesheetData, form) {
-	var newViewRow = renderViewRow(timesheetData, entry);
-
-	form.row.prev().remove();
-	form.row.before(newViewRow).hide();
-
+	var newViewRow = prepareViewRow(timesheetData, entry); //todo check if entry is augmented
+	var oldViewRow = form.row.prev();
+	
 	newViewRow.find("button.edit").click(function () {
-		newViewRow.hide();
-		form.row.show();
+	newViewRow.hide();
+//		newViewRow.css("opacity", ".2"); //todo remove
+	form.row.show();
+//	form.row.css("opacity", "1"); //todo remove
 	});
+
+	newViewRow.find("button.delete").click(function () {
+		deleteEntryClicked(newViewRow, entry.entryID);
+	});
+	
+	oldViewRow.after(newViewRow);
+	oldViewRow.remove();
+	
+	form.row.hide(); 
+///	form.row.css("opacity", ".2"); //todo remove
 }
 
 /**
@@ -189,7 +208,8 @@ function saveEntryClicked(timesheetData, saveOptions, form) {
 		data: JSON.stringify(entry)
 	})
 	.then(function(entry) {
-		saveOptions.callback(entry, timesheetData, form);
+		var augmentedEntry = augmentEntry(timesheetData, entry);
+		saveOptions.callback(augmentedEntry, timesheetData, form);
 	})
 	.fail(function (error) {
 		AJS.messages.error({
@@ -282,9 +302,10 @@ function prepareForm(entry, timesheetData) {
 
 	new Datepair(row.find(".time-picker")[0]);
 
-	row.find('input.time').change(function () {
-		updateTimeField(form);
-	});
+	row.find('input.time')
+		.change(function () {
+			updateTimeField(form);
+		});
 
 	var initTeamID = (entry.teamID !== undefined)
 				? entry.teamID : Object.keys(teams)[0];
@@ -416,16 +437,14 @@ function changePauseTimeField() {
 }
 
 /**
- * creates a view row (for viewing) and a form row (for editing)
+ * creates a view row with working ui components
  * @param {Object} timesheetData
  * @param {Object} entry
  * @returns {viewrow : jquery, formrow : jquery}
  */
-function renderEntryRow(timesheetData, entry) {
+function renderViewRow(timesheetData, entry) {
 
-	var timesheetID = timesheetData.timesheetID;
-
-	var augmentedEntry = augmentEntryObject(timesheetData, entry);
+	var augmentedEntry = augmentEntry(timesheetData, entry);
 
 	var editEntryOptions = {
 		httpMethod : "put",
@@ -433,33 +452,38 @@ function renderEntryRow(timesheetData, entry) {
 		ajaxUrl    : restBaseUrl + "entries/" + entry.entryID
 	};
 
-	var entryRow = {};
-	entryRow.formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions); //@todo fix
-	entryRow.viewRow = renderViewRow(timesheetData, augmentedEntry);
-
-	entryRow.formRow.hide(); //@todo fix
-
-	entryRow.viewRow.find("button.edit").click(function () {
-		editEntryClicked(entryRow);
+	var viewRow = prepareViewRow(timesheetData, augmentedEntry);
+	viewRow.find("button.edit").click(function () {
+		editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow);
 	});
 
-	entryRow.viewRow.find("button.delete").click(function () {
-		deleteEntryClicked(entryRow, timesheetID, entry.entryID);
+	viewRow.find("button.delete").click(function () {
+		deleteEntryClicked(viewRow, entry.entryID);
 	});
 
-	return entryRow;
+	return viewRow;
 }
 
-function editEntryClicked(entryRow) {
-	entryRow.viewRow.hide();
-	entryRow.formRow.show();
+function editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow) {
+	
+	var formRow = getFormRow(viewRow);
+	
+	if (formRow === undefined) {
+		formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions);
+		viewRow.after(formRow);
+	} 
+	
+	viewRow.hide();
+//		viewRow.css("opacity", ".2"); //todo remove
+	formRow.show();
+//		formRow.css("opacity", "1"); //todo remove
 }
 
-function deleteEntryClicked(entryRow, timesheetID, entryID) {
+function deleteEntryClicked(viewRow, entryID) {
 
 	var ajaxUrl = restBaseUrl + "entries/" + entryID;
 
-	var spinner = entryRow.viewRow.find('span.aui-icon-wait');
+	var spinner = viewRow.find('span.aui-icon-wait');
 	spinner.show();
 
 	AJS.$.ajax({
@@ -468,8 +492,9 @@ function deleteEntryClicked(entryRow, timesheetID, entryID) {
 		contentType: "application/json"
 	})
 	.then(function () {
-		entryRow.viewRow.remove();
-		entryRow.formRow.remove();
+		var formRow = getFormRow(viewRow);
+		if(formRow !== undefined) formRow.remove();
+		viewRow.remove();
 	})
 	.fail(function (error) {
 		AJS.messages.error({
@@ -482,13 +507,25 @@ function deleteEntryClicked(entryRow, timesheetID, entryID) {
 }
 
 /**
+ * Finds and returns the form row that belongs to a view row
+ * @param {jQuery} viewRow
+ * @returns {jQuery} formRow or undefined if not found
+ */
+function getFormRow(viewRow) {
+	var formRow = viewRow.next(".entry-form");
+	if(formRow.data("id") === viewRow.data("id")) {
+		return formRow;
+	}
+}
+
+/**
  * Augments an entry object wth a few attributes by deriving them from its
  * original attributes
  * @param {Object} timesheetData
  * @param {Object} entry
  * @returns {Object} augmented entry
  */
-function augmentEntryObject(timesheetData, entry) {
+function augmentEntry(timesheetData, entry) {
 
 	var pauseDate = new Date(entry.pauseMinutes * 1000 * 60);
 
@@ -515,9 +552,10 @@ function augmentEntryObject(timesheetData, entry) {
  * @param {Object} timesheetData
  * @param {Object} entry
  */
-function renderViewRow(timesheetData, entry) {
+function prepareViewRow(timesheetData, entry) {
 
-	var augmentedEntry = augmentEntryObject(timesheetData, entry);
+  //todo: dont augment entry twice.
+	var augmentedEntry = augmentEntry(timesheetData, entry);
 
 	var viewRow = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
 					{entry: augmentedEntry, teams: timesheetData.teams}));
@@ -561,10 +599,10 @@ function countDefinedElementsInArray(array) {
 }
 
 /**
- * 
+ * Check if date is a valid Date
  * source: http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
  * @param {type} date
- * @returns {undefined} 
+ * @returns {boolean} true, if date is valid 
  */
 function isValidDate(date) {
 	if ( Object.prototype.toString.call(date) === "[object Date]" ) {

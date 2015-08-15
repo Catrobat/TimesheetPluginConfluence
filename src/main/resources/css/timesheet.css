@@ -31,10 +31,13 @@
 #timesheet-table td.team aui-select2-container,
 #timesheet-table td.category aui-select2-container{width:200px;}
 
-#timesheet-table button.edit {
+#timesheet-table button
+{
   visibility:hidden; 
 }
 
-#timesheet-table tr:hover button.edit {
+#timesheet-table tr:hover button,
+#timesheet-table button.save 
+{
   visibility:visible; 
 }

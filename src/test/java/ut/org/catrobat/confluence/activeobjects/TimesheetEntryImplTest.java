@@ -34,10 +34,10 @@ public class TimesheetEntryImplTest {
 						"DESCRIPTION = ?", "Master Fixen"
 		);
 		entry = entries[0];
-
 	}
 	
-	@Test public void testGetDurationMinutes() throws Exception {
+	@Test
+  public void testGetDurationMinutes() throws Exception {
 
 		TimesheetEntry[] entries = ao.find(
 						TimesheetEntry.class,
@@ -47,10 +47,10 @@ public class TimesheetEntryImplTest {
 		//assert
 		assertEquals(entries[0].getDurationMinutes(), 10);
 		assertEquals(entries[1].getDurationMinutes(), 50);
-
 	}
 
-	@Test public void testSetBeginDate() throws Exception {
+	@Test
+  public void testSetBeginDate() throws Exception {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 
@@ -60,7 +60,8 @@ public class TimesheetEntryImplTest {
 		assertEquals(entry.getDurationMinutes(), 70);
 	}
 
-	@Test public void testSetEndDate() throws Exception {
+	@Test
+  public void testSetEndDate() throws Exception {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 
@@ -70,7 +71,8 @@ public class TimesheetEntryImplTest {
 		assertEquals(entry.getDurationMinutes(), 25);
 	}
 
-	@Test public void testSetPauseMinutes() throws Exception {
+	@Test
+  public void testSetPauseMinutes() throws Exception {
 		
 		assertEquals(entry.getDurationMinutes(), 10);
 
@@ -80,7 +82,8 @@ public class TimesheetEntryImplTest {
 		assertEquals(entry.getDurationMinutes(), 12);
 	}
 
-	@Test public void testSetDurationMinutesUpdatesAreUseless() throws Exception {
+	@Test
+  public void testSetDurationMinutesUpdatesAreUseless() throws Exception {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 
@@ -94,5 +97,18 @@ public class TimesheetEntryImplTest {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 	}
+
+  @Test
+  public void testChangeDurationMinutesUpdate() throws Exception {
+
+    assertEquals(entry.getDurationMinutes(), 10);
+
+    entry.setBeginDate(sdf.parse("02-01-2015 08:00"));
+    entry.setEndDate(sdf.parse("02-01-2015 10:00"));
+    entry.setPauseMinutes(0);
+    entry.save();
+
+    assertEquals(entry.getDurationMinutes(), 120);
+  }
 
 }

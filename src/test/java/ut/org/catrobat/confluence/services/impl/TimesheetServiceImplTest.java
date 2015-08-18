@@ -1,4 +1,4 @@
-package ut.org.catrobat.confluence.services.imp;
+package ut.org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import net.java.ao.EntityManager;
@@ -13,7 +13,7 @@ import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.services.TimesheetService;
-import org.catrobat.confluence.services.imp.TimesheetServiceImpl;
+import org.catrobat.confluence.services.impl.TimesheetServiceImpl;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(TimesheetServiceImplTest.MyDatabaseUpdater.class)
@@ -46,7 +46,6 @@ public class TimesheetServiceImplTest {
 			Timesheet sheet = em.create(Timesheet.class);
 			sheet.setUserKey("USER_000");
 			sheet.save();
-
 		}
 	}
 
@@ -62,7 +61,6 @@ public class TimesheetServiceImplTest {
 		assertEquals(userKey,             entries[0].getUserKey());
 		assertEquals(targetHoursPractice, entries[0].getTargetHoursPractice());
 		assertEquals(targetHoursTheory,   entries[0].getTargetHoursTheory());
-		
 	}
 
 	@Test

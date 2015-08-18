@@ -47,7 +47,6 @@ public class ActiveObjectsTest {
 
 		assertEquals(catrobatTeam.getEntries().length, 1);
 		assertEquals(catrobatTeam.getCategories().length, 2);
-
 	}
 
 	@Test

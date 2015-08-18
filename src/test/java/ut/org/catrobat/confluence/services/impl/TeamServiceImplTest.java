@@ -1,4 +1,4 @@
-package ut.org.catrobat.confluence.services.imp;
+package ut.org.catrobat.confluence.services.impl;
 
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.activeobjects.external.ActiveObjects;
@@ -17,7 +17,7 @@ import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.services.TeamService;
-import org.catrobat.confluence.services.imp.TeamServiceImpl;
+import org.catrobat.confluence.services.impl.TeamServiceImpl;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.mockito.Mockito;
@@ -102,6 +102,21 @@ public class TeamServiceImplTest {
     
     //assert
     Assert.assertEquals(expectedTeams, teams);
-    
 	}
+
+  @Test
+  public void testAddAndGetTeamByID() throws Exception
+  {
+    Team addedTeam = service.add("Test");
+    Team receivedTeam = service.getTeamByID(addedTeam.getID());
+    Assert.assertEquals(addedTeam, receivedTeam);
+  }
+
+  @Test
+  public void testAddAndGetTeamByName() throws Exception
+  {
+    Team addedTeam = service.add("Test");
+    Team receivedTeam = service.getTeamByName("Test");
+    Assert.assertEquals(addedTeam, receivedTeam);
+  }
 }

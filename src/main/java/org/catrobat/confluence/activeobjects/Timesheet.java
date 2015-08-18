@@ -24,5 +24,4 @@ public interface Timesheet extends Entity
 
 	@OneToMany(reverse = "getTimeSheet")
 	TimesheetEntry[] getEntries();
-
 }

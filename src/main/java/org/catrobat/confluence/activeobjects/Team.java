@@ -14,5 +14,4 @@ public interface Team extends Entity {
 
   @OneToMany(reverse = "getTeam")
   TimesheetEntry[] getEntries();
-
 }

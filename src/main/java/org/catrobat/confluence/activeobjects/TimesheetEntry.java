@@ -31,5 +31,4 @@ public interface TimesheetEntry extends Entity {
 
 	public int getDurationMinutes();
 	public void setDurationMinutes(int duration);
-
 }

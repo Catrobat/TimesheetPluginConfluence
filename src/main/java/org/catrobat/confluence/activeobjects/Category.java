@@ -14,5 +14,4 @@ public interface Category extends Entity {
 
 	@OneToMany(reverse = "getCategory")
 	TimesheetEntry[] getEntries();
-
 }

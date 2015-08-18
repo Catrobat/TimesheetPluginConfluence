@@ -1,13 +1,12 @@
-package org.catrobat.confluence.services.imp;
+package org.catrobat.confluence.services.impl;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
-import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import java.util.Date;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
+
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;

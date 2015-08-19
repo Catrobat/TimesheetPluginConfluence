@@ -4,17 +4,18 @@
  * @param teams
  */
 {template .timesheetHeader}
-  <tr>
-    <th class="date">Datum</th>
-    <th class="range">Von - Bis</th>
-    <th class="pause">Pause</th>
-    <th class="duration">Dauer</th>
+  <div class="tr">
+    <span class="th date">Datum</span>
+    <span class="th range">Von - Bis</span>
+    <span class="th pause">Pause</span>
+    <span class="th duration">Dauer</span>
     {if length(keys($teams)) > 1} 
-      <th class="team">Team</th>
+      <span class="th team">Team</span>
     {/if}
-    <th class="category">Kategorie</th>
-    <th class="aui-table-column-unsortable">T&auml;tigkeit</th>
-  </tr>
+    <span class="th category">Kategorie</span>
+    <span class="th">T&auml;tigkeit</span>
+    <span class="th"></span>
+  </div>
 {/template}
 
 /**
@@ -23,17 +24,17 @@
  * @param teams
  */
 {template .timesheetEntry}
-   <tr class="entry-view" data-id="{$entry.entryID}">
-    <td class="date">{$entry.date}</td>
-    <td class="range">{$entry.begin} - {$entry.end}</td>
-    <td class="pause">{$entry.pause}</td>
-    <td class="duration">{$entry.duration}</td>
+   <div class="tr entry-view" data-id="{$entry.entryID}">
+    <span class="td date">{$entry.date}</span>
+    <span class="td range">{$entry.begin} - {$entry.end}</span>
+    <span class="td pause">{$entry.pause}</span>
+    <span class="td duration">{$entry.duration}</span>
     {if length(keys($teams)) > 1} 
-      <td>{$entry.team}</td>
+      <span class="td">{$entry.team}</span>
     {/if}
-    <td>{$entry.category}</td>
-    <td>{$entry.description}</td>
-    <td>
+    <span class="td">{$entry.category}</span>
+    <span class="td">{$entry.description}</span>
+    <span class="td">
       <button class="aui-button aui-button-subtle edit">
         {call aui.icons.icon}
           {param useIconFont: true /}
@@ -47,8 +48,8 @@
         {/call} 
       </button>
       <span class="aui-icon aui-icon-wait">Loading...</span>
-    </td>
-  </tr>
+    </span>
+  </div>
 {/template}
 
 /**
@@ -57,34 +58,34 @@
  * @param teams
  */
 {template .timesheetEntryForm}
-  <tr class="entry-form aui" data-id="{$entry.entryID}">
-    <td>
+  <form class="entry-form aui tr" data-id="{$entry.entryID}">
+    <span class="td">
       <input class="date aui-date-picker text" type="date" value="{$entry.date}">
-    </td>
-    <td class="time-picker">
+    </span>
+    <span class="td time-picker">
       <input class="time start text" type="text" value="{$entry.begin}"> &nbsp;
       <input class="time end text" type="text" value="{$entry.end}">
-    </td>
-    <td class="pause">
+    </span>
+    <span class="td pause">
       <input class="time pause text" type="text" value="{$entry.pause}">
-    </td>
-    <td>
+    </span>
+    <span class="td">
       <input class="duration text" type="text" disabled="disabled" value="{$entry.duration}" />
-    </td>
-    <td class="team">
+    </span>
+    <span class="td team">
       <select class="team">
         {foreach $key in keys($teams)}
           <option value="{$key}">{$teams[$key].teamName}</option>
         {/foreach}
       </select>
-    </td>
-    <td>
+    </span>
+    <span class="td">
       <span class="category"></span>
-    </td>
-    <td>
+    </span>
+    <span class="td">
       <input class="description text" type="text" value="{$entry.description}"/> 
-    </td>
-    <td>
+    </span>
+    <span class="td">
       <button class="aui-button aui-button-subtle save">
         {call aui.icons.icon}
           {param useIconFont: true /}
@@ -92,6 +93,6 @@
         {/call}
       </button>
       <span class="aui-icon aui-icon-wait">Loading...</span>
-    </td>
-  </tr>
+    </span>
+  </form>
 {/template}

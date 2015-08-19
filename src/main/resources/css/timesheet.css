@@ -1,10 +1,23 @@
+.table {
+	display:table;
+}
+
+.th {
+	font-weight: bold;
+}
+
+.tr {
+	display:table-row;
+}
+
+.th, .td {
+	display:table-cell;
+}
+
 #timesheet-table .time-picker, 
-#timesheet-table th.range, 
-#timesheet-table td.range, 
-#timesheet-table th.pause, 
-#timesheet-table td.pause, 
-#timesheet-table th.duration 
-#timesheet-table td.duration 
+#timesheet-table .range, 
+#timesheet-table .pause, 
+#timesheet-table .duration 
 {
   text-align:center;
 }
@@ -21,22 +34,22 @@
   color: inherit;
 }
 
-#timesheet-table th.date     {width:87px;}
-#timesheet-table th.range    {width:115px;}
-#timesheet-table th.pause, 
-#timesheet-table th.duration {width:55px;}
-#timesheet-table th.team,
-#timesheet-table th.category {min-width:150px;}
+#timesheet-table .date     {width:87px;}
+#timesheet-table .range    {width:115px;}
+#timesheet-table .pause, 
+#timesheet-table .duration {width:55px;}
+#timesheet-table .team,
+#timesheet-table .category {min-width:150px;}
 
-#timesheet-table td.team aui-select2-container,
-#timesheet-table td.category aui-select2-container{width:200px;}
+#timesheet-table .team aui-select2-container,
+#timesheet-table .category aui-select2-container{width:200px;}
 
 #timesheet-table button
 {
   visibility:hidden; 
 }
 
-#timesheet-table tr:hover button,
+#timesheet-table .tr:hover button,
 #timesheet-table button.save 
 {
   visibility:visible; 

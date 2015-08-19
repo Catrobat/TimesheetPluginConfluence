@@ -6,25 +6,8 @@ var restBaseUrl;
 AJS.toInit(function () {
 	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
 	restBaseUrl = baseUrl + "/rest/timesheet/1.0/";
-
-	var timesheetForm = AJS.$("#timesheet-form");
-	timesheetForm
-		.submit(preventFormSubmission)
-		.keydown(preventButtonClickOnEnter); 
-		
 	fetchData();
 });
-
-function preventFormSubmission(event) {
-	event.preventDefault();
-	return false;
-}
-	
-function preventButtonClickOnEnter(event){
-	if(event.keyCode === 13) {	 
-		return false;	
-	}
-}
 
 function fetchData() {
 	var timesheetFetched = AJS.$.ajax({
@@ -88,14 +71,12 @@ function handletimesheetData(timesheetReply, categoriesReply, teamsReply, entrie
 function populateTable(timesheetData) {
 
 	var timesheetTable = AJS.$("#timesheet-table");
-	var timesheetTableHeader = timesheetTable.find("thead");
-	timesheetTableHeader.append(Confluence.Templates.Timesheet.timesheetHeader(
+	timesheetTable.empty();
+
+	timesheetTable.append(Confluence.Templates.Timesheet.timesheetHeader(
 					{teams: timesheetData.teams}
 	));
-
-	var timesheetTableBody = timesheetTable.find("tbody");
-	timesheetTableBody.empty();
-
+	
 	var emptyEntry = {
 		entryID: "new-id",
 		date: "",
@@ -113,13 +94,11 @@ function populateTable(timesheetData) {
 	};
 	
 	var emptyForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
+	timesheetTable.append(emptyForm);
 
-	timesheetTableBody.append(emptyForm);
-
-	//prepare view
 	timesheetData.entries.map(function (entry) {
 		var viewRow = renderViewRow(timesheetData, entry);
-		timesheetTableBody.append(viewRow);
+		timesheetTable.append(viewRow);
 	});
 }
 
@@ -152,9 +131,7 @@ function editEntryCallback(entry, timesheetData, form) {
 	
 	newViewRow.find("button.edit").click(function () {
 	newViewRow.hide();
-//		newViewRow.css("opacity", ".2"); //todo remove
 	form.row.show();
-//	form.row.css("opacity", "1"); //todo remove
 	});
 
 	newViewRow.find("button.delete").click(function () {
@@ -165,7 +142,6 @@ function editEntryCallback(entry, timesheetData, form) {
 	oldViewRow.remove();
 	
 	form.row.hide(); 
-///	form.row.css("opacity", ".2"); //todo remove
 }
 
 /**
@@ -319,7 +295,7 @@ function prepareForm(entry, timesheetData) {
 		.trigger("change");
 
 	if (countDefinedElementsInArray(teams) < 2) {
-		row.find("td.team").hide();
+		row.find(".team").hide();
 	}
 	
 	return form;
@@ -474,9 +450,7 @@ function editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewR
 	} 
 	
 	viewRow.hide();
-//		viewRow.css("opacity", ".2"); //todo remove
 	formRow.show();
-//		formRow.css("opacity", "1"); //todo remove
 }
 
 function deleteEntryClicked(viewRow, entryID) {
@@ -532,7 +506,7 @@ function augmentEntry(timesheetData, entry) {
 	return {
 		date         : toDateString(new Date(entry.beginDate)),
 		begin        : toTimeString(new Date(entry.beginDate)),
-	  end          : toTimeString(new Date(entry.endDate)),
+		end          : toTimeString(new Date(entry.endDate)),
 		pause        : (entry.pauseMinutes > 0) ? toUTCTimeString(pauseDate) : "",
 		duration     : toTimeString(calculateDuration(entry.beginDate, entry.endDate, pauseDate)),
 		category     : timesheetData.categories[entry.categoryID].categoryName,

@@ -39,7 +39,6 @@ public class TeamServiceImpl implements TeamService{
 	}
 
   @Override
-  @Nullable
   public Team getTeamByID(int id) {
     Team[] found = ao.find(Team.class, "ID = ?", id);
 
@@ -51,7 +50,6 @@ public class TeamServiceImpl implements TeamService{
   }
 
   @Override
-  @Nullable
   public Team getTeamByName(String name) {		
     Team[] found = ao.find(Team.class, "TEAM_NAME = ?", name);
 

@@ -54,3 +54,22 @@
 {
   visibility:visible; 
 }
+
+#button-wrapper {
+	width: 100%;
+	text-align: right;
+}
+
+code {
+	font-weight: bold;
+}
+
+.import-form {
+	text-align: center;
+}
+
+.import-text {
+	width: 100%;
+	height: 80px;
+	overflow-x:scroll;
+}

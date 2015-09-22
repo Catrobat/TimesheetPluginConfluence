@@ -145,6 +145,11 @@ public final class JsonTimesheetEntry {
     return result;
   }
 
+	public String toReadableString() {
+		return beginDate + " - " + endDate + ": " + description + 
+				"; TeamID: " + teamID + "; CategoryID: " + categoryID;
+	}
+	
   @Override
   public String toString() {
     return "JsonTimesheetEntry{" +

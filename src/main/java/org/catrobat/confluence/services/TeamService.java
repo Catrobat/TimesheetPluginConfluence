@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 @Transactional
 public interface TeamService {
@@ -15,14 +16,14 @@ public interface TeamService {
 
 	List<Team> all();
   
+	@Nullable
   Team getTeamByID(int id);
   
+	@Nullable
   Team getTeamByName(String name);
   
-  @Nonnull
   Set<Team> getTeamsOfUser(String userName);
   
-  @Nonnull
   Set<Team> getCoordinatorTeamsOfUser(String userName);
   
 }

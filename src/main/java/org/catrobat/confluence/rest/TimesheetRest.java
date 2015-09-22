@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -24,6 +25,7 @@ import org.catrobat.confluence.rest.json.JsonTimesheet;
 import org.catrobat.confluence.rest.json.JsonTimesheetEntry;
 import org.catrobat.confluence.rest.json.JsonCategory;
 import org.catrobat.confluence.rest.json.JsonTeam;
+import org.catrobat.confluence.rest.json.JsonTimesheetEntries;
 import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.DBFillerService;
 import org.catrobat.confluence.services.PermissionService;
@@ -55,8 +57,17 @@ public class TimesheetRest {
     this.dbfiller = df;
   }
 
-  private void checkIfCategoryIsAssociatedWithTeam(Team team, Category category) {
-    if(!Arrays.asList(team.getCategories()).contains(category)) {
+  private void checkIfCategoryIsAssociatedWithTeam(@Nullable Team team, @Nullable Category category) {
+    
+		if(team == null) {
+      throw new NotAuthorizedException("Team not found.");
+		}
+		
+		if(category == null) {
+      throw new NotAuthorizedException("Category not found.");
+		}
+		
+		if(!Arrays.asList(team.getCategories()).contains(category)) {
       throw new NotAuthorizedException("Category is not associated with Team.");
     }
   }
@@ -166,7 +177,7 @@ public class TimesheetRest {
   }
   
   @POST
-  @Path("timesheets/{timesheetID}/entries")
+  @Path("timesheets/{timesheetID}/entry")
   public Response postTimesheetEntry(@Context HttpServletRequest request, 
       final JsonTimesheetEntry entry, @PathParam("timesheetID") int timesheetID) {
     
@@ -180,7 +191,7 @@ public class TimesheetRest {
       sheet = sheetService.getTimesheetByID(timesheetID);
       category = categoryService.getCategoryByID(entry.getCategoryID());
       team = teamService.getTeamByID(entry.getTeamID());
-      checkIfCategoryIsAssociatedWithTeam(team, category);
+			checkIfCategoryIsAssociatedWithTeam(team, category);
       permissionService.userCanEditTimesheetEntry(user, sheet, entry);
     } catch (NotAuthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
@@ -194,6 +205,51 @@ public class TimesheetRest {
     
     return Response.ok(entry).build();
   }
+	
+	@POST
+  @Path("timesheets/{timesheetID}/entries")
+  public Response postTimesheetEntries(@Context HttpServletRequest request, 
+      final JsonTimesheetEntry[] entries, @PathParam("timesheetID") int timesheetID) {
+
+		Timesheet sheet;
+    UserProfile user;
+		
+    try {
+      user = permissionService.checkIfUserExists(request);
+      sheet = sheetService.getTimesheetByID(timesheetID);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
+		
+		List<JsonTimesheetEntry> newEntries = new LinkedList<JsonTimesheetEntry>();
+		List<String> errorMessages = new LinkedList<String>();
+		
+		for(JsonTimesheetEntry entry : entries) {
+			try {
+				permissionService.userCanEditTimesheetEntry(user, sheet, entry);
+				Category category = categoryService.getCategoryByID(entry.getCategoryID());
+				Team team = teamService.getTeamByID(entry.getTeamID());
+				checkIfCategoryIsAssociatedWithTeam(team, category);
+
+				TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(),
+					entry.getEndDate(), category, entry.getDescription(), 
+					entry.getPauseMinutes(), team);
+				
+				entry.setEntryID(newEntry.getID());
+				newEntries.add(entry);
+				
+			} catch (NotAuthorizedException e) {
+				errorMessages.add(entry.toReadableString() + ": " + e.getMessage());
+			}
+		}
+		
+		JsonTimesheetEntries jsonNewEntries = new JsonTimesheetEntries(
+			newEntries.toArray(new JsonTimesheetEntry[newEntries.size()]),
+			errorMessages.toArray(new String[errorMessages.size()])
+		);
+		
+		return Response.ok(jsonNewEntries).build();
+	}
 
   @PUT
   @Path("entries/{entryID}")

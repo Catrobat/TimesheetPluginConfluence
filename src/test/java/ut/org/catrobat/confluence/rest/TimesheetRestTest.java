@@ -1,5 +1,6 @@
 package ut.org.catrobat.confluence.rest;
 
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import junit.framework.Assert;
@@ -335,12 +336,5 @@ public class TimesheetRestTest {
     response = timesheetRest.cleanAndInitDB();
 
     Assert.assertTrue(response.getEntity().toString() == "you're not admin");
-
-    //check if all methods from DBFillerServiceImpl.java are called
-    /*
-    Mockito.verify(dbFillerService).cleanDB();
-    Mockito.verify(dbFillerService).insertDefaultData();
-    Mockito.verify(dbFillerService).printDBStatus();
-    */
   }
 }

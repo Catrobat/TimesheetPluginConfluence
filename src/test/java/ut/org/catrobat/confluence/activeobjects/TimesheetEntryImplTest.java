@@ -35,9 +35,9 @@ public class TimesheetEntryImplTest {
 		);
 		entry = entries[0];
 	}
-	
+
 	@Test
-  public void testGetDurationMinutes() throws Exception {
+	public void testGetDurationMinutes() throws Exception {
 
 		TimesheetEntry[] entries = ao.find(
 						TimesheetEntry.class,
@@ -50,7 +50,7 @@ public class TimesheetEntryImplTest {
 	}
 
 	@Test
-  public void testSetBeginDate() throws Exception {
+	public void testSetBeginDate() throws Exception {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 
@@ -61,19 +61,19 @@ public class TimesheetEntryImplTest {
 	}
 
 	@Test
-  public void testSetEndDate() throws Exception {
+	public void testSetEndDate() throws Exception {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 
 		entry.setEndDate(sdf.parse("02-01-2015 11:00"));
 		entry.save();
-		
+
 		assertEquals(entry.getDurationMinutes(), 25);
 	}
 
 	@Test
-  public void testSetPauseMinutes() throws Exception {
-		
+	public void testSetPauseMinutes() throws Exception {
+
 		assertEquals(entry.getDurationMinutes(), 10);
 
 		entry.setPauseMinutes(3);
@@ -83,32 +83,26 @@ public class TimesheetEntryImplTest {
 	}
 
 	@Test
-  public void testSetDurationMinutesUpdatesAreUseless() throws Exception {
+	public void testSetDurationMinutesUpdatesAreUseless() throws Exception {
 
 		assertEquals(entry.getDurationMinutes(), 10);
 
-		try {
-			entry.setDurationMinutes(100);
-			entry.save();
-		} catch (AssertionError e) {
-			assertEquals(entry.getDurationMinutes(), 10);
-			return;
-		}
+		entry.setDurationMinutes(100);
+		entry.save();
 
 		assertEquals(entry.getDurationMinutes(), 10);
 	}
 
-  @Test
-  public void testChangeDurationMinutesUpdate() throws Exception {
+	@Test
+	public void testChangeDurationMinutesUpdate() throws Exception {
 
-    assertEquals(entry.getDurationMinutes(), 10);
+		assertEquals(entry.getDurationMinutes(), 10);
 
-    entry.setBeginDate(sdf.parse("02-01-2015 08:00"));
-    entry.setEndDate(sdf.parse("02-01-2015 10:00"));
-    entry.setPauseMinutes(0);
-    entry.save();
+		entry.setBeginDate(sdf.parse("02-01-2015 08:00"));
+		entry.setEndDate(sdf.parse("02-01-2015 10:00"));
+		entry.setPauseMinutes(0);
+		entry.save();
 
-    assertEquals(entry.getDurationMinutes(), 120);
-  }
-
+		assertEquals(entry.getDurationMinutes(), 120);
+	}
 }

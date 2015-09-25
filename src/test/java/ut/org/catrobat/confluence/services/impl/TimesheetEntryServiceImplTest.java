@@ -18,6 +18,7 @@ package ut.org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.test.TestActiveObjects;
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import junit.framework.Assert;
 import net.java.ao.EntityManager;
 import net.java.ao.test.jdbc.Data;
@@ -27,6 +28,7 @@ import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TimesheetEntryService;
 import org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl;
 import org.junit.Before;
@@ -43,9 +45,10 @@ import static org.junit.Assert.assertNotNull;
 
 public class TimesheetEntryServiceImplTest {
 
-  private EntityManager entityManager;
+	private EntityManager entityManager;
 	private TimesheetEntryService service;
-  private ActiveObjects ao;
+	private PermissionService permissionService;
+	private ActiveObjects ao;
 
 	@Before
 	public void setUp() throws Exception
@@ -152,25 +155,25 @@ public class TimesheetEntryServiceImplTest {
 	@Test
 	public void testDeleteTimesheetEntry() throws Exception
 	{
-    //Arrange
-    long oneHourInMS   = 60 * 60 * 1000;
-    Timesheet sheet    = ao.create(Timesheet.class);
-    Category  category = ao.create(Category.class);
-    Team team = ao.create(Team.class);
-    Date      begin    = new Date();
-    Date      end      = new Date(begin.getTime() + oneHourInMS);
-    String    desc     = "Debugged this thingy...";
-    int       pause		 = 0;
+		//Arrange
+		long oneHourInMS   = 60 * 60 * 1000;
+		Timesheet sheet    = ao.create(Timesheet.class);
+		Category  category = ao.create(Category.class);
+		Team team = ao.create(Team.class);
+		Date      begin    = new Date();
+		Date      end      = new Date(begin.getTime() + oneHourInMS);
+		String    desc     = "Debugged this thingy...";
+		int       pause		 = 0;
 
-    //Act
-    service.add(sheet, begin, end, category, desc, pause, team);
-    TimesheetEntry[] entriesBeforeDelete = ao.find(TimesheetEntry.class);
+		//Act
+		service.add(sheet, begin, end, category, desc, pause, team);
+		TimesheetEntry[] entriesBeforeDelete = ao.find(TimesheetEntry.class);
 
-    service.delete(entriesBeforeDelete[0]);
-    TimesheetEntry[] entriesAfterDelete = ao.find(TimesheetEntry.class);
+		service.delete(entriesBeforeDelete[0]);
+		TimesheetEntry[] entriesAfterDelete = ao.find(TimesheetEntry.class);
 
-    Assert.assertTrue(entriesBeforeDelete.length > entriesAfterDelete.length);
-  }
+		Assert.assertTrue(entriesBeforeDelete.length > entriesAfterDelete.length);
+	}
 
 	@Test
 	public void testEditTimesheetEntryWithSetter() throws Exception

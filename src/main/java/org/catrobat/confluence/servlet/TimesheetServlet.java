@@ -1,4 +1,4 @@
-package org.catrobat.confluence.timesheet;
+package org.catrobat.confluence.servlet;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserProfile;
@@ -46,7 +46,7 @@ public class TimesheetServlet extends HttpServlet {
 			paramMap.put("timesheetid", sheet.getID());
 			response.setContentType("text/html;charset=utf-8");
 			templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
-		
+
 		} catch (NotAuthorizedException e) {
 			redirectToLogin(request, response);
 		}

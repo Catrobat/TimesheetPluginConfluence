@@ -1,6 +1,5 @@
 package ut.org.catrobat.confluence.rest;
 
-import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import junit.framework.Assert;

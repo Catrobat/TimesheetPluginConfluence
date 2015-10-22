@@ -1,4 +1,4 @@
-package org.catrobat.confluence.timesheet;
+package org.catrobat.confluence.servlet;
 
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.sal.api.auth.LoginUriProvider;

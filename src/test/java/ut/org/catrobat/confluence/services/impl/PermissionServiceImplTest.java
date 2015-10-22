@@ -36,11 +36,12 @@ import static org.junit.Assert.*;
 
 public class PermissionServiceImplTest {
 
+  private static Team catroid, html5, drone;
+  @Rule public org.mockito.junit.MockitoRule mockitoRule = MockitoJUnit.rule();
   private PermissionServiceImpl permissionService, permissionServiceException;
   private TeamService teamService;
   private UserManager userManager;
   private EntityManager entityManager;
-  private static Team catroid, html5, drone;
   private UserProfile coord, owner, eve, test, admin;
   private Timesheet sheet;
   private TimesheetEntry timeSheetEntry;
@@ -48,10 +49,8 @@ public class PermissionServiceImplTest {
   private Team team;
   private TimesheetService sheetService;
   private TimesheetEntryService entryService;
-
   private SimpleDateFormat sdf;
 
-  @Rule public org.mockito.junit.MockitoRule mockitoRule = MockitoJUnit.rule();
   @Before
   public void setUp() throws Exception
   {
@@ -86,26 +85,26 @@ public class PermissionServiceImplTest {
 
     Mockito.when(coord.getUserKey()).thenReturn(coord_key);
     Mockito.when(owner.getUserKey()).thenReturn(owner_key);
-    Mockito.when(eve.getUserKey())  .thenReturn(eve_key);
-    Mockito.when(test.getUserKey())  .thenReturn(test_key);
+    Mockito.when(eve.getUserKey()).thenReturn(eve_key);
+    Mockito.when(test.getUserKey()).thenReturn(test_key);
     Mockito.when(admin.getUserKey()).thenReturn(admin_key);
 
     Mockito.when(coord.getUsername()).thenReturn("coord");
     Mockito.when(owner.getUsername()).thenReturn("owner");
-    Mockito.when(eve.getUsername())  .thenReturn("eve");
-    Mockito.when(test.getUsername())  .thenReturn("test");
+    Mockito.when(eve.getUsername()).thenReturn("eve");
+    Mockito.when(test.getUsername()).thenReturn("test");
     Mockito.when(admin.getUsername()).thenReturn("admin");
 
     Mockito.when(userManager.isAdmin(owner_key)).thenReturn(false);
     Mockito.when(userManager.isAdmin(coord_key)).thenReturn(false);
-    Mockito.when(userManager.isAdmin(eve_key))  .thenReturn(false);
-    Mockito.when(userManager.isAdmin(test_key))  .thenReturn(false);
+    Mockito.when(userManager.isAdmin(eve_key)).thenReturn(false);
+    Mockito.when(userManager.isAdmin(test_key)).thenReturn(false);
     Mockito.when(userManager.isAdmin(admin_key)).thenReturn(true);
 
     Mockito.when(userManager.getUserProfile(owner_key.getStringValue())).thenReturn(owner);
     Mockito.when(userManager.getUserProfile(admin_key.getStringValue())).thenReturn(admin);
-    Mockito.when(userManager.getUserProfile(eve_key.getStringValue()))  .thenReturn(eve);
-    Mockito.when(userManager.getUserProfile(test_key.getStringValue()))  .thenReturn(test);
+    Mockito.when(userManager.getUserProfile(eve_key.getStringValue())).thenReturn(eve);
+    Mockito.when(userManager.getUserProfile(test_key.getStringValue())).thenReturn(test);
     Mockito.when(userManager.getUserProfile(coord_key.getStringValue())).thenReturn(coord);
 
     Set<Team> owner_teams  = new HashSet<Team>();
@@ -127,25 +126,6 @@ public class PermissionServiceImplTest {
     Mockito.when(teamService.getCoordinatorTeamsOfUser("owner")).thenReturn(no_teams);
     Mockito.when(teamService.getCoordinatorTeamsOfUser("eve")).thenReturn(no_teams);
     Mockito.when(teamService.getCoordinatorTeamsOfUser("admin")).thenReturn(no_teams);
-  }
-
-  public static class MyDatabaseUpdater implements DatabaseUpdater {
-
-    @Override
-    public void update(EntityManager em) throws Exception {
-      em.migrate(Team.class);
-      catroid = em.create(Team.class);
-      catroid.setTeamName("catroid");
-      catroid.save();
-
-      html5 = em.create(Team.class);
-      html5.setTeamName("html5");
-      html5.save();
-
-      drone = em.create(Team.class);
-      drone.setTeamName("drone");
-      drone.save();
-    }
   }
 
   @Test
@@ -345,5 +325,24 @@ public class PermissionServiceImplTest {
 
     permissionService.userCanDeleteTimesheetEntry(owner, timeSheetEntry);
     Mockito.verify(permissionServiceException).userCanDeleteTimesheetEntry(owner, timeSheetEntry);
+  }
+
+  public static class MyDatabaseUpdater implements DatabaseUpdater {
+
+    @Override
+    public void update(EntityManager em) throws Exception {
+      em.migrate(Team.class);
+      catroid = em.create(Team.class);
+      catroid.setTeamName("catroid");
+      catroid.save();
+
+      html5 = em.create(Team.class);
+      html5.setTeamName("html5");
+      html5.save();
+
+      drone = em.create(Team.class);
+      drone.setTeamName("drone");
+      drone.save();
+    }
   }
 }

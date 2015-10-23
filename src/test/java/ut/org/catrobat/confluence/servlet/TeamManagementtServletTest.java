@@ -81,7 +81,5 @@ public class TeamManagementtServletTest {
     Mockito.when(userManager.getUserProfile(admin_key)).thenReturn(null);
 
     teamManagementServlet.doGet(request, response);
-
-    teamManagementServlet.doGet(request, response);
   }
 }

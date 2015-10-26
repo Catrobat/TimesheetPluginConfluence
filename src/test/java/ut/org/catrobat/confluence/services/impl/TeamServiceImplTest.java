@@ -1,4 +1,4 @@
-package ut.org.catrobat.confluence.services.imp;
+package ut.org.catrobat.confluence.services.impl;
 
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.activeobjects.external.ActiveObjects;
@@ -34,11 +34,11 @@ public class TeamServiceImplTest {
   private UserAccessor userAccessor;
   private List<String> groups;
   private static Team catroid, html5, drone;
-  
+
   @Rule public org.mockito.junit.MockitoRule mockitoRule = MockitoJUnit.rule();
   @Before
-	public void setUp() throws Exception
-	{
+  public void setUp() throws Exception
+  {
     groups = new ArrayList<String>();
     groups.add("Administrators");
     groups.add("Catroid");
@@ -48,60 +48,75 @@ public class TeamServiceImplTest {
     groups.add("HTML5-Coordinators");
 
     userAccessor = Mockito.mock(UserAccessor.class);
-		assertNotNull(entityManager);
-		ao = new TestActiveObjects(entityManager);
-		service = new TeamServiceImpl(ao, userAccessor);
-	}
+    assertNotNull(entityManager);
+    ao = new TestActiveObjects(entityManager);
+    service = new TeamServiceImpl(ao, userAccessor);
+  }
 
-	public static class MyDatabaseUpdater implements DatabaseUpdater {
+  public static class MyDatabaseUpdater implements DatabaseUpdater {
 
-		@Override
-		public void update(EntityManager em) throws Exception {
-			em.migrate(Team.class);
+    @Override
+    public void update(EntityManager em) throws Exception {
+      em.migrate(Team.class);
       catroid = em.create(Team.class);
       catroid.setTeamName("Catroid");
       catroid.save();
-      
+
       html5 = em.create(Team.class);
       html5.setTeamName("HTML5");
       html5.save();
-      
+
       drone = em.create(Team.class);
       drone.setTeamName("Drone");
       drone.save();
-		}
-	}
-	
-	@Test
-	public void testGetTeamsOfUser() throws Exception
-	{
+    }
+  }
+
+  @Test
+  public void testGetTeamsOfUser() throws Exception
+  {
     //arrange
     String userName = "user_x";
     Mockito.when(userAccessor.getGroupNamesForUserName(userName)).thenReturn(groups);
     Set<Team> expectedTeams = new HashSet<Team>(2);
     expectedTeams.add(catroid);
     expectedTeams.add(html5);
-    
+
     Set<Team> teams = service.getTeamsOfUser(userName);
-    
+
     //assert
     Assert.assertEquals(expectedTeams, teams);
-	}
-	
+  }
+
   @Test
-	public void testGetCoordinatorTeamsOfUser() throws Exception
-	{
+  public void testGetCoordinatorTeamsOfUser() throws Exception
+  {
     //arrange
     String userName = "user_x";
     Mockito.when(userAccessor.getGroupNamesForUserName(userName)).thenReturn(groups);
     Set<Team> expectedTeams = new HashSet<Team>(1);
     expectedTeams.add(html5);
-    
+
     //act
     Set<Team> teams = service.getCoordinatorTeamsOfUser(userName);
-    
+
     //assert
     Assert.assertEquals(expectedTeams, teams);
-    
-	}
+  }
+
+  @Test
+  public void testAddAndGetTeamByID() throws Exception
+  {
+    Team addedTeam = service.add("Test");
+    Team receivedTeam = service.getTeamByID(addedTeam.getID());
+    Assert.assertEquals(addedTeam, receivedTeam);
+  }
+
+  @Test
+  public void testAddAndGetTeamByName() throws Exception
+  {
+    Team addedTeam = service.add("Test");
+    Team receivedTeam = service.getTeamByName("Test");
+    Assert.assertEquals(addedTeam, receivedTeam);
+  }
 }

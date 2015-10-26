@@ -13,19 +13,19 @@ import org.catrobat.confluence.rest.json.JsonTeam;
 import org.catrobat.confluence.rest.json.JsonTimesheet;
 import org.catrobat.confluence.rest.json.JsonTimesheetEntry;
 import org.catrobat.confluence.services.*;
+import org.catrobat.confluence.services.impl.DBFillerServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-/**
- * Created by Adrian Schnedlitz on 10.08.2015.
- */
 public class TimesheetRestTest {
 
   private CategoryService categoryService;
@@ -42,6 +42,7 @@ public class TimesheetRestTest {
   private TimesheetRest timesheetRest;
   private TimesheetEntryService entryService;
   private Team team;
+  private DBFillerService dbFillerService;
 
   private SimpleDateFormat sdf;
 
@@ -60,6 +61,7 @@ public class TimesheetRestTest {
     timeSheet = Mockito.mock(Timesheet.class);
     timeSheetEntry = Mockito.mock(TimesheetEntry.class);
     team = Mockito.mock(Team.class);
+    dbFillerService = Mockito.mock(DBFillerServiceImpl.class);
 
     timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller);
 
@@ -82,6 +84,7 @@ public class TimesheetRestTest {
     Mockito.when(timeSheetEntry.getEndDate()).thenReturn(sdf.parse("31-12-2015 23:59"));
     Mockito.when(timeSheetEntry.getDescription()).thenReturn("My First Entry");
     Mockito.when(timeSheetEntry.getPauseMinutes()).thenReturn(30);
+    Mockito.when(timeSheetEntry.getID()).thenReturn(1);
     Mockito.when(teamService.getTeamByID(1)).thenReturn(team);
     Mockito.when(sheetService.getTimesheetByID(1)).thenReturn(timeSheet);
     Mockito.when(entryService.getEntryByID(1)).thenReturn(timeSheetEntry);
@@ -95,7 +98,7 @@ public class TimesheetRestTest {
   }
 
   @Test
-  public void testGetTeams() throws Exception
+  public void testGetTeamsOk() throws Exception
   {
     List<JsonTeam> expectedTeams = new LinkedList<JsonTeam>();
     expectedTeams.add(new JsonTeam(1, "Catroid", new int[0]));
@@ -124,7 +127,38 @@ public class TimesheetRestTest {
   }
 
   @Test
-  public void testGetCategories() throws Exception
+  public void testGetTeamsNotOk() throws Exception
+  {
+    List<JsonTeam> expectedTeams = new LinkedList<JsonTeam>();
+    expectedTeams.add(new JsonTeam(1, "Catroid", new int[0]));
+    expectedTeams.add(new JsonTeam(2, "IRC", new int[0]));
+    expectedTeams.add(new JsonTeam(3, "Test", new int[0]));
+
+    Team team1 = Mockito.mock(Team.class);
+    Mockito.when(team1.getID()).thenReturn(1);
+    Mockito.when(team1.getTeamName()).thenReturn("Catroid");
+    Mockito.when(team1.getCategories()).thenReturn(new Category[0]);
+
+    Team team2 = Mockito.mock(Team.class);
+    Mockito.when(team2.getID()).thenReturn(2);
+    Mockito.when(team2.getTeamName()).thenReturn("IRC");
+    Mockito.when(team2.getCategories()).thenReturn(new Category[0]);
+
+    Set<Team> teams = new HashSet<Team>();
+    teams.add(team1);
+    teams.add(team2);
+
+    Mockito.when(teamService.getTeamsOfUser("testUser")).thenReturn(teams);
+
+    response = timesheetRest.getTeams(request);
+    List<JsonTeam> responseTeamList = (List<JsonTeam>)response.getEntity();
+    Assert.assertTrue(responseTeamList.contains(expectedTeams.get(0)));
+    Assert.assertTrue(responseTeamList.contains(expectedTeams.get(1)));
+    Assert.assertFalse(responseTeamList.contains(expectedTeams.get(2)));
+  }
+
+  @Test
+  public void testGetCategoriesOk() throws Exception
   {
     List<JsonCategory> expectedCategories = new LinkedList<JsonCategory>();
     expectedCategories.add(new JsonCategory(1, "Programming"));
@@ -149,7 +183,32 @@ public class TimesheetRestTest {
   }
 
   @Test
-  public void testGetAndVerifyTimeSheet() throws Exception
+  public void testGetCategoriesNotOk() throws Exception {
+    List<JsonCategory> expectedCategories = new LinkedList<JsonCategory>();
+    expectedCategories.add(new JsonCategory(1, "Programming"));
+    expectedCategories.add(new JsonCategory(2, "Meeting"));
+    expectedCategories.add(new JsonCategory(3, "Test"));
+
+    Category category1 = Mockito.mock(Category.class);
+    Mockito.when(category1.getID()).thenReturn(2);
+    Mockito.when(category1.getName()).thenReturn("Meeting");
+
+    Category category2 = Mockito.mock(Category.class);
+    Mockito.when(category2.getID()).thenReturn(1);
+    Mockito.when(category2.getName()).thenReturn("Programming");
+
+    List<Category> categories = new LinkedList<Category>();
+    categories.add(category2);
+    categories.add(category1);
+
+    Mockito.when(categoryService.all()).thenReturn(categories);
+
+    response = timesheetRest.getCategories(request);
+    Assert.assertFalse(expectedCategories == response.getEntity());
+  }
+
+  @Test
+  public void testGetAndVerifyTimeSheetOk() throws Exception
   {
     JsonTimesheet expectedTimesheet = new JsonTimesheet(1,
             timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
@@ -158,6 +217,18 @@ public class TimesheetRestTest {
     response = timesheetRest.getTimesheet(request, 1);
 
     Assert.assertEquals(expectedTimesheet, response.getEntity());
+  }
+
+  @Test
+  public void testGetAndVerifyTimeSheetNotOk() throws Exception
+  {
+    JsonTimesheet expectedTimesheet = new JsonTimesheet(5,
+            timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
+            timeSheet.getLecture(), timeSheet.getIsActive());
+
+    response = timesheetRest.getTimesheet(request, 1);
+
+    Assert.assertFalse(expectedTimesheet == response.getEntity());
   }
 
   @Test
@@ -187,8 +258,7 @@ public class TimesheetRestTest {
 
     Mockito.when(entryService.add(timeSheet,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category1,
-            timeSheetEntry.getDescription(),
-            timeSheetEntry.getPauseMinutes(), team)).thenReturn(newEntry);
+            timeSheetEntry.getDescription(), timeSheetEntry.getPauseMinutes(), team)).thenReturn(newEntry);
 
     response = timesheetRest.postTimesheetEntry(request, expectedTimesheetEntry, 1);
 
@@ -241,14 +311,11 @@ public class TimesheetRestTest {
             changedDescription,
             timeSheetEntry.getPauseMinutes(), team);
 
-    System.out.println(expectedTimesheetEntry);
-    System.out.println(response.getEntity());
-
     Assert.assertEquals(expectedTimesheetEntry, response.getEntity());
   }
 
   @Test
-  public void testDeleteTimesheetEntry() throws Exception
+  public void testDeleteTimesheetEntryOk() throws Exception
   {
     TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
     Mockito.when(newEntry.getID()).thenReturn(1);
@@ -256,5 +323,16 @@ public class TimesheetRestTest {
     response = timesheetRest.deleteTimesheetEntry(request, 1);
 
     Mockito.verify(entryService).delete(timeSheetEntry);
+  }
+
+  @Test
+  public void testCleanAndInitDBNotAdmin() throws Exception
+  {
+    TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
+    Mockito.when(newEntry.getID()).thenReturn(1);
+
+    response = timesheetRest.cleanAndInitDB();
+
+    Assert.assertTrue(response.getEntity().toString() == "you're not admin");
   }
 }

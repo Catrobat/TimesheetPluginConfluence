@@ -1,4 +1,4 @@
-package ut.org.catrobat.confluence.services.imp;
+package ut.org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import net.java.ao.EntityManager;
@@ -20,9 +20,9 @@ import org.catrobat.confluence.services.impl.TimesheetServiceImpl;
 
 public class TimesheetServiceImplTest {
 
-  private EntityManager entityManager;
+	private EntityManager entityManager;
 	private TimesheetService service;
-  private ActiveObjects ao;
+	private ActiveObjects ao;
 
 	final String userKey          = "USER_001";
 	final int targetHoursPractice = 150;
@@ -46,7 +46,6 @@ public class TimesheetServiceImplTest {
 			Timesheet sheet = em.create(Timesheet.class);
 			sheet.setUserKey("USER_000");
 			sheet.save();
-
 		}
 	}
 
@@ -62,7 +61,6 @@ public class TimesheetServiceImplTest {
 		assertEquals(userKey,             entries[0].getUserKey());
 		assertEquals(targetHoursPractice, entries[0].getTargetHoursPractice());
 		assertEquals(targetHoursTheory,   entries[0].getTargetHoursTheory());
-		
 	}
 
 	@Test
@@ -122,26 +120,26 @@ public class TimesheetServiceImplTest {
 		//Assert
 		assertNull(missingSheet);
 	}
-	
-  @Test
+
+	@Test
 	public void testGetTimesheetByID() throws Exception
 	{
 		//Act
 		Timesheet[] sheets = ao.find(Timesheet.class, "USER_KEY = ?", "USER_000");
-    Timesheet refSheet = sheets[0];
-    Timesheet checkSheet = service.getTimesheetByID(refSheet.getID());
-    
+		Timesheet refSheet = sheets[0];
+		Timesheet checkSheet = service.getTimesheetByID(refSheet.getID());
+
 		//Assert
-    assertEquals(refSheet, checkSheet);
+		assertEquals(refSheet, checkSheet);
 	}
-  
-  @Test
+
+	@Test
 	public void testGetTimesheetByMissingID() throws Exception
 	{
 		//Act
-    Timesheet sheet = service.getTimesheetByID(12345);
-    
+		Timesheet sheet = service.getTimesheetByID(12345);
+
 		//Assert
-    assertNull(sheet);
+		assertNull(sheet);
 	}
 }

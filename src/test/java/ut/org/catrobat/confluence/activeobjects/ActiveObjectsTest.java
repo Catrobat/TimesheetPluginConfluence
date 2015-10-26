@@ -26,8 +26,8 @@ import org.catrobat.confluence.activeobjects.TimesheetEntry;
  */
 public class ActiveObjectsTest {
 
-  private EntityManager entityManager;
-  private ActiveObjects ao;
+	private EntityManager entityManager;
+	private ActiveObjects ao;
 
 	@Before
 	public void setUp() throws Exception
@@ -47,7 +47,6 @@ public class ActiveObjectsTest {
 
 		assertEquals(catrobatTeam.getEntries().length, 1);
 		assertEquals(catrobatTeam.getCategories().length, 2);
-
 	}
 
 	@Test
@@ -85,12 +84,11 @@ public class ActiveObjectsTest {
 		SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
 		tf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-		TimesheetEntry[] entries = ao.find(TimesheetEntry.class, 
+		TimesheetEntry[] entries = ao.find(TimesheetEntry.class,
 						"DATEDIFF('minute', BEGIN_DATE, END_DATE) - PAUSE_MINUTES < 20" );
 
 		//assert
 		assertEquals(entries.length, 1);
 		assertEquals(entries[0].getDescription(), "Master Fixen");
 	}
-
 }

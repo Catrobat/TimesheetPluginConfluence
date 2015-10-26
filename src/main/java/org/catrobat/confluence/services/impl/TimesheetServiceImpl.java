@@ -1,4 +1,4 @@
-package org.catrobat.confluence.services.imp;
+package org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import static com.google.common.collect.Lists.newArrayList;

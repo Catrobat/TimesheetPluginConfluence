@@ -65,12 +65,12 @@
 		<decription>Processes @Transactional annotations.</decription>
 	</component>
   
-  <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.imp.TeamServiceImpl"/>
-  <component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.imp.TimesheetServiceImpl"/>
-  <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl"/>
-  <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.imp.CategoryServiceImpl"/>
-  <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.imp.PermissionServiceImpl"/>
-  <component key="dbfiller-service" name="DBFiller Service" class="org.catrobat.confluence.services.imp.DBFillerServiceImpl"/>
+  <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.impl.TeamServiceImpl"/>
+  <component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.impl.TimesheetServiceImpl"/>
+  <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl"/>
+  <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.impl.CategoryServiceImpl"/>
+  <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.impl.PermissionServiceImpl"/>
+  <component key="dbfiller-service" name="DBFiller Service" class="org.catrobat.confluence.services.impl.DBFillerServiceImpl"/>
 
 	<ao key="ao-module">
 		<description>The module configuring the Active Objects service used by this plugin</description>

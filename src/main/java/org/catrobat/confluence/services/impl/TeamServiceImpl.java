@@ -1,4 +1,4 @@
-package org.catrobat.confluence.services.imp;
+package org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
@@ -12,7 +12,6 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 import java.util.Set;
 import java.util.HashSet;
-import javax.annotation.Nullable;
 
 public class TeamServiceImpl implements TeamService{
 

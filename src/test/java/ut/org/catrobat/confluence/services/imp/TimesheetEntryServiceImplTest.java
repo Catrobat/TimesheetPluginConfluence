@@ -32,7 +32,7 @@ import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;
-import org.catrobat.confluence.services.imp.TimesheetEntryServiceImpl;
+import org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(TimesheetEntryServiceImplTest.MyDatabaseUpdater.class)

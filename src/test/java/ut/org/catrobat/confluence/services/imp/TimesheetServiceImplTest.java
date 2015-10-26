@@ -13,7 +13,7 @@ import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.services.TimesheetService;
-import org.catrobat.confluence.services.imp.TimesheetServiceImpl;
+import org.catrobat.confluence.services.impl.TimesheetServiceImpl;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(TimesheetServiceImplTest.MyDatabaseUpdater.class)

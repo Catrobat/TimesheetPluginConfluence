@@ -14,7 +14,7 @@ import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Team;
-import org.catrobat.confluence.services.imp.PermissionServiceImpl;
+import org.catrobat.confluence.services.impl.PermissionServiceImpl;
 import org.catrobat.confluence.services.TeamService;
 import org.junit.Rule;
 import org.mockito.Mockito;

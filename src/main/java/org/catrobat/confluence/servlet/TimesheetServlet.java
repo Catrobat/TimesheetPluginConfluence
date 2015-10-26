@@ -1,4 +1,4 @@
-package org.catrobat.confluence.timesheet;
+package org.catrobat.confluence.servlet;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserProfile;

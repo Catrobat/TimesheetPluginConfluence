@@ -17,7 +17,7 @@ import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.services.TeamService;
-import org.catrobat.confluence.services.imp.TeamServiceImpl;
+import org.catrobat.confluence.services.impl.TeamServiceImpl;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.mockito.Mockito;

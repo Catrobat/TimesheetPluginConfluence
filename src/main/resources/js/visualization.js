@@ -5,7 +5,7 @@ var restBaseUrl;
 
 AJS.toInit(function () {
 	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-	restBaseUrl = baseUrl + "/rest/timesheet/1.0/";
+	restBaseUrl = baseUrl + "/rest/visualization/1.0/";
 	fetchData();
 });
 

@@ -77,12 +77,14 @@ function populateTable(timesheetDataReply) {
 	timesheetTable.append(Confluence.Templates.Timesheet.timesheetHeader(
 					{teams: timesheetData.teams}
 	));
-	
+
+	var actualDate = new Date();
+
 	var emptyEntry = {
 		entryID: "new-id",
 		date: "",
-		begin: "",
-		end: "",
+		begin: actualDate.getHours() + ":" + actualDate.getMinutes(),
+		end: (actualDate.getHours() + 1) + ":" + actualDate.getMinutes(),
 		pause: "00:00",
 		description: "",
 		duration: ""
@@ -251,14 +253,14 @@ function saveEntryClicked(timesheetData, saveOptions, form) {
 
 	var beginTime = form.beginTimeField.timepicker('getTime');
 
-	if(beginTime == null) {
-	  beginTime = new Date;
+	if(beginTime === null) {
+	  beginTime = new Date();
 	}
 
 	var endTime   = form.endTimeField.timepicker('getTime');
 
-	if(endTime == null) {
-	  endTime = new Date;
+	if(endTime === null) {
+	  endTime = new Date();
   }
 
 	var pauseTime = form.pauseTimeField.timepicker('getTime');
@@ -519,7 +521,6 @@ function renderViewRow(timesheetData, entry) {
 }
 
 function editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow) {
-	
 	var formRow = getFormRow(viewRow);
 	
 	if (formRow === undefined) {

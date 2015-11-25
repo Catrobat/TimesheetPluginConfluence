@@ -241,7 +241,7 @@ function editEntryCallback(entry, timesheetData, form) {
  * @param {jQuery} form
  * @returns {undefined}
  */
-function saveEntryClicked(timesheetData, saveOptions, form) {
+function saveEntryClicked(timesheetData, saveOptions, form, existingEntryID) {
 	form.saveButton.prop('disabled', true);
 
 	var date = form.dateField.val();
@@ -276,6 +276,10 @@ function saveEntryClicked(timesheetData, saveOptions, form) {
 		teamID: form.teamSelect.val(),
 		categoryID: form.categorySelect.val()
 	};
+
+	if(existingEntryID !== "new-id") {
+	  entry.entryID = existingEntryID;
+	}
 
 	form.loadingSpinner.show();
 
@@ -321,7 +325,7 @@ function renderFormRow(timesheetData, entry, saveOptions) {
 	var form = prepareForm(entry, timesheetData);
 
 	form.saveButton.click(function () {
-		saveEntryClicked(timesheetData, saveOptions, form);
+		saveEntryClicked(timesheetData, saveOptions, form, entry.entryID);
 	});
 
 	return form.row;

@@ -82,42 +82,77 @@ function populateTable(timesheetDataReply) {
 	appendEntriesToTable(timesheetData);
 }
 
+Array.prototype.contains = function(k) {
+  for ( var p in this)
+    if (this[p] === k)
+      return true;
+  return false;
+};
+
+
 function appendEntriesToTable(timesheetData) {
-	
-	var timesheetTable = AJS.$("#visualization-table");
 
-  var month = "";
+  var timesheetTable = AJS.$("#visualization-table");
+
+  var availableEntries = timesheetData.entries;
+
+  var pos = 0;
   var sum = 0;
+  var i = 0;
 
-  for(var key in timesheetData.entries) {
-    //noch einbauen ob im selben Montag
+  while(i < availableEntries.length) {
+    console.log(i);
+    var referenceEntryDate = new Date(availableEntries[pos].beginDate);
+    var compareToDate = new Date(availableEntries[i].beginDate);
+    var oldPos = pos;
 
-    var hours = calculateDuration(timesheetData.entries[key].beginDate, timesheetData.entries[key].endDate,
-    timesheetData.entries[key].pauseMinutes).getHours();
-    var minutes = calculateDuration(timesheetData.entries[key].beginDate, timesheetData.entries[key].endDate,
-    timesheetData.entries[key].pauseMinutes).getMinutes();
+    console.log("ref: " + (referenceEntryDate.getMonth() + 1));
 
-    sum = sum + hours + minutes / 60;
-  }
-  //console.log(sum);
-  var emptyEntry = {
-    entryID: "new-id",
-    date: "",
-    begin: "",
-    end: "",
-    pause: "00:00",
-    description: "",
-    duration: sum
-  };
+    if((referenceEntryDate.getFullYear() == compareToDate.getFullYear()) &&
+       (referenceEntryDate.getMonth() == compareToDate.getMonth())) {
 
-  var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
-  					{entry: emptyEntry, teams: timesheetData.teams}));
-  timesheetTable.append(viewRow);
+         //add all times for the same year-month pairs
+         var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+         availableEntries[i].pauseMinutes).getHours();
+         var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+         availableEntries[i].pauseMinutes).getMinutes();
+         var pause = availableEntries[i].pauseMinutes;
+         var calculatedTime = minutes - pause;
 
+         sum = sum + hours + calculatedTime / 60;
+      } else {
+          pos = i;
+          i = i - 1;
+        }
+
+        if(oldPos != pos || i == availableEntries.length - 1) {
+          //create a new table entry and add it to the table
+          var newVisualizationEntry = {
+           entryID: "new-id",
+           date: referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1),
+           begin: "",
+           end: "",
+           pause: "00:00",
+           description: "",
+           duration: sum
+          };
+
+          var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
+            {entry: newVisualizationEntry, teams: timesheetData.teams}));
+            timesheetTable.append(viewRow);
+
+          sum = 0;
+        }
+
+        i = i + 1;
+    }
+
+  /*
 	timesheetData.entries.map(function (entry) {
 		var viewRow = prepareViewRow(timesheetData, entry);
 		timesheetTable.append(viewRow);
 	});
+	*/
 }
 
 /**

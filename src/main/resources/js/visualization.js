@@ -98,19 +98,19 @@ function appendEntriesToTable(timesheetData) {
 
   var pos = 0;
   var sum = 0;
+  var spentTime = 0;
   var i = 0;
+  //save data in an additional array
+  var index = 0;
+  var dataArray = [];
 
   while(i < availableEntries.length) {
-    console.log(i);
     var referenceEntryDate = new Date(availableEntries[pos].beginDate);
     var compareToDate = new Date(availableEntries[i].beginDate);
     var oldPos = pos;
 
-    console.log("ref: " + (referenceEntryDate.getMonth() + 1));
-
     if((referenceEntryDate.getFullYear() == compareToDate.getFullYear()) &&
        (referenceEntryDate.getMonth() == compareToDate.getMonth())) {
-
          //add all times for the same year-month pairs
          var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
          availableEntries[i].pauseMinutes).getHours();
@@ -128,7 +128,7 @@ function appendEntriesToTable(timesheetData) {
         if(oldPos != pos || i == availableEntries.length - 1) {
           //create a new table entry and add it to the table
           var newVisualizationEntry = {
-           entryID: "new-id",
+           entryID: index,
            date: referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1),
            begin: "",
            end: "",
@@ -137,22 +137,37 @@ function appendEntriesToTable(timesheetData) {
            duration: sum
           };
 
+          dataArray.push(newVisualizationEntry);
+          index = index + 1;
+
           var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
             {entry: newVisualizationEntry, teams: timesheetData.teams}));
             timesheetTable.append(viewRow);
 
+          //overall sum of spent time
+         spentTime = spentTime + sum;
           sum = 0;
         }
-
         i = i + 1;
     }
 
-  /*
-	timesheetData.entries.map(function (entry) {
-		var viewRow = prepareViewRow(timesheetData, entry);
-		timesheetTable.append(viewRow);
-	});
-	*/
+    var newVisualizationEntry = {
+     entryID: index,
+     date: "Gesamtdauer",
+     begin: "",
+     end: "",
+     pause: "00:00",
+     description: "",
+     duration: spentTime
+    };
+
+    dataArray.push(newVisualizationEntry);
+
+    var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
+      {entry: newVisualizationEntry, teams: timesheetData.teams}));
+      timesheetTable.append(viewRow);
+
+    console.log(dataArray);
 }
 
 /**

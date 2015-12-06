@@ -73,7 +73,6 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 		entry.save();
 
 		return entry;
-		
 	}
 
   @Override
@@ -91,5 +90,4 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
   public void delete(TimesheetEntry entry) {
     ao.delete(entry);
   }
-  
 }

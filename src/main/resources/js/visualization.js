@@ -97,9 +97,12 @@ function appendEntriesToTable(timesheetData) {
   var availableEntries = timesheetData.entries;
 
   var pos = 0;
-  var sum = 0;
-  var spentTime = 0;
   var i = 0;
+  //variables for the time calculation
+  var totalHours = 0;
+  var totalMinutes = 0;
+  var totalTimeHours = 0;
+  var totalTimeMinutes = 0;
   //save data in an additional array
   var index = 0;
   var dataArray = [];
@@ -117,9 +120,16 @@ function appendEntriesToTable(timesheetData) {
          var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
          availableEntries[i].pauseMinutes).getMinutes();
          var pause = availableEntries[i].pauseMinutes;
-         var calculatedTime = minutes - pause;
+         var calculatedTime = hours * 60 + minutes - pause;
 
-         sum = sum + hours + calculatedTime / 60;
+         totalMinutes = totalMinutes + calculatedTime;
+
+         if(totalMinutes >= 60) {
+            var minutesToFullHours = Math.floor(totalMinutes / 60) ; //get only full hours
+            totalHours = totalHours + minutesToFullHours;
+            totalMinutes = totalMinutes - minutesToFullHours * 60;
+         }
+
       } else {
           pos = i;
           i = i - 1;
@@ -134,7 +144,7 @@ function appendEntriesToTable(timesheetData) {
            end: "",
            pause: "00:00",
            description: "",
-           duration: sum
+           duration: totalHours+"h"+totalMinutes+"min"
           };
 
           dataArray.push(newVisualizationEntry);
@@ -144,9 +154,17 @@ function appendEntriesToTable(timesheetData) {
             {entry: newVisualizationEntry, teams: timesheetData.teams}));
             timesheetTable.append(viewRow);
 
-          //overall sum of spent time
-         spentTime = spentTime + sum;
-          sum = 0;
+         //overall sum of spent time
+         totalTimeHours = totalTimeHours + totalHours;
+         totalTimeMinutes = totalTimeMinutes + totalMinutes;
+
+         if(totalTimeMinutes >= 60) {
+            var minutesToFullHours = Math.floor(totalTimeMinutes / 60) ; //get only full hours
+            totalTimeHours = totalTimeHours + minutesToFullHours;
+            totalTimeMinutes = totalTimeMinutes - minutesToFullHours * 60;
+         }
+            totalHours = 0;
+            totalMinutes = 0;
         }
         i = i + 1;
     }
@@ -158,7 +176,7 @@ function appendEntriesToTable(timesheetData) {
      end: "",
      pause: "00:00",
      description: "",
-     duration: spentTime
+     duration: totalTimeHours+"h"+totalTimeMinutes+"min"
     };
 
     dataArray.push(newVisualizationEntry);
@@ -166,8 +184,6 @@ function appendEntriesToTable(timesheetData) {
     var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
       {entry: newVisualizationEntry, teams: timesheetData.teams}));
       timesheetTable.append(viewRow);
-
-    console.log(dataArray);
 }
 
 /**

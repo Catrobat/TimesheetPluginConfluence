@@ -1,6 +1,6 @@
 "use strict";
 
-//var baseUrl, timesheetTable, timesheetForm, restBaseUrl;
+//var baseUrl, visualizationTable, timesheetForm, restBaseUrl;
 var restBaseUrl;
 
 AJS.toInit(function () {
@@ -72,10 +72,10 @@ function populateTable(timesheetDataReply) {
 
 	var timesheetData = timesheetDataReply[0];
 
-	var timesheetTable = AJS.$("#visualization-table");
-	timesheetTable.empty();
+	var visualizationTable = AJS.$("#visualization-table");
+	visualizationTable.empty();
 
-	timesheetTable.append(Confluence.Templates.Visualization.visualizationHeader(
+	visualizationTable.append(Confluence.Templates.Visualization.visualizationHeader(
 					{teams: timesheetData.teams}
 	));
 
@@ -92,8 +92,7 @@ Array.prototype.contains = function(k) {
 
 function appendEntriesToTable(timesheetData) {
 
-  var timesheetTable = AJS.$("#visualization-table");
-
+  var visualizationTable = AJS.$("#visualization-table");
   var availableEntries = timesheetData.entries;
 
   var pos = 0;
@@ -106,6 +105,8 @@ function appendEntriesToTable(timesheetData) {
   //save data in an additional array
   var index = 0;
   var dataArray = [];
+  var dataPoints = []
+
 
   while(i < availableEntries.length) {
     var referenceEntryDate = new Date(availableEntries[pos].beginDate);
@@ -147,12 +148,18 @@ function appendEntriesToTable(timesheetData) {
            duration: totalHours+"h"+totalMinutes+"min"
           };
 
+          //add points
+          var dataX = referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1);
+          var dataY = totalHours + totalMinutes / 60;
+          dataPoints.push(dataX);
+          dataPoints.push(dataY);
+
           dataArray.push(newVisualizationEntry);
           index = index + 1;
 
           var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
             {entry: newVisualizationEntry, teams: timesheetData.teams}));
-            timesheetTable.append(viewRow);
+            visualizationTable.append(viewRow);
 
          //overall sum of spent time
          totalTimeHours = totalTimeHours + totalHours;
@@ -183,7 +190,21 @@ function appendEntriesToTable(timesheetData) {
 
     var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
       {entry: newVisualizationEntry, teams: timesheetData.teams}));
-      timesheetTable.append(viewRow);
+      visualizationTable.append(viewRow);
+
+    diagram(dataPoints);
+}
+
+function diagram(dataPoints) {
+
+   var data = [];
+   for(var i = 0; i < dataPoints.length; i = i + 2) {
+     data.push({
+         year : dataPoints[i],
+         value  : dataPoints[i+1]
+     });
+   }
+   drawDiagram(data);
 }
 
 /**

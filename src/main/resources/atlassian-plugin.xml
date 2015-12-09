@@ -34,7 +34,7 @@
             <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
         </transformer>
     </transformation>
-        <resource name="template-soy.js" type="download" location="timesheet.soy"/>
+        <resource name="timesheet-template-soy.js" type="download" location="timesheet.soy"/>
         <context>timesheet</context>
     </web-resource>
 
@@ -55,12 +55,17 @@
         <resource type="download" name="autosize.js" location="/js/autosize.js"/>
         <resource type="download" name="images/" location="/images"/>
 
+        <!-- add additional web resources -->
+        <resource type="download" name="morris.css" location="/library/morris/morris.css"/>
+        <resource type="download" name="morris.min.js" location="/library/morris/morris.min.js"/>
+        <resource type="download" name="raphael-min.js" location="/library/raphael/raphael-min.js"/>
+
         <transformation extension="soy">
             <transformer key="soyTransformer">
                 <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
             </transformer>
         </transformation>
-        <resource name="template-soy.js" type="download" location="visualization.soy"/>
+        <resource name="visualization-template-soy.js" type="download" location="visualization.soy"/>
         <context>visualization</context>
     </web-resource>
 

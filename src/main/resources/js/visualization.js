@@ -141,11 +141,11 @@ function appendEntriesToTable(timesheetData) {
           var newVisualizationEntry = {
            entryID: index,
            date: referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1),
-           begin: "",
+           begin: totalHours+"h"+totalMinutes+"min",
            end: "",
-           pause: "00:00",
+           pause: "",
            description: "",
-           duration: totalHours+"h"+totalMinutes+"min"
+           duration: ""
           };
 
           //add points
@@ -176,14 +176,42 @@ function appendEntriesToTable(timesheetData) {
         i = i + 1;
     }
 
+    //entry for whole time
     var newVisualizationEntry = {
      entryID: index,
      date: "Gesamtdauer",
-     begin: "",
+     begin: totalTimeHours+"h"+totalTimeMinutes+"min",
      end: "",
-     pause: "00:00",
+     pause: "",
      description: "",
-     duration: totalTimeHours+"h"+totalTimeMinutes+"min"
+     duration: ""
+    };
+
+    dataArray.push(newVisualizationEntry);
+
+    var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
+      {entry: newVisualizationEntry, teams: timesheetData.teams}));
+      visualizationTable.append(viewRow);
+
+    //entry for average time
+    var averageMinutesPerMonth =  (totalTimeHours*60 + totalTimeMinutes) / dataArray.length;
+    var averageTimeHours = 0;
+    var averageTimeMinutes = 0;
+
+     if(averageMinutesPerMonth >= 60) {
+        var minutesToFullHours = Math.floor(averageMinutesPerMonth / 60) ; //get only full hours
+        averageTimeHours = minutesToFullHours;
+        averageTimeMinutes = averageMinutesPerMonth - minutesToFullHours * 60;
+     }
+
+    newVisualizationEntry = {
+     entryID: index,
+     date: "Zeit / Monat",
+     begin:  averageTimeHours+"h"+averageTimeMinutes+"min",
+     end: "",
+     pause: "",
+     description: "",
+     duration: ""
     };
 
     dataArray.push(newVisualizationEntry);

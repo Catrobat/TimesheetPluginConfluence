@@ -6,9 +6,9 @@
 {template .visualizationHeader}
   <div class="tr">
     <span class="th date">Datum</span>
-    <span class="th range"></span>
+    <span class="th range">Dauer</span>
     <span class="th pause"></span>
-    <span class="th duration">Dauer</span>
+    <span class="th duration"></span>
     {if length(keys($teams)) > 1}
       <span class="th team"></span>
     {/if}
@@ -26,9 +26,9 @@
 {template .visualizationEntry}
    <div class="tr entry-view" data-id="{$entry.entryID}">
     <span class="td date">{$entry.date}</span>
-    <span class="td range"></span>
+    <span class="td range">{$entry.begin}</span>
     <span class="td pause"></span>
-    <span class="td duration">{$entry.duration}</span>
+    <span class="td duration"></span>
     {if length(keys($teams)) > 1}
       <span class="td"></span>
     {/if}

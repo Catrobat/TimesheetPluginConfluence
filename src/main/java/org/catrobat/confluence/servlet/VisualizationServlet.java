@@ -64,5 +64,4 @@ public class VisualizationServlet extends HttpServlet {
     }
     return URI.create(builder.toString());
   }
-
 }

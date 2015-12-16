@@ -190,7 +190,7 @@ public class PermissionServiceImplTest {
   {
     JsonTimesheetEntry entry = new JsonTimesheetEntry(1,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
-            timeSheetEntry.getDescription(), 1, 1);
+            timeSheetEntry.getDescription(), 1, 1, false);
 
     permissionServiceException.userCanEditTimesheetEntry(owner, sheet, entry);
     Mockito.verify(permissionServiceException).userCanEditTimesheetEntry(owner, sheet, entry);
@@ -214,7 +214,7 @@ public class PermissionServiceImplTest {
 
     JsonTimesheetEntry entry = new JsonTimesheetEntry(1,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
-            timeSheetEntry.getDescription(), 1, 1);
+            timeSheetEntry.getDescription(), 1, 1, false);
 
     permissionService.userCanEditTimesheetEntry(admin, sheet, entry);
   }
@@ -235,7 +235,7 @@ public class PermissionServiceImplTest {
 
     JsonTimesheetEntry entry = new JsonTimesheetEntry(1,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
-            timeSheetEntry.getDescription(), 1, 1);
+            timeSheetEntry.getDescription(), 1, 1, false);
 
     permissionService.userCanEditTimesheetEntry(owner, sheet, entry);
   }
@@ -285,7 +285,7 @@ public class PermissionServiceImplTest {
   {
     JsonTimesheetEntry entry = new JsonTimesheetEntry(1,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
-            timeSheetEntry.getDescription(), 1, 1);
+            timeSheetEntry.getDescription(), 1, 1, false);
 
     permissionService.userCanEditTimesheetEntry(eve, sheet, entry);
     //Mockito.verify(permissionServiceException).userCanEditTimesheetEntry(eve, sheet, entry);

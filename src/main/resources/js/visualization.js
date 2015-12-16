@@ -194,7 +194,7 @@ function appendEntriesToTable(timesheetData) {
       visualizationTable.append(viewRow);
 
     //entry for average time
-    var averageMinutesPerMonth =  (totalTimeHours*60 + totalTimeMinutes) / dataArray.length;
+    var averageMinutesPerMonth =  (totalTimeHours*60 + totalTimeMinutes) / (dataArray.length - 1);
     var averageTimeHours = 0;
     var averageTimeMinutes = 0;
 

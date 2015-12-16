@@ -171,7 +171,7 @@ public class TimesheetRest {
       jsonEntries.add(new JsonTimesheetEntry(entry.getID(), entry.getBeginDate(), 
           entry.getEndDate(), entry.getPauseMinutes(), 
           entry.getDescription(), entry.getTeam().getID(), 
-          entry.getCategory().getID()));
+          entry.getCategory().getID(), entry.getIsGoogleDocImport()));
     }
     return Response.ok(jsonEntries).build();
   }
@@ -199,7 +199,7 @@ public class TimesheetRest {
 
     TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(),
         entry.getEndDate(), category, entry.getDescription(), 
-        entry.getPauseMinutes(), team);
+        entry.getPauseMinutes(), team, entry.getIsGoogleDocImport());
     
     entry.setEntryID(newEntry.getID());
     
@@ -233,7 +233,7 @@ public class TimesheetRest {
 
 				TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(),
 					entry.getEndDate(), category, entry.getDescription(), 
-					entry.getPauseMinutes(), team);
+					entry.getPauseMinutes(), team, entry.getIsGoogleDocImport());
 				
 				entry.setEntryID(newEntry.getID());
 				newEntries.add(entry);
@@ -273,7 +273,7 @@ public class TimesheetRest {
     
     entryService.edit(entryID, entry.getTimeSheet(), jsonEntry.getBeginDate(),
         jsonEntry.getEndDate(), category, jsonEntry.getDescription(), 
-        jsonEntry.getPauseMinutes(), team);
+        jsonEntry.getPauseMinutes(), team, jsonEntry.getIsGoogleDocImport());
     
     return Response.ok(jsonEntry).build();
   }

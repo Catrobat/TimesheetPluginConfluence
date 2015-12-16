@@ -48,10 +48,14 @@ public final class JsonTimesheetEntry {
   @XmlElement
 	private int categoryID;
 
+  @XmlElement
+  private boolean isGoogleDocImport;
+
   public JsonTimesheetEntry() {
   }
 
-  public JsonTimesheetEntry(int entryID, Date beginDate, Date endDate, int pauseMinutes, String description, int teamID, int categoryID) {
+  public JsonTimesheetEntry(int entryID, Date beginDate, Date endDate, int pauseMinutes, String description, int teamID,
+                            int categoryID, boolean isGoogleDocImport) {
     this.entryID = entryID;
     this.beginDate = beginDate;
     this.endDate = endDate;
@@ -59,6 +63,7 @@ public final class JsonTimesheetEntry {
     this.description = description;
     this.teamID = teamID;
     this.categoryID = categoryID;
+    this.isGoogleDocImport = isGoogleDocImport;
   }
   
   public int getEntryID() {
@@ -117,6 +122,14 @@ public final class JsonTimesheetEntry {
     this.categoryID = categoryID;
   }
 
+  public boolean getIsGoogleDocImport() {
+    return isGoogleDocImport;
+  }
+
+  public void setIsGoogleDocImport(boolean isGoogleDocImport) {
+    this.isGoogleDocImport = isGoogleDocImport;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -128,6 +141,7 @@ public final class JsonTimesheetEntry {
     if (pauseMinutes != that.pauseMinutes) return false;
     if (teamID != that.teamID) return false;
     if (categoryID != that.categoryID) return false;
+    if (isGoogleDocImport != that.isGoogleDocImport) return false;
     if (!beginDate.equals(that.beginDate)) return false;
     if (!endDate.equals(that.endDate)) return false;
     return description.equals(that.description);
@@ -148,7 +162,8 @@ public final class JsonTimesheetEntry {
 
 	public String toReadableString() {
 		return beginDate + " - " + endDate + ": " + description + 
-				"; TeamID: " + teamID + "; CategoryID: " + categoryID;
+				"; TeamID: " + teamID + "; CategoryID: " + categoryID
+            + "; isGoogleDocImport: " + isGoogleDocImport;
 	}
 	
   @Override
@@ -161,6 +176,7 @@ public final class JsonTimesheetEntry {
             ", description='" + description + '\'' +
             ", teamID=" + teamID +
             ", categoryID=" + categoryID +
+            ", isGoogleDocImprt=" + isGoogleDocImport +
             '}';
   }
 }

@@ -22,7 +22,7 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 
 	@Override
 	public TimesheetEntry add(Timesheet sheet, Date begin, Date end, 
-					Category category, String description, int pause, Team team) {
+					Category category, String description, int pause, Team team, boolean isGoogleDocImport) {
 		
 		TimesheetEntry entry = ao.create(TimesheetEntry.class);
 
@@ -33,6 +33,7 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 		entry.setDescription(description);
 		entry.setPauseMinutes(pause);
 		entry.setTeam(team);
+		entry.setIsGoogleDocImport(isGoogleDocImport);
 
 		entry.save();
 
@@ -55,7 +56,7 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
   @Override
   @Nullable
 	public TimesheetEntry edit(int entryId, Timesheet sheet, Date begin, Date end,
-					Category category, String description, int pause, Team team) {
+					Category category, String description, int pause, Team team, boolean isGoogleDocImport) {
 		
 		TimesheetEntry entry = getEntryByID(entryId);
     
@@ -70,6 +71,8 @@ public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 		entry.setDescription(description);
 		entry.setPauseMinutes(pause);
 		entry.setTeam(team);
+		entry.setIsGoogleDocImport(isGoogleDocImport);
+
 		entry.save();
 
 		return entry;

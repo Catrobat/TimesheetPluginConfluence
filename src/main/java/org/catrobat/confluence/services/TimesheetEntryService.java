@@ -14,10 +14,10 @@ import org.catrobat.confluence.activeobjects.TimesheetEntry;
 public interface TimesheetEntryService
 {
 	TimesheetEntry add(Timesheet sheet, Date begin, Date end, Category category,
-					String description, int pause, Team team);
+					String description, int pause, Team team, boolean isGoogleDocImport);
 	
   TimesheetEntry edit(int entryID, Timesheet sheet, Date begin, Date end, 
-      Category category, String description, int pause, Team team);
+      Category category, String description, int pause, Team team, boolean isGoogleDocImport);
   
   TimesheetEntry getEntryByID(int entryID);
   

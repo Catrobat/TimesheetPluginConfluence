@@ -48,12 +48,18 @@ public class PermissionServiceImpl implements PermissionService {
     return userManager.isAdmin(user.getUserKey());  
   }
   
-  private boolean dateIsOld(Date date) {
+  private boolean dateIsOlderThanAMonth(Date date) {
     DateTime aMonthAgo = new DateTime().minusDays(30);
     DateTime datetime  = new DateTime(date);
     return (datetime.compareTo(aMonthAgo) < 0);
-  } 
-  
+  }
+
+  private boolean dateIsOlderThanFiveYears(Date date) {
+    DateTime fiveYearsAgo = new DateTime().minusYears(5);
+    DateTime datetime  = new DateTime(date);
+    return (datetime.compareTo(fiveYearsAgo) < 0);
+  }
+
   private boolean userCoordinatesTeamsOfSheet(UserProfile user, Timesheet sheet) {
     UserProfile owner = userManager.getUserProfile(sheet.getUserKey());
     if(owner == null)
@@ -79,11 +85,15 @@ public class PermissionServiceImpl implements PermissionService {
   public void userCanEditTimesheetEntry(UserProfile user, Timesheet sheet, JsonTimesheetEntry entry) {
   
     if (userOwnsSheet(user, sheet)) {
-      /*
-      if (dateIsOld(entry.getBeginDate()) || dateIsOld(entry.getEndDate())) {
-        throw new NotAuthorizedException("You can not add an old entry.");
+      if(!entry.getIsGoogleDocImport()) {
+        if (dateIsOlderThanAMonth(entry.getBeginDate()) || dateIsOlderThanAMonth(entry.getEndDate())) {
+          throw new NotAuthorizedException("You can not edit an entry that is older than 30 days.");
+        }
+      } else {
+        if (dateIsOlderThanFiveYears(entry.getBeginDate()) || dateIsOlderThanFiveYears(entry.getEndDate())) {
+          throw new NotAuthorizedException("You can not edit an imported entry that is older than 5 years.");
+        }
       }
-      */
     } else if (!userIsAdmin(user)) {
       throw new NotAuthorizedException("You are not Admin.");
     }
@@ -93,11 +103,15 @@ public class PermissionServiceImpl implements PermissionService {
   public void userCanDeleteTimesheetEntry(UserProfile user, TimesheetEntry entry) {
 
     if (userOwnsSheet(user, entry.getTimeSheet())) {
-      /*
-      if (dateIsOld(entry.getBeginDate()) || dateIsOld(entry.getEndDate())) {
-        throw new NotAuthorizedException("You can not add an old entry.");
+      if(!entry.getIsGoogleDocImport()) {
+        if (dateIsOlderThanAMonth(entry.getBeginDate()) || dateIsOlderThanAMonth(entry.getEndDate())) {
+          throw new NotAuthorizedException("You can not delete an that is older than 30 days.");
+        }
+      } else {
+        if (dateIsOlderThanFiveYears(entry.getBeginDate()) || dateIsOlderThanFiveYears(entry.getEndDate())) {
+          throw new NotAuthorizedException("You can not delete an imported entry that is older than 5 years.");
+        }
       }
-      */
     } else if (!userIsAdmin(user)) {
       throw new NotAuthorizedException("You are not Admin");
     }

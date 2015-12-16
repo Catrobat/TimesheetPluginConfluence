@@ -87,7 +87,8 @@ function populateTable(timesheetDataReply) {
 		end: (actualDate.getHours() + 1) + ":" + actualDate.getMinutes(),
 		pause: "00:00",
 		description: "",
-		duration: ""
+		duration: "",
+    isGoogleDocImport: false
 	};
 
 	var addNewEntryOptions = {
@@ -135,7 +136,7 @@ function prepareImportDialog(timesheetDataReply) {
 function importGoogleDocsTable(table, timesheetData, importDialog) {
 	var entries = parseEntriesFromGoogleDocTimesheet(table, timesheetData);
 	var url = restBaseUrl + "timesheets/" + timesheetID + "/entries";
-	
+
 	if(entries.length === 0) return;
 	
 	AJS.$.ajax({
@@ -241,7 +242,8 @@ function editEntryCallback(entry, timesheetData, form) {
  * @param {jQuery} form
  * @returns {undefined}
  */
-function saveEntryClicked(timesheetData, saveOptions, form, existingEntryID) {
+function saveEntryClicked(timesheetData, saveOptions, form, existingEntryID,
+existingIsGoogleDocImportValue) {
 	form.saveButton.prop('disabled', true);
 
 	var date = form.dateField.val();
@@ -274,12 +276,15 @@ function saveEntryClicked(timesheetData, saveOptions, form, existingEntryID) {
 		description: form.descriptionField.val(),
 		pauseMinutes: pauseMin,
 		teamID: form.teamSelect.val(),
-		categoryID: form.categorySelect.val()
+		categoryID: form.categorySelect.val(),
+		isGoogleDocImport: existingIsGoogleDocImportValue
 	};
 
 	if(existingEntryID !== "new-id") {
 	  entry.entryID = existingEntryID;
 	}
+
+	console.log(entry);
 
 	form.loadingSpinner.show();
 
@@ -325,7 +330,8 @@ function renderFormRow(timesheetData, entry, saveOptions) {
 	var form = prepareForm(entry, timesheetData);
 
 	form.saveButton.click(function () {
-		saveEntryClicked(timesheetData, saveOptions, form, entry.entryID);
+		saveEntryClicked(timesheetData, saveOptions, form, entry.entryID,
+		entry.isGoogleDocImport);
 	});
 
 	return form.row;
@@ -430,7 +436,8 @@ function parseEntryFromGoogleDocRow(row, timesheetData) {
 		beginDate    : new Date(pieces[0] + " " + pieces[1]),
 		endDate      : new Date(pieces[0] + " " + pieces[2]),
 		teamID			 : firstTeamID,
-		categoryID	 : firstCategoryIDOfFirstTeam
+		categoryID	 : firstCategoryIDOfFirstTeam,
+		isGoogleDocImport : true
 	};
 } 
 
@@ -514,6 +521,7 @@ function renderViewRow(timesheetData, entry) {
 
 	var viewRow = prepareViewRow(timesheetData, augmentedEntry);
 	viewRow.find("button.edit").click(function () {
+	  //augmentedEntry.isGoogleDocImport = false;
 		editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow);
 	});
 
@@ -531,7 +539,7 @@ function editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewR
 		formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions);
 		viewRow.after(formRow);
 	} 
-	
+
 	viewRow.hide();
 	formRow.show();
 }
@@ -600,7 +608,8 @@ function augmentEntry(timesheetData, entry) {
 		description  : entry.description ,
 		pauseMinutes : entry.pauseMinutes ,
 		teamID       : entry.teamID ,
-		categoryID   : entry.categoryID
+		categoryID   : entry.categoryID,
+		isGoogleDocImport : entry.isGoogleDocImport
 	};
 }
 

@@ -236,7 +236,7 @@ public class TimesheetRestTest {
   {
     JsonTimesheetEntry expectedTimesheetEntry = new JsonTimesheetEntry(1,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
-            timeSheetEntry.getDescription(), 1, 1);
+            timeSheetEntry.getDescription(), 1, 1, false);
 
     Category category1 = Mockito.mock(Category.class);
     Mockito.when(category1.getID()).thenReturn(1);
@@ -258,14 +258,14 @@ public class TimesheetRestTest {
 
     Mockito.when(entryService.add(timeSheet,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category1,
-            timeSheetEntry.getDescription(), timeSheetEntry.getPauseMinutes(), team)).thenReturn(newEntry);
+            timeSheetEntry.getDescription(), timeSheetEntry.getPauseMinutes(), team, false)).thenReturn(newEntry);
 
     response = timesheetRest.postTimesheetEntry(request, expectedTimesheetEntry, 1);
 
     Mockito.verify(entryService).add(timeSheet,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category1,
             timeSheetEntry.getDescription(),
-            timeSheetEntry.getPauseMinutes(), team);
+            timeSheetEntry.getPauseMinutes(), team, false);
 
     Assert.assertEquals(expectedTimesheetEntry, response.getEntity());
   }
@@ -278,7 +278,7 @@ public class TimesheetRestTest {
     JsonTimesheetEntry expectedTimesheetEntry = new JsonTimesheetEntry(1,
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(),
             timeSheetEntry.getPauseMinutes(),
-            changedDescription, 1, 2);
+            changedDescription, 1, 2, false);
 
     Category category1 = Mockito.mock(Category.class);
     Mockito.when(category1.getID()).thenReturn(1);
@@ -302,14 +302,14 @@ public class TimesheetRestTest {
     Mockito.when(entryService.edit(1, timeSheetEntry.getTimeSheet(),
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category2,
             changedDescription,
-            timeSheetEntry.getPauseMinutes(), team)).thenReturn(newEntry);
+            timeSheetEntry.getPauseMinutes(), team, false)).thenReturn(newEntry);
 
     response = timesheetRest.putTimesheetEntry(request, expectedTimesheetEntry, 1);
 
     Mockito.verify(entryService).edit(1, timeSheetEntry.getTimeSheet(),
             timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category2,
             changedDescription,
-            timeSheetEntry.getPauseMinutes(), team);
+            timeSheetEntry.getPauseMinutes(), team, false);
 
     Assert.assertEquals(expectedTimesheetEntry, response.getEntity());
   }

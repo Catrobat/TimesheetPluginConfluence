@@ -20,6 +20,9 @@ public interface TimesheetEntry extends Entity {
 	public Category getCategory();
 	public void setCategory(Category category);
 
+	public boolean getIsGoogleDocImport();
+	public void setIsGoogleDocImport(boolean isGoogleDocImport);
+
 	public String getDescription();
 	public void setDescription(String description);
 

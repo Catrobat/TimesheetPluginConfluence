@@ -105,8 +105,9 @@ function appendEntriesToTable(timesheetData) {
   //save data in an additional array
   var index = 0;
   var dataArray = [];
-  var dataPoints = []
-
+  var dataPoints = [];
+  var piChartDataPoints = [];
+  var piChartDataPractice = 0;
 
   while(i < availableEntries.length) {
     var referenceEntryDate = new Date(availableEntries[pos].beginDate);
@@ -154,6 +155,11 @@ function appendEntriesToTable(timesheetData) {
           dataPoints.push(dataX);
           dataPoints.push(dataY);
 
+          //if not theory
+          if(availableEntries[i].categoryID != 1) {
+            piChartDataPractice = piChartDataPractice + totalHours*60 + totalMinutes;
+          }
+
           dataArray.push(newVisualizationEntry);
           index = index + 1;
 
@@ -172,9 +178,21 @@ function appendEntriesToTable(timesheetData) {
          }
             totalHours = 0;
             totalMinutes = 0;
-        }
+         }
+
         i = i + 1;
     }
+
+    var totalTime = totalTimeHours*60 + totalTimeMinutes;
+
+    //practice hours
+    piChartDataPoints.push("Practice Hours");
+    piChartDataPoints.push((piChartDataPractice * 100) / totalTime);
+    //theory hours
+    piChartDataPoints.push("Theory Hours");
+    piChartDataPoints.push(100 - (piChartDataPractice * 100) / totalTime);
+
+    console.log(piChartDataPoints);
 
     //entry for whole time
     var newVisualizationEntry = {
@@ -220,11 +238,12 @@ function appendEntriesToTable(timesheetData) {
       {entry: newVisualizationEntry, teams: timesheetData.teams}));
       visualizationTable.append(viewRow);
 
+    //draw graphs
     diagram(dataPoints);
+    drawPiChartDiagram(piChartDataPoints);
 }
 
 function diagram(dataPoints) {
-
    var data = [];
    for(var i = 0; i < dataPoints.length; i = i + 2) {
      data.push({
@@ -233,6 +252,17 @@ function diagram(dataPoints) {
      });
    }
    drawDiagram(data);
+}
+
+function drawPiChartDiagram(dataPoints) {
+   var data = [];
+   for(var i = 0; i < dataPoints.length; i = i + 2) {
+     data.push({
+         label : dataPoints[i],
+         value  : dataPoints[i+1]
+     });
+   }
+   drawPiChart(data);
 }
 
 /**

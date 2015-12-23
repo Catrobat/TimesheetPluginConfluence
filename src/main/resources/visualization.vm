@@ -15,14 +15,17 @@
 			<div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
 		</div>
 
-    <br><h3>Grafische Visualisierung deiner Timesheet-Daten</h3>
-    <div id="myfirstchart" style="height: 250px;"></div>
+    <br><h3>Visualisierung deiner Timesheet-Daten</h3>
+    <div id="lineDiagram" style="height: 250px;"></div>
+
+    <br><h3>Visualisierung deiner Aktivitäten</h3>
+    <div id="piChartDiagram" style="height: 250px;"></div>
 
     <script>
     function drawDiagram(data) {
       new Morris.Line({
         // ID of the element in which to draw the chart.
-        element: 'myfirstchart',
+        element: 'lineDiagram',
         // Chart data records -- each entry in this array corresponds to a point on
         // the chart.
         data,
@@ -33,6 +36,18 @@
         // Labels for the ykeys -- will be displayed when you hover over the
         // chart.
         labels: ['Stunden']
+      });
+    }
+    </script>
+
+    <script>
+    function drawPiChart(data) {
+      new Morris.Donut({
+        // ID of the element in which to draw the chart.
+        element: 'piChartDiagram',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data
       });
     }
     </script>

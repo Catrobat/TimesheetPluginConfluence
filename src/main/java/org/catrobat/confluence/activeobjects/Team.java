@@ -7,7 +7,18 @@ import net.java.ao.OneToMany;
 public interface Team extends Entity {
 
   String getTeamName();
+
   void setTeamName(String name);
+
+  AdminHelperConfig getConfiguration();
+
+  void setConfiguration(AdminHelperConfig configuration);
+
+  @ManyToMany(value = TeamToGithubTeam.class, reverse = "getTeam", through = "getGithubTeam")
+  GithubTeam[] getGithubTeams();
+
+  @ManyToMany(value = TeamToGroup.class, reverse = "getTeam", through = "getGroup")
+  Group[] getGroups();
 
   @ManyToMany(value=CategoryToTeam.class, through="getCategory", reverse = "getTeam")
   Category[] getCategories();

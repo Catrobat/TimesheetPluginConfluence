@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.catrobat.confluence.rest.json;
+package org.catrobat.jira.adminhelper.rest.json;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.text.SimpleDateFormat;

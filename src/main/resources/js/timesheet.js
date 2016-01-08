@@ -69,7 +69,6 @@ function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entr
 }
 
 function populateTable(timesheetDataReply) {
-
 	var timesheetData = timesheetDataReply[0];
 	var timesheetTable = AJS.$("#timesheet-table");
 	timesheetTable.empty();
@@ -104,7 +103,6 @@ function populateTable(timesheetDataReply) {
 }
 
 function appendEntriesToTable(timesheetData) {
-	
 	var timesheetTable = AJS.$("#timesheet-table");
 	
 	timesheetData.entries.map(function (entry) {
@@ -114,9 +112,7 @@ function appendEntriesToTable(timesheetData) {
 }
 
 function prepareImportDialog(timesheetDataReply) {
-	
 	var timesheetData = timesheetDataReply[0];
-	
 	var showImportDialogButton = AJS.$(".import-google-docs");
 	var importDialog = AJS.$(".import-dialog"); 
 	var importTextarea = importDialog.find(".import-text");

@@ -1,34 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
+    <?xml version="1.0" encoding="UTF-8"?>
 
-<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
-	<plugin-info>
-		<description>${project.description}</description>
-		<version>${project.version}</version>
-		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
-		<param name="plugin-icon">images/pluginIcon.png</param>
-		<param name="plugin-logo">images/pluginLogo.png</param>
-	</plugin-info>
-	<!-- add our i18n resource -->
-  <resource type="i18n" name="i18n" location="timesheet"  />
+    <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
 
-	<!-- add our web resources -->
-	<web-resource key="timesheet-resources" name="Timesheet Web Resources">
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="timesheet"/>
+
+    <!-- web-resources -->
+
+    <web-resource key="timesheet-resources" name="Timesheet Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
-		<dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
         <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
         <dependency>com.atlassian.auiplugin:dialog2</dependency>
-        
-		<resource type="download" name="timesheet.css" location="/css/timesheet.css"/>
-		<resource type="download" name="table-aui.css" location="/css/table-aui.css"/>
-		<resource type="download" name="timesheet.js" location="/js/timesheet.js"/>
-		<resource type="download" name="jquery.datepair.min.js" location="/js/jquery.datepair.min.js"/>
-		<resource type="download" name="datepair.min.js" location="/js/datepair.min.js"/>
-		<resource type="download" name="jquery.timepicker.min.js" location="/js/jquery.timepicker.min.js"/>
-		<resource type="download" name="jquery.timepicker.css" location="/css/jquery.timepicker.css"/>
-		<resource type="download" name="autosize.js" location="/js/autosize.js"/>
-		<resource type="download" name="images/" location="/images"/>
-    
+
+        <resource type="download" name="timesheet.css" location="/css/timesheet.css"/>
+        <resource type="download" name="table-aui.css" location="/css/table-aui.css"/>
+        <resource type="download" name="timesheet.js" location="/js/timesheet.js"/>
+        <resource type="download" name="jquery.datepair.min.js" location="/js/jquery.datepair.min.js"/>
+        <resource type="download" name="datepair.min.js" location="/js/datepair.min.js"/>
+        <resource type="download" name="jquery.timepicker.min.js" location="/js/jquery.timepicker.min.js"/>
+        <resource type="download" name="jquery.timepicker.css" location="/css/jquery.timepicker.css"/>
+        <resource type="download" name="autosize.js" location="/js/autosize.js"/>
+        <resource type="download" name="images/" location="/images"/>
+
     <transformation extension="soy">
         <transformer key="soyTransformer">
             <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
@@ -55,7 +57,8 @@
         <resource type="download" name="autosize.js" location="/js/autosize.js"/>
         <resource type="download" name="images/" location="/images"/>
 
-        <!-- add additional web resources -->
+        <!-- add additional web-resources for morris -->
+
         <resource type="download" name="morris.css" location="/library/morris/morris.css"/>
         <resource type="download" name="morris.min.js" location="/library/morris/morris.min.js"/>
         <resource type="download" name="raphael-min.js" location="/library/raphael/raphael-min.js"/>
@@ -69,68 +72,166 @@
         <context>visualization</context>
     </web-resource>
 
+    <web-resource name="Admin Web Resources" key="administration-resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <resource type="download" name="admin.js" location="js/admin.js"/>
+        <resource type="download" name="administration.css" location="css/administration.css"/>
+    </web-resource>
+
+    <web-resource name="Create User Resources" key="create-resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <resource type="download" name="create_user.js" location="js/create_user.js"/>
+        <resource type="download" name="user.js" location="js/user.js"/>
+        <resource type="download" name="administration.css" location="css/administration.css"/>
+    </web-resource>
+
+    <web-resource name="Modify User Resources" key="modify-resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-table-sortable</dependency>
+        <resource type="download" name="modify_user.js" location="js/modify_user.js"/>
+        <resource type="download" name="user.js" location="js/user.js"/>
+        <resource type="download" name="administration.css" location="css/administration.css"/>
+    </web-resource>
+
+    <!-- end of web-resources -->
+
+    <!-- servlets -->
+
     <servlet name="timesheet" class="org.catrobat.confluence.servlet.TimesheetServlet" key="timesheet">
-		<url-pattern>/timesheet</url-pattern>
-		<url-pattern>/timesheet/</url-pattern>
+        <url-pattern>/timesheet</url-pattern>
+        <url-pattern>/timesheet/</url-pattern>
     </servlet>
+
     <servlet name="visualization" class="org.catrobat.confluence.servlet.VisualizationServlet" key="visualization">
         <url-pattern>/visualization</url-pattern>
         <url-pattern>/visualization/</url-pattern>
     </servlet>
+
     <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet" key="teammanagement">
         <url-pattern>/teams</url-pattern>
         <url-pattern>/teams/</url-pattern>
     </servlet>
-	<!-- import from the product container -->
-	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
-	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
-	<component-import key="groupManager" interface="com.atlassian.user.GroupManager" filter=""/>
-	<component-import key="userAccessor" interface="com.atlassian.confluence.user.UserAccessor" filter=""/>
-	<component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
-	<component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
-	<component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
-	<component-import key="ao" name="Active Objects service" interface="com.atlassian.activeobjects.external.ActiveObjects">
-        <description>Component to access Active Objects functionality from the plugin</description>
-	</component-import>
-	<component-import key="ApplicationLinkService">
-		<interface>com.atlassian.applinks.api.ApplicationLinkService</interface>
-	</component-import>
-	<component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
-		<decription>Processes @Transactional annotations.</decription>
-	</component>
-  
-  <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.impl.TeamServiceImpl"/>
-  <component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.impl.TimesheetServiceImpl"/>
-  <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl"/>
-  <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.impl.CategoryServiceImpl"/>
-  <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.impl.PermissionServiceImpl"/>
-  <component key="dbfiller-service" name="DBFiller Service" class="org.catrobat.confluence.services.impl.DBFillerServiceImpl"/>
 
-	<ao key="ao-module">
-		<description>The module configuring the Active Objects service used by this plugin</description>
-		<entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
-		<entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
-		<entity>org.catrobat.confluence.activeobjects.Team</entity>
-		<entity>org.catrobat.confluence.activeobjects.Category</entity>
-		<entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
-	</ao>
-	
-	<rest key="timesheetRest" path="/timesheet" version="1.0">
-		<description>Provides timesheet services.</description>
-	</rest>
+    <servlet key="create-user-servlet" class="org.catrobat.confluence.servlet.CreateUserServlet">
+        <url-pattern>/admin_helper/create_user</url-pattern>
+    </servlet>
+
+    <servlet key="modify-user-servlet" class="org.catrobat.confluence.servlet.ModifyUserServlet">
+        <url-pattern>/admin_helper/modify_user</url-pattern>
+    </servlet>
+
+    <servlet key="administration-servlet" class="org.catrobat.confluence.servlet.AdminServlet">
+        <url-pattern>/admin_helper/admin</url-pattern>
+    </servlet>
+
+    <!-- end of servlets -->
+
+    <!-- import from the product container -->
+
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
+    <component-import key="groupManager" interface="com.atlassian.user.GroupManager" filter=""/>
+    <component-import key="userAccessor" interface="com.atlassian.confluence.user.UserAccessor" filter=""/>
+    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
+    <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
+    <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
+    <component-import key="ao" name="Active Objects service" interface="com.atlassian.activeobjects.external.ActiveObjects">
+        <description>Component to access Active Objects functionality from the plugin</description>
+    </component-import>
+    <component-import key="ApplicationLinkService">
+        <interface>com.atlassian.applinks.api.ApplicationLinkService</interface>
+    </component-import>
+    <component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
+        <decription>Processes @Transactional annotations.</decription>
+    </component>
+
+    <!-- additional components for administration -->
+
+    <component-import key="pluginSettingsFactory"
+                      interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+    <component-import key="transactionTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"/>
+    <component-import key="webSudoManager" interface="com.atlassian.sal.api.websudo.WebSudoManager"/>
+
+    <!-- end of import from the product container -->
+
+    <!-- timesheet-components -->
+
+    <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.impl.TeamServiceImpl"/>
+    <component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.impl.TimesheetServiceImpl"/>
+    <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl"/>
+    <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.impl.CategoryServiceImpl"/>
+    <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.impl.PermissionServiceImpl"/>
+    <component key="dbfiller-service" name="DBFiller Service" class="org.catrobat.confluence.services.impl.DBFillerServiceImpl"/>
+
+    <!-- end of timesheet-components -->
+
+    <!-- administration-components -->
+    <component key="adminHelperConfiguration"
+               class="org.catrobat.jira.adminhelper.activeobject.AdminHelperConfigServiceImpl"/>
+
+    <!-- end of administration-components -->
+
+    <ao key="ao-module">
+        <description>The module configuring the Active Objects service used by this plugin</description>
+        <entity>org.catrobat.confluence.activeobjects.TimesheetEntry</entity>
+        <entity>org.catrobat.confluence.activeobjects.Timesheet</entity>
+        <entity>org.catrobat.confluence.activeobjects.Team</entity>
+        <entity>org.catrobat.confluence.activeobjects.Category</entity>
+        <entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
+    </ao>
+
+    <!-- rest-resources -->
+
+    <rest key="timesheetRest" path="/timesheet" version="1.0">
+        <description>Provides timesheet services.</description>
+    </rest>
 
     <rest key="visualizationRest" path="/visualization" version="1.0">
         <description>Provides visualization services.</description>
     </rest>
-  
-	<web-item key="timesheet_view" name="Link to Timsheet View" section="system.user" weight="47">
-	  <label>Timesheet</label>
-	  <link linkId="timesheet_view_link">/plugins/servlet/timesheet/</link>
-	</web-item>
 
-	<web-item key="visualization_view" name="Link to Visualization View" section="system.user" weight="47">
-		<label>Visualization</label>
-		<link linkId="visualization_view_link">/plugins/servlet/visualization/</link>
-	</web-item>
-  
-</atlassian-plugin>
+    <rest key="administrationRest" path="/administration" version="1.0">
+        <description>Provides administration services.</description>
+    </rest>
+
+    <!-- end of rest-resources -->
+
+    <!-- web-items -->
+
+    <!-- user timesheet -->
+
+    <web-item key="timesheet_view" name="Link to Timsheet View" section="system.user" weight="47">
+      <label>Timesheet</label>
+      <link linkId="timesheet_view_link">/plugins/servlet/timesheet/</link>
+    </web-item>
+
+    <!-- single user visualization -->
+
+    <web-item key="visualization_view" name="Link to Visualization View" section="system.user" weight="47">
+        <label>Visualization</label>
+        <link linkId="visualization_view_link">/plugins/servlet/visualization/</link>
+    </web-item>
+
+    <!-- administration -->
+
+    <web-item key="administration_view" name="Link to Administration View" section="system.user" weight="47">
+        <label>Administration</label>
+        <link linkId="administration_view_link">/plugins/servlet/administration/</link>
+    </web-item>
+
+    <web-item key="create_user_view" name="Link to Create User View" section="system.user" weight="47">
+        <label>Create User</label>
+        <link linkId="create_user_view_link">/plugins/servlet/create_user/</link>
+    </web-item>
+
+    <web-item key="modify_user_view" name="Link to Modify User View" section="system.user" weight="47">
+        <label>Modify User</label>
+        <link linkId="modify_user_view_link">/plugins/servlet/modify_user/</link>
+    </web-item>
+
+    <!-- end of web-items -->
+
+    </atlassian-plugin>

@@ -1,0 +1,126 @@
+<!--
+  ~ Copyright 2014 Stephan Fellhofer
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>Create New User</title>
+    <meta name="decorator" content="atl.admin"/>
+    <meta name="application-base-url" content="$applicationProperties.getBaseUrl()">
+    $webResourceManager.requireResource("org.catrobat.confluence.timesheet:create-resources")
+</head>
+<body class="aui-layout aui-theme-default">
+<div id="aui-message-bar"></div>
+<div class="loadingDiv"><span class="aui-icon aui-icon-wait">Loading...</span></div>
+<header class="aui-page-header">
+    <div class="aui-page-header-inner">
+        <h2>Create New User</h2>
+    </div>
+</header>
+<div class="aui-page-panel">
+    <div class="aui-page-panel-inner">
+        <section class="aui-page-panel-content">
+            <form id="create" class="aui">
+                <h3>Personal Information</h3>
+                <fieldset>
+                    <div class="field-group">
+                        <label for="firstname">First Name<span class="aui-icon icon-required"> required</span></label>
+                        <input class="text" type="text" id="firstname" name="firstname" title="first name">
+                    </div>
+                    <div class="field-group">
+                        <label for="lastname">Last Name<span class="aui-icon icon-required"> required</span></label>
+                        <input class="text" type="text" id="lastname" name="lastname" title="last name">
+                    </div>
+                    <div class="field-group">
+                        <label for="username">Username<span class="aui-icon icon-required"> required</span></label>
+                        <input class="text" type="text" id="username" name="username" title="username">
+
+                        <div class="description">Suggested username regarding to the user's full name.</div>
+                    </div>
+                    <div class="field-group">
+                        <label for="email">Email<span class="aui-icon icon-required"> required</span></label>
+                        <input class="text" type="text" id="email" name="email" title="email"
+                               placeholder="you@example.com">
+                    </div>
+                    <div class="field-group">
+                        <label for="github">GitHub username</label>
+                        <input class="text" type="text" id="github" name="github" title="github name">
+                        <div class="description">
+                            If unknown the GitHub username can be edited later on at 'Modify User'.
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <div class="checkbox">
+                            <input class="checkbox" type="checkbox" name="defaultGithubTeam" id="defaultGithubTeam">
+                            <label for="defaultGithubTeam">Default GitHub Team</label>
+                        </div>
+                        <div class="description">
+                            User will be added to default GitHub team (important for Jenkins white listing)
+                        </div>
+                    </div>
+                </fieldset>
+
+                <h3>Individual Resources</h3>
+                <fieldset id="individual-resources" class="group">
+
+                </fieldset>
+
+                <h3>Teams</h3>
+                <p>
+                    Please choose at least one team and one role (coordinator, senior or member) for the new user.
+                    Depending on the selected team and role the new user will be created and added to different user
+                    groups within the configured User Directory (e.g. Jira Internal Directory, LDAP, ...).
+                    If a GitHub user name is entered, the new user will also be added automatically to a GitHub team and
+                    repository.
+                </p>
+                <p>
+                    The relationships between teams, roles, user groups and GitHub teams are defined in
+                    'Helper&nbsp;Configuration'. Team membership is only an auxiliary structure during the creation of
+                    new users. It simplifies the process of adding new users to user groups, to GitHub and GitHub
+                    teams. After creating a new user, team membership will not be stored and is of no further use.
+                </p>
+                <p>
+                    If the user groups of a user have to be changed afterwards, this can be done in the
+                    standard Jira User Management or by disabling and enabling the user in 'Modify&nbsp;User'. If a
+                    GitHub user name has to be added or changed after the initial user creation, this can be done in
+                    'Modify&nbsp;User'.
+                </p>
+                <table class="aui">
+                    <thead>
+                    <tr>
+                        <th id="basic-team">Team</th>
+                        <th id="basic-coordinator">Coordinator</th>
+                        <th id="basic-senior">Senior</th>
+                        <th id="basic-developer">Developer</th>
+                        <th id="basic-none">None</th>
+                    </tr>
+                    </thead>
+                    <tbody id="team-body">
+
+                    </tbody>
+                </table>
+
+                <div class="buttons-container">
+                    <div class="buttons">
+                        <input class="button submit" type="submit" value="Save" id="d-save-btn1">
+                        <a class="cancel" href="#">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

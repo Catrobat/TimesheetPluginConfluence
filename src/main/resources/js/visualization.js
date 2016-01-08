@@ -69,9 +69,7 @@ function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entr
 }
 
 function populateTable(timesheetDataReply) {
-
 	var timesheetData = timesheetDataReply[0];
-
 	var visualizationTable = AJS.$("#visualization-table");
 	visualizationTable.empty();
 
@@ -131,7 +129,6 @@ function appendEntriesToTable(timesheetData) {
             totalHours = totalHours + minutesToFullHours;
             totalMinutes = totalMinutes - minutesToFullHours * 60;
          }
-
       } else {
           pos = i;
           i = i - 1;
@@ -165,7 +162,7 @@ function appendEntriesToTable(timesheetData) {
 
           var viewRow = AJS.$(Confluence.Templates.Visualization.visualizationEntry(
             {entry: newVisualizationEntry, teams: timesheetData.teams}));
-            visualizationTable.append(viewRow);
+          visualizationTable.append(viewRow);
 
          //overall sum of spent time
          totalTimeHours = totalTimeHours + totalHours;
@@ -186,10 +183,10 @@ function appendEntriesToTable(timesheetData) {
     var totalTime = totalTimeHours*60 + totalTimeMinutes;
 
     //practice hours
-    piChartDataPoints.push("Practice Hours");
+    piChartDataPoints.push("Practice Hours Percentage");
     piChartDataPoints.push((piChartDataPractice * 100) / totalTime);
     //theory hours
-    piChartDataPoints.push("Theory Hours");
+    piChartDataPoints.push("Theory Hours Percentage");
     piChartDataPoints.push(100 - (piChartDataPractice * 100) / totalTime);
 
     console.log(piChartDataPoints);
@@ -197,7 +194,7 @@ function appendEntriesToTable(timesheetData) {
     //entry for whole time
     var newVisualizationEntry = {
      entryID: index,
-     date: "Gesamtdauer",
+     date: "Total Time",
      begin: totalTimeHours+"h"+totalTimeMinutes+"min",
      end: "",
      pause: "",
@@ -216,15 +213,15 @@ function appendEntriesToTable(timesheetData) {
     var averageTimeHours = 0;
     var averageTimeMinutes = 0;
 
-     if(averageMinutesPerMonth >= 60) {
-        var minutesToFullHours = Math.floor(averageMinutesPerMonth / 60) ; //get only full hours
-        averageTimeHours = minutesToFullHours;
-        averageTimeMinutes = averageMinutesPerMonth - minutesToFullHours * 60;
-     }
+    if(averageMinutesPerMonth >= 60) {
+      var minutesToFullHours = Math.floor(averageMinutesPerMonth / 60) ; //get only full hours
+      averageTimeHours = minutesToFullHours;
+      averageTimeMinutes = averageMinutesPerMonth - minutesToFullHours * 60;
+    }
 
     newVisualizationEntry = {
      entryID: index,
-     date: "Zeit / Monat",
+     date: "Time / Month",
      begin:  averageTimeHours+"h"+averageTimeMinutes+"min",
      end: "",
      pause: "",

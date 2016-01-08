@@ -15,10 +15,10 @@
 			<div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
 		</div>
 
-    <br><h3>Visualisierung deiner Timesheet-Daten</h3>
+    <br><h3>Visualization of your spent time</h3>
     <div id="lineDiagram" style="height: 250px;"></div>
 
-    <br><h3>Visualisierung deiner Aktivitäten</h3>
+    <br><h3>Visualization of your theory - practical hours distribution</h3>
     <div id="piChartDiagram" style="height: 250px;"></div>
 
     <script>
@@ -35,7 +35,7 @@
         ykeys: ['value'],
         // Labels for the ykeys -- will be displayed when you hover over the
         // chart.
-        labels: ['Stunden']
+        labels: ['hours']
       });
     }
     </script>

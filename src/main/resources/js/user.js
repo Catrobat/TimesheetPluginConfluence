@@ -42,7 +42,8 @@ function populateTeamTable(config, tableId, resourceId) {
 
 function getTeamList(baseUrl, callme) {
     AJS.$.ajax({
-        url: baseUrl + "/rest/administration/latest/config/getTeamList",
+        //url: baseUrl + "/rest/administration/latest/config/getTeamList",
+        url: baseUrl + "/rest/administration/1.0/config/getTeamList",
         type: "GET",
         contentType: "application/json",
         success: function (result) {
@@ -54,7 +55,8 @@ function getTeamList(baseUrl, callme) {
 function getConfigAndCallback(baseUrl, callback) {
     AJS.$(".loadingDiv").show();
     AJS.$.ajax({
-        url: baseUrl + "/rest/administration/latest/config/getConfig",
+        //url: baseUrl + "/rest/administration/latest/config/getConfig",
+        url: baseUrl + "/rest/administration/1.0/config/getconfig",
         dataType: "json",
         success: function (config) {
             AJS.$(".loadingDiv").hide();

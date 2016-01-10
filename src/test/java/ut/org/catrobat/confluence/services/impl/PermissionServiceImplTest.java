@@ -1,6 +1,7 @@
 package ut.org.catrobat.confluence.services.impl;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
+import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
@@ -9,9 +10,7 @@ import net.java.ao.EntityManager;
 import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
-import org.catrobat.confluence.activeobjects.Team;
-import org.catrobat.confluence.activeobjects.Timesheet;
-import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.rest.json.JsonTimesheetEntry;
 import org.catrobat.confluence.services.TeamService;
 import org.catrobat.confluence.services.TimesheetEntryService;
@@ -50,16 +49,20 @@ public class PermissionServiceImplTest {
   private TimesheetService sheetService;
   private TimesheetEntryService entryService;
   private SimpleDateFormat sdf;
+  private AdminHelperConfigService adminHelperConfig;
+  private UserAccessor userAccessor;
 
   @Before
   public void setUp() throws Exception
   {
     teamService = Mockito.mock(TeamService.class);
     userManager = Mockito.mock(UserManager.class);
+    adminHelperConfig = Mockito.mock(AdminHelperConfigService.class);
+    userAccessor = Mockito.mock(UserAccessor.class);
 
     assertNotNull(entityManager);
 
-    permissionService = new PermissionServiceImpl(userManager, teamService);
+    permissionService = new PermissionServiceImpl(userManager, teamService, adminHelperConfig, userAccessor);
 
     //arrange
     coord = Mockito.mock(UserProfile.class);

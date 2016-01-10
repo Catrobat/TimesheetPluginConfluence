@@ -40,6 +40,6 @@ public class AdminServlet extends HelperServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         super.doGet(request, response);
-        renderer.render("admin.vm", response.getWriter());
+        renderer.render("administration.vm", response.getWriter());
     }
 }

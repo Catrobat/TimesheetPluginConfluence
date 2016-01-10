@@ -36,7 +36,7 @@ AJS.toInit(function () {
     function populateForm() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/latest/config/getConfig",
+            url: baseUrl + "/rest/administration/1.0/config/getConfig",
             dataType: "json",
             success: function (config) {
                 if (config.githubToken)
@@ -108,7 +108,7 @@ AJS.toInit(function () {
                     placeholder: "Search for directories",
                     minimumInputLength: 0,
                     ajax: {
-                        url: baseUrl + "/rest/administration/latest/config/getDirectories",
+                        url: baseUrl + "/rest/administration/1.0/config/getDirectories",
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};

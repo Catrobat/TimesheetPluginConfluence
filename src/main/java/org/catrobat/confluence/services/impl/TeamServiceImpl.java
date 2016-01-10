@@ -78,7 +78,6 @@ public class TeamServiceImpl implements TeamService{
   @Override
   public Set<Team> getCoordinatorTeamsOfUser(String userName) {
     Set<Team> teams = new HashSet<Team>();
-    
     for(String groupName : userAccessor.getGroupNamesForUserName(userName)) {
       String[] pieces = groupName.split("-");
       

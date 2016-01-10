@@ -3,26 +3,33 @@ package org.catrobat.confluence.services.impl;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
+
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 
-import org.catrobat.confluence.activeobjects.Team;
-import org.catrobat.confluence.activeobjects.Timesheet;
-import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.rest.json.JsonTimesheetEntry;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
+import com.atlassian.confluence.user.UserAccessor;
 import org.joda.time.DateTime;
 
 public class PermissionServiceImpl implements PermissionService {
   
   private final UserManager userManager;
   private final TeamService teamService;
+  private final AdminHelperConfigService adminHelperConfigService;
+  private final UserAccessor userAccessor;
 
-  public PermissionServiceImpl(UserManager userManager, TeamService teamService) {
+  public PermissionServiceImpl(UserManager userManager, TeamService teamService,
+                               AdminHelperConfigService adminHelperConfigService, UserAccessor userAccessor) {
     this.userManager = userManager;
     this.teamService = teamService;
+    this.adminHelperConfigService = adminHelperConfigService;
+    this.userAccessor = userAccessor;
   }
   
   public UserProfile checkIfUserExists(HttpServletRequest request) {
@@ -32,6 +39,49 @@ public class PermissionServiceImpl implements PermissionService {
       throw new NotAuthorizedException("User does not exist.");
     }
     return userProfile;
+  }
+
+  protected Response checkPermission(HttpServletRequest request) {
+    String username = userManager.getRemoteUser(request).getUsername();
+
+    if (username == null) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    } else if (!userManager.isSystemAdmin(username)) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+    //else if (!permissionCondition.isApproved(username)) {
+    //return Response.status(Response.Status.UNAUTHORIZED).build();
+    //}
+
+    return null;
+  }
+
+  public boolean isApproved(UserProfile applicationUser) {
+    if (applicationUser == null || !userManager.isSystemAdmin(applicationUser.getUserKey())) {
+      return false;
+    }
+
+    // check if permissions are set
+    AdminHelperConfig config = adminHelperConfigService.getConfiguration();
+    if(config.getApprovedGroups().length == 0 && config.getApprovedUsers().length == 0){
+      return true;
+    }
+
+    if (adminHelperConfigService.isUserApproved(applicationUser.getUserKey().getStringValue())) {
+      return true;
+    }
+
+    Collection<String> groupNameCollection = userAccessor.getGroupNamesForUserName(applicationUser.getUsername());
+    for (String groupName : groupNameCollection) {
+      if (adminHelperConfigService.isGroupApproved(groupName))
+        return true;
+    }
+
+    return false;
+  }
+
+  public boolean isApproved(String userName) {
+    return isApproved(userManager.getUserProfile(userName));
   }
 
   private boolean userOwnsSheet(UserProfile user, Timesheet sheet) {

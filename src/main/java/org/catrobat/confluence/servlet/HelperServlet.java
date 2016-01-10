@@ -22,7 +22,6 @@ import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
-//import org.catrobat.jira.adminhelper.helper.PermissionCondition;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

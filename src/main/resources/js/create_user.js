@@ -111,7 +111,7 @@ AJS.toInit(function () {
 
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/admin-helper/1.0/user/createUser",
+            url: baseUrl + "/rest/administration/1.0/user/createUser",
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(userToCreate),

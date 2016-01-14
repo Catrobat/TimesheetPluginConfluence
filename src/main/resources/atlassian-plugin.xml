@@ -101,25 +101,21 @@
     <!-- end of web-resources -->
 
     <!-- servlets -->
-    <servlet name="timesheet" class="org.catrobat.confluence.servlet.TimesheetServlet" key="timesheet">
+    <servlet name="timesheet" class="org.catrobat.confluence.servlet.TimesheetServlet" key="timesheet-servlet">
         <url-pattern>/timesheet</url-pattern>
         <url-pattern>/timesheet/</url-pattern>
     </servlet>
-    <servlet name="visualization" class="org.catrobat.confluence.servlet.VisualizationServlet" key="visualization">
+    <servlet name="visualization" class="org.catrobat.confluence.servlet.VisualizationServlet" key="visualization-servlet">
         <url-pattern>/visualization</url-pattern>
         <url-pattern>/visualization/</url-pattern>
     </servlet>
-    <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet" key="teammanagement">
+    <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet" key="teammanagement-servlet">
         <url-pattern>/teams</url-pattern>
         <url-pattern>/teams/</url-pattern>
     </servlet>
     <servlet name="administration-servlet" class="org.catrobat.confluence.servlet.AdminServlet" key="administration-servlet">
         <url-pattern>/administration</url-pattern>
         <url-pattern>/administration/</url-pattern>
-    </servlet>
-    <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet" key="teammanagement">
-        <url-pattern>/teams</url-pattern>
-        <url-pattern>/teams/</url-pattern>
     </servlet>
     <servlet name="create-user-servlet" class="org.catrobat.confluence.servlet.CreateUserServlet" key="create-user-servlet">
         <url-pattern>/create_user</url-pattern>

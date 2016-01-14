@@ -16,6 +16,8 @@
 
 "use strict";
 
+var restBaseUrl;
+
 var tableSkeleton = "<h3>Teams</h3>" +
     "<table class=\"aui\">\n" +
     "<thead>\n" +
@@ -65,7 +67,9 @@ AJS.toInit(function () {
     //    AJS.$(".loadingDiv").hide();
     //});
 
-    var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
+    //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
+    var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
+    restBaseUrl = baseUrl + "/rest/administration/latest/";
 
     var config;
     getConfigAndCallback(baseUrl, function (ajaxConfig) {
@@ -93,7 +97,7 @@ AJS.toInit(function () {
     function populateTable() {
         //AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/user/getUsers",
+            url: restBaseUrl + 'user/getUsers',
             dataType: "json",
             success: function (users) {
                 AJS.$("#user-body").empty();
@@ -227,7 +231,7 @@ AJS.toInit(function () {
         };
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/github/changeGithubname",
+            url: restBaseUrl + 'github/changeGithubname',
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(jsonUser),
@@ -277,7 +281,7 @@ AJS.toInit(function () {
 
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/user/activateUser",
+            url: restBaseUrl + 'user/activateUser',
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(userToModify),
@@ -302,7 +306,7 @@ AJS.toInit(function () {
     function inactivateUser(userName) {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/user/inactivateUser",
+            url: restBaseUrl + 'user/inactivateUser',
             type: "PUT",
             contentType: "application/json",
             data: userName,

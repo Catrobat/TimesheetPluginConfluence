@@ -15,6 +15,9 @@
  */
 
 "use strict";
+
+var restBaseUrl;
+
 AJS.toInit(function () {
     //AJS.$(document).ajaxStart(function () {
     //    AJS.$(".loadingDiv").show();
@@ -23,7 +26,9 @@ AJS.toInit(function () {
     //    AJS.$(".loadingDiv").hide();
     //});
 
-    var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
+    //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
+    var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
+    restBaseUrl = baseUrl + "/rest/administration/latest/";
     var teams = [];
     var localTempResources = [];
     var editNameDialog;
@@ -36,7 +41,7 @@ AJS.toInit(function () {
     function populateForm() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/config/getConfig",
+            url: restBaseUrl + 'config/getConfig',
             dataType: "json",
             success: function (config) {
                 if (config.githubToken)
@@ -54,6 +59,7 @@ AJS.toInit(function () {
                 if (config.mailBody)
                     AJS.$("#mail-body").val(config.mailBody);
                 localTempResources = [];
+                /*
                 AJS.$("#resources").empty();
                 for (var i = 0; i < config.resources.length; i++) {
                     var resource = config.resources[i];
@@ -64,6 +70,7 @@ AJS.toInit(function () {
                         '<input class="text single-jira-group" type="text" id="' + tempResourceName + '">' +
                         '</div>');
                 }
+                */
                 teams = [];
                 AJS.$("#teams").empty();
                 for (var i = 0; i < config.teams.length; i++) {
@@ -82,9 +89,11 @@ AJS.toInit(function () {
 
 
                 var singleGithubData = [];
+                /*
                 for(var i = 0; i < config.availableGithubTeams.length; i++) {
                     singleGithubData.push({id: config.availableGithubTeams[i], text: config.availableGithubTeams[i]});
                 }
+                */
                 AJS.$(".github-single").auiSelect2({
                     placeholder: "Search for team",
                     minimumInputLength: 0,
@@ -108,7 +117,7 @@ AJS.toInit(function () {
                     placeholder: "Search for directories",
                     minimumInputLength: 0,
                     ajax: {
-                        url: baseUrl + "/rest/administration/1.0/config/getDirectories",
+                        url: restBaseUrl + 'config/getDirectories',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -128,7 +137,7 @@ AJS.toInit(function () {
                     placeholder: "Search for group",
                     minimumInputLength: 0,
                     ajax: {
-                        url: baseUrl + "/rest/api/2/groups/picker",
+                        url: restBaseUrl + 'api/2/groups/picker',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -149,7 +158,7 @@ AJS.toInit(function () {
                     tags: true,
                     tokenSeparators: [",", " "],
                     ajax: {
-                        url: baseUrl + "/rest/api/2/groupuserpicker",
+                        url: restBaseUrl + 'api/2/groupuserpicker',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -187,7 +196,7 @@ AJS.toInit(function () {
                     tags: true,
                     tokenSeparators: [",", " "],
                     ajax: {
-                        url: baseUrl + "/rest/api/2/groups/picker",
+                        url: restBaseUrl + 'api/2/groups/picker',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -228,6 +237,7 @@ AJS.toInit(function () {
                     id: config.userDirectoryId,
                     text: config.userDirectoryName
                 });
+                /*
                 for(var i = 0; i < config.resources.length; i++) {
                     var resource = config.resources[i];
                     var tempResourceName = resource['resourceName'].replace(/\W/g, "-");
@@ -236,6 +246,7 @@ AJS.toInit(function () {
                             text: resource['groupName']
                         });
                 }
+                */
 
                 AJS.$(".loadingDiv").hide();
             },
@@ -319,7 +330,7 @@ AJS.toInit(function () {
 
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/config/saveConfig",
+            url: restBaseUrl + 'config/saveConfig',
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(config),
@@ -344,7 +355,7 @@ AJS.toInit(function () {
     function addTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/config/addTeam",
+            url: restBaseUrl + 'config/addTeam',
             type: "PUT",
             contentType: "application/json",
             data: AJS.$("#team").attr("value"),
@@ -369,7 +380,7 @@ AJS.toInit(function () {
     function addResource() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/config/addResource",
+            url: restBaseUrl + 'config/addResource',
             type: "PUT",
             contentType: "application/json",
             data: AJS.$("#edit-resource").attr("value"),
@@ -394,7 +405,7 @@ AJS.toInit(function () {
     function removeResource() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/config/removeResource",
+            url: restBaseUrl + 'config/removeResource',
             type: "PUT",
             contentType: "application/json",
             data: AJS.$("#edit-resource").attr("value"),
@@ -448,7 +459,7 @@ AJS.toInit(function () {
         editNameDialog.addButton("Save", function (dialog) {
             AJS.$(".loadingDiv").show();
             AJS.$.ajax({
-                url: baseUrl + "/rest/administration/1.0/config/editTeam",
+                url: restBaseUrl + 'config/editTeam',
                 type: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify([teamName, AJS.$("#new-name").val()]),
@@ -486,7 +497,7 @@ AJS.toInit(function () {
     function removeTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/config/removeTeam",
+            url: restBaseUrl + 'config/removeTeam',
             type: "PUT",
             contentType: "application/json",
             data: AJS.$("#team").attr("value"),

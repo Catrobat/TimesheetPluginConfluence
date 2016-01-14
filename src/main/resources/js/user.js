@@ -16,6 +16,10 @@
 
 "use strict";
 
+var restBaseUrl;
+var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
+restBaseUrl = baseUrl + "/rest/administration/latest/";
+
 function populateTeamTable(config, tableId, resourceId) {
     AJS.$(tableId).empty();
     for (var i = 0; i < config.teams.length; i++) {
@@ -28,7 +32,7 @@ function populateTeamTable(config, tableId, resourceId) {
         teamName + "\" id=\"" + teamName + "-developer\" value=\"developer\"></td><td headers=\"basic-none\"><input class=\"radio\" type=\"radio\" checked=\"checked\" name=\"" +
         teamName + "\" id=\"" + teamName + "-none\" value=\"none\"></td></tr>");
     }
-
+    /*
     AJS.$(resourceId).empty();
     for (i = 0; i < config.resources.length; i++) {
         obj = config.resources[i];
@@ -38,12 +42,13 @@ function populateTeamTable(config, tableId, resourceId) {
             '</div>'
         );
     }
+    */
 }
 
 function getTeamList(baseUrl, callme) {
     AJS.$.ajax({
         //url: baseUrl + "/rest/administration/latest/config/getTeamList",
-        url: baseUrl + "/rest/administration/1.0/config/getTeamList",
+        url: restBaseUrl + 'config/getTeamList',
         type: "GET",
         contentType: "application/json",
         success: function (result) {
@@ -56,7 +61,7 @@ function getConfigAndCallback(baseUrl, callback) {
     AJS.$(".loadingDiv").show();
     AJS.$.ajax({
         //url: baseUrl + "/rest/administration/latest/config/getConfig",
-        url: baseUrl + "/rest/administration/1.0/config/getconfig",
+        url: restBaseUrl + 'config/getConfig',
         dataType: "json",
         success: function (config) {
             AJS.$(".loadingDiv").hide();

@@ -15,6 +15,9 @@
  */
 
 "use strict";
+
+var restBaseUrl;
+
 AJS.toInit(function () {
     //AJS.$(document).ajaxStart(function () {
     //    AJS.$(".loadingDiv").show();
@@ -23,12 +26,14 @@ AJS.toInit(function () {
     //    AJS.$(".loadingDiv").hide();
     //});
 
-    var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
+    //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
+    var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
+    restBaseUrl = baseUrl + "/rest/administration/latest/";
     var config;
 
     getConfigAndCallback(baseUrl, function (ajaxConfig) {
         config = ajaxConfig;
-        populateTeamTable(config, "#team-body", "#individual-resources");
+        populateTeamTable(config, "#team-body");
         AJS.$("#github").auiSelect2({
             placeholder: "Search for user",
             minimumInputLength: 1,
@@ -102,16 +107,16 @@ AJS.toInit(function () {
             }
         }
         userToCreate.resourceList = [];
-        for (i = 0; i < config.resources.length; i++) {
-            var resource = config.resources[i];
+        /*[i];
             if (AJS.$('#' + resource.resourceName.replace(/\W/g, "-")).attr('checked')) {
                 userToCreate.resourceList.push(resource);
             }
         }
+        */
 
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: baseUrl + "/rest/administration/1.0/user/createUser",
+            url: restBaseUrl + 'user/createUser',
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(userToCreate),

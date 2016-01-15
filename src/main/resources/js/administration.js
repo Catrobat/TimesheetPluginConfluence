@@ -59,26 +59,17 @@ AJS.toInit(function () {
                 if (config.mailBody)
                     AJS.$("#mail-body").val(config.mailBody);
                 localTempResources = [];
-                /*
-                AJS.$("#resources").empty();
-                for (var i = 0; i < config.resources.length; i++) {
-                    var resource = config.resources[i];
-                    localTempResources.push(resource['resourceName']);
-                    var tempResourceName = resource['resourceName'].replace(/\W/g, '-');
-                    AJS.$("#resources").append('<div class="field-group">' +
-                        '<label for="' + tempResourceName + '">' + resource['resourceName'] + '</label>' +
-                        '<input class="text single-jira-group" type="text" id="' + tempResourceName + '">' +
-                        '</div>');
-                }
-                */
+
                 teams = [];
                 AJS.$("#teams").empty();
                 for (var i = 0; i < config.teams.length; i++) {
                     var team = config.teams[i];
-                    teams.push(team['name']);
-                    var tempTeamName = team['name'].replace(/\W/g, '-');
+                    teams.push(team['teamName']);
+                    console.log(team);
+
+                    var tempTeamName = team['teamName'].replace(/\W/g, '-');
                     AJS.$("#teams").append("<h3>" + team['name'] +
-                    "<button class=\"aui-button aui-button-subtle\" value=\"" + team['name'] + "\">" +
+                    "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
                     "<span class=\"aui-icon aui-icon-small aui-iconfont-edit\">Editing</span> Edit</button></h3><fieldset>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-github-teams\">GitHub Teams</label><input class=\"text github\" type=\"text\" id=\"" + tempTeamName + "-github-teams\" name=\"github-teams\" value=\"" + team["githubTeams"] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-coordinator\">Coordinator</label><input class=\"text jira-group\" type=\"text\" id=\"" + tempTeamName + "-coordinator\" value=\"" + team['coordinatorGroups'] + "\"></div>");
@@ -137,7 +128,7 @@ AJS.toInit(function () {
                     placeholder: "Search for group",
                     minimumInputLength: 0,
                     ajax: {
-                        url: restBaseUrl + 'api/2/groups/picker',
+                        url: restBaseUrl + 'rest/api/2/groups/picker',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -158,53 +149,24 @@ AJS.toInit(function () {
                     tags: true,
                     tokenSeparators: [",", " "],
                     ajax: {
-                        url: restBaseUrl + 'api/2/groupuserpicker',
+                        url: baseUrl + '/rest/prototype/1/search/user-or-group',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
                         },
                         results: function (data, page) {
                             var select2data = [];
-                            for (var i = 0; i < data.groups.groups.length; i++) {
+                            for (var i = 0; i < data.group.length; i++) {
                                 select2data.push({
-                                    id: "groups-" + data.groups.groups[i].name,
-                                    text: data.groups.groups[i].name
+                                    id: "groups-" + data.group[i].name,
+                                    text: data.group[i].name
                                 });
                             }
-                            for (var i = 0; i < data.users.users.length; i++) {
+                            for (var i = 0; i < data.result.length; i++) {
                                 select2data.push({
-                                    id: "users-" + data.users.users[i].name,
-                                    text: data.users.users[i].name
+                                    id: "users-" + data.result[i].name,
+                                    text: data.result[i].name
                                 });
-                            }
-                            return {results: select2data};
-                        }
-                    },
-                    initSelection: function (elements, callback) {
-                        var data = [];
-                        var array = elements.val().split(",");
-                        for (var i = 0; i < array.length; i++) {
-                            data.push({id: array[i], text: array[i].replace(/^users-/i, "").replace(/^groups-/i, "")});
-                        }
-                        callback(data);
-                    }
-                });
-
-                AJS.$(".jira-group").auiSelect2({
-                    placeholder: "Search for groups",
-                    minimumInputLength: 0,
-                    tags: true,
-                    tokenSeparators: [",", " "],
-                    ajax: {
-                        url: restBaseUrl + 'api/2/groups/picker',
-                        dataType: "json",
-                        data: function (term, page) {
-                            return {query: term};
-                        },
-                        results: function (data, page) {
-                            var select2data = [];
-                            for (var i = 0; i < data.groups.length; i++) {
-                                select2data.push({id: data.groups[i].name, text: data.groups[i].name});
                             }
                             return {results: select2data};
                         }
@@ -237,16 +199,6 @@ AJS.toInit(function () {
                     id: config.userDirectoryId,
                     text: config.userDirectoryName
                 });
-                /*
-                for(var i = 0; i < config.resources.length; i++) {
-                    var resource = config.resources[i];
-                    var tempResourceName = resource['resourceName'].replace(/\W/g, "-");
-                    AJS.$("#" + tempResourceName).auiSelect2("data", {
-                            id: resource['groupName'],
-                            text: resource['groupName']
-                        });
-                }
-                */
 
                 AJS.$(".loadingDiv").hide();
             },
@@ -281,14 +233,6 @@ AJS.toInit(function () {
         config.mailBody = AJS.$("#mail-body").val();
         config.userDirectoryId = AJS.$("#userdirectory").auiSelect2("val");
         config.defaultGithubTeam = AJS.$("#default-github-team").auiSelect2("val");
-        config.resources = [];
-        for(var i = 0; i < localTempResources.length; i++) {
-            var resource = {};
-            resource.resourceName = localTempResources[i];
-            var tempResourceName = localTempResources[i].replace(/\W/g, "-");
-            resource.groupName = AJS.$("#" + tempResourceName).auiSelect2("val");
-            config.resources.push(resource);
-        }
 
         var usersAndGroups = AJS.$("#plugin-permission").auiSelect2("val");
         var approvedUsers = [];
@@ -364,56 +308,6 @@ AJS.toInit(function () {
                 AJS.messages.success({
                     title: "Success!",
                     body: "Team added!"
-                });
-                AJS.$(".loadingDiv").hide();
-            },
-            error: function (error) {
-                AJS.messages.error({
-                    title: "Error!",
-                    body: "Something went wrong!<br />" + error.responseText
-                });
-                AJS.$(".loadingDiv").hide();
-            }
-        });
-    }
-
-    function addResource() {
-        AJS.$(".loadingDiv").show();
-        AJS.$.ajax({
-            url: restBaseUrl + 'config/addResource',
-            type: "PUT",
-            contentType: "application/json",
-            data: AJS.$("#edit-resource").attr("value"),
-            processData: false,
-            success: function () {
-                AJS.messages.success({
-                    title: "Success!",
-                    body: "Resource added!"
-                });
-                AJS.$(".loadingDiv").hide();
-            },
-            error: function (error) {
-                AJS.messages.error({
-                    title: "Error!",
-                    body: "Something went wrong!<br />" + error.responseText
-                });
-                AJS.$(".loadingDiv").hide();
-            }
-        });
-    }
-
-    function removeResource() {
-        AJS.$(".loadingDiv").show();
-        AJS.$.ajax({
-            url: restBaseUrl + 'config/removeResource',
-            type: "PUT",
-            contentType: "application/json",
-            data: AJS.$("#edit-resource").attr("value"),
-            processData: false,
-            success: function () {
-                AJS.messages.success({
-                    title: "Success!",
-                    body: "Resource removed!"
                 });
                 AJS.$(".loadingDiv").hide();
             },
@@ -537,21 +431,9 @@ AJS.toInit(function () {
         scrollToAnchor('top');
     });
 
-    AJS.$("#modify-resources").submit(function (e) {
-        e.preventDefault();
-        addResource();
-        scrollToAnchor('top');
-    });
-
     AJS.$("#remove").click(function (e) {
         e.preventDefault();
         removeTeam();
-        scrollToAnchor('top');
-    });
-
-    AJS.$("#remove-resource").click(function (e) {
-        e.preventDefault();
-        removeResource();
         scrollToAnchor('top');
     });
 

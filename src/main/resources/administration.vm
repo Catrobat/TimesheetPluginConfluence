@@ -67,8 +67,6 @@
                     </div>
                 </div>
             </fieldset>
-            <h2>Individual Resources</h2>
-            <fieldset id="resources">
 
             </fieldset>
             <h2>Welcome E-Mail</h2>
@@ -171,19 +169,6 @@
                 <div class="field-group">
                     <input type="submit" value="Create" class="aui-button aui-button-primary">
                     <input type="submit" value="Remove" id="remove" class="aui-button">
-                </div>
-            </fieldset>
-        </form>
-        <h2>Resources</h2>
-        <form id="modify-resources" class="aui">
-            <fieldset>
-                <div class="field-group">
-                    <label for="edit-resource">Resource name<span class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="text" id="edit-resource" name="edit-resource" title="edit-resource">
-                </div>
-                <div class="field-group">
-                    <input type="submit" value="Create" class="aui-button aui-button-primary">
-                    <input type="submit" value="Remove" id="remove-resource" class="aui-button">
                 </div>
             </fieldset>
         </form>

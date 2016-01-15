@@ -1,6 +1,7 @@
 package org.catrobat.confluence.services.impl;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
+import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 
@@ -41,12 +42,20 @@ public class PermissionServiceImpl implements PermissionService {
     return userProfile;
   }
 
-  protected Response checkPermission(HttpServletRequest request) {
-    String username = userManager.getRemoteUser(request).getUsername();
+  public boolean checkIfUserExists(String userName) {
+    UserProfile userProfile = userManager.getUserProfile(userName);
+    if (userProfile == null) {
+      return false;
+    }
+    return true;
+  }
 
-    if (username == null) {
+  public Response checkPermission(HttpServletRequest request) {
+    UserKey userKey = userManager.getRemoteUser(request).getUserKey();
+
+    if (userKey == null) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
-    } else if (!userManager.isSystemAdmin(username)) {
+    } else if (!userManager.isSystemAdmin(userKey)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
     //else if (!permissionCondition.isApproved(username)) {

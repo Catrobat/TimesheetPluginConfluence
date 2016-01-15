@@ -72,11 +72,6 @@
                     </div>
                 </fieldset>
 
-                <h3>Individual Resources</h3>
-                <fieldset id="individual-resources" class="group">
-
-                </fieldset>
-
                 <h3>Teams</h3>
                 <p>
                     Please choose at least one team and one role (coordinator, senior or member) for the new user.

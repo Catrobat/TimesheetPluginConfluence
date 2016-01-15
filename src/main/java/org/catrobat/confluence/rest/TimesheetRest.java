@@ -6,6 +6,7 @@
 package org.catrobat.confluence.rest;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
+import com.atlassian.confluence.json.json.Json;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 
@@ -143,7 +144,7 @@ public class TimesheetRest {
     
     return Response.ok(jsonTimesheet).build();
   }
-  
+
   @GET
   @Path("timesheets/{timesheetID}/entries")
   public Response getTimesheetEntries(@Context HttpServletRequest request, 
@@ -250,6 +251,42 @@ public class TimesheetRest {
 		
 		return Response.ok(jsonNewEntries).build();
 	}
+
+  @POST
+  @Path("timesheets/{timesheetID}/changeHours")
+  public Response postTimesheetHours(@Context HttpServletRequest request,
+      final JsonTimesheet jsonTimesheet, @PathParam("timesheetID") int timesheetID) {
+
+    Timesheet sheet;
+    UserProfile user;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+      sheet = sheetService.getTimesheetByID(timesheetID);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
+
+    if(sheet == null || !permissionService.userCanViewTimesheet(user, sheet)) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+
+    sheetService.editTimesheet(user.getUserKey().getStringValue(), jsonTimesheet.getTargetHourPractice(),
+            jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getLectures());
+    /*
+    sheet.setTargetHoursPractice(jsonTimesheet.getTargetHourPractice());
+    sheet.setTargetHoursTheory(jsonTimesheet.getTargetHourTheory());
+    sheet.setLecture(jsonTimesheet.getLectures());
+    sheet.setIsActive(jsonTimesheet.isIsActive());
+    sheet.save();
+    */
+
+    JsonTimesheet newJsonTimesheet = new JsonTimesheet(sheet.getID(),
+            sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
+            sheet.getLecture(), sheet.getIsActive());
+
+    return Response.ok(newJsonTimesheet).build();
+  }
 
   @PUT
   @Path("entries/{entryID}")

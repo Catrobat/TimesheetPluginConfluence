@@ -5,7 +5,7 @@ var restBaseUrl;
 
 AJS.toInit(function () {
 	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-	restBaseUrl = baseUrl + "/rest/visualization/1.0/";
+	restBaseUrl = baseUrl + "/rest/visualization/latest/";
 	fetchData();
 });
 
@@ -188,8 +188,6 @@ function appendEntriesToTable(timesheetData) {
     //theory hours
     piChartDataPoints.push("Theory Hours Percentage");
     piChartDataPoints.push(100 - (piChartDataPractice * 100) / totalTime);
-
-    console.log(piChartDataPoints);
 
     //entry for whole time
     var newVisualizationEntry = {

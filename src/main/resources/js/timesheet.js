@@ -5,9 +5,70 @@ var restBaseUrl;
 
 AJS.toInit(function () {
 	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-	restBaseUrl = baseUrl + "/rest/timesheet/1.0/";
+	restBaseUrl = baseUrl + "/rest/timesheet/latest/";
+	initSaveButton();
 	fetchData();
 });
+
+function initSaveButton() {
+  AJS.$("#timesheet-hours").submit(function (e) {
+      e.preventDefault();
+      if (AJS.$(document.activeElement).val() === 'Save') {
+          getExistingTimesheetHours();
+      }
+  });
+}
+
+function getExistingTimesheetHours() {
+  //fetch existing values
+  var timesheetFetched = AJS.$.ajax({
+    type: 'GET',
+    url: restBaseUrl + 'timesheets/' + timesheetID,
+    contentType: "application/json"
+  });
+
+  AJS.$.when(timesheetFetched)
+  .done(updateTimesheetHours)
+  .fail(function (error) {
+    AJS.messages.error({
+      title: 'There was an error while fetching data.',
+      body: '<p>Reason: ' + error.responseText + '</p>'
+    });
+    console.log(error);
+  });
+}
+
+function updateTimesheetHours(existingTimesheetData) {
+	var timesheetUpdateData = {
+		timesheetID: existingTimesheetData.timesheetID,
+		lectures: existingTimesheetData.lectures,
+		targetHourPractice: AJS.$("#timesheet-hours-text").val(),
+		targetHourTheory: existingTimesheetData.targetHourTheory,
+		isActive: existingTimesheetData.isActive,
+	};
+
+  AJS.$.ajax({
+  		type: "post",
+      url : restBaseUrl + 'timesheets/' + timesheetID + '/changeHours',
+  		contentType: "application/json",
+  		data: JSON.stringify(timesheetUpdateData)
+  	})
+  	.then(function(response) {
+  		showResults(response);
+  	})
+  	.fail(function (error) {
+  		AJS.messages.error({
+  			title: 'There was an error during your Google Timesheet import.',
+  			body: '<p>Reason: ' + error.responseText + '</p>'
+  		});
+  	});
+}
+
+function showResults(response) {
+  //set timesheet hours text field
+  AJS.$("#timesheet-hours-text").val(response.targetHourPractice);
+  fetchData();
+}
 
 function fetchData() {
 	var timesheetFetched = AJS.$.ajax({
@@ -48,6 +109,9 @@ function fetchData() {
 
 function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
 	var timesheetData = timesheetReply[0];
+
+  //set timesheet hours text field
+  AJS.$("#timesheet-hours-text").val(timesheetData.targetHourPractice);
 
 	timesheetData.entries = entriesReply[0];
 	timesheetData.categories = [];
@@ -95,7 +159,7 @@ function populateTable(timesheetDataReply) {
 		callback   : addNewEntryCallback,
 		ajaxUrl    : restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entry/"
 	};
-	
+
 	var emptyForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
 	timesheetTable.append(emptyForm);
 
@@ -279,8 +343,6 @@ existingIsGoogleDocImportValue) {
 	if(existingEntryID !== "new-id") {
 	  entry.entryID = existingEntryID;
 	}
-
-	console.log(entry);
 
 	form.loadingSpinner.show();
 

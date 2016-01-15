@@ -142,4 +142,22 @@ public class TimesheetServiceImplTest {
 		//Assert
 		assertNull(sheet);
 	}
+
+	@Test
+	public void testUpdateTimesheetPractialhours() throws Exception
+	{
+		//Act
+		Timesheet[] sheets = ao.find(Timesheet.class, "USER_KEY = ?", "USER_000");
+		Timesheet refSheet = sheets[0];
+		Timesheet checkSheet = service.getTimesheetByID(refSheet.getID());
+
+		//Assert
+		assertEquals(refSheet, checkSheet);
+
+		//Act
+		final int newPracticalHours = 300;
+		refSheet.setTargetHoursPractice(newPracticalHours);
+		//Assert
+		assertTrue(refSheet.getTargetHoursPractice() == 300);
+	}
 }

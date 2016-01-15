@@ -17,6 +17,24 @@ public class TimesheetServiceImpl implements TimesheetService {
 	}
 
 	@Override
+	public Timesheet editTimesheet(String userKey, int targetHoursPractice,
+																 int targetHoursTheory, String lecture) {
+		Timesheet[] found = ao.find(Timesheet.class, "USER_KEY = ?", userKey);
+		if((found.length == 1)) {
+			Timesheet sheet = found[0];
+
+			sheet.setUserKey(userKey);
+			sheet.setTargetHoursPractice(targetHoursPractice);
+			sheet.setTargetHoursTheory(targetHoursTheory);
+			sheet.setLecture(lecture);
+			sheet.setIsActive(true);
+			sheet.save();
+			return sheet;
+		}
+		return null;
+	}
+
+	@Override
 	public Timesheet add(String userKey, int targetHoursPractice,
 					int targetHoursTheory, String lecture) {
 		Timesheet sheet = ao.create(Timesheet.class);

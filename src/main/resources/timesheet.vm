@@ -8,6 +8,19 @@
     <script type="text/javascript">
       var timesheetID = $timesheetid;
     </script>
+
+    <form id="timesheet-hours">
+        <label for="timesheet practice_hours:">timesheet hours:</label>
+        <input class="text" type="text" id="timesheet-hours-text" name="timesheet-hours-text"
+               title="timesheet-hours-text">
+        <div class="description">
+            You can change our timesheet hours here if necessary.
+        </div>
+        <div class="timesheet-hours">
+            <input type="submit" value="Save" class="aui-button aui-button-primary">
+        </div>
+    </form>
+
     <div id="aui-message-bar"></div>
 		
 		<div id="button-wrapper">

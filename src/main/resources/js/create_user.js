@@ -28,7 +28,7 @@ AJS.toInit(function () {
 
     //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-    restBaseUrl = baseUrl + "/rest/administration/latest/";
+    restBaseUrl = baseUrl + "/rest/timesheet/latest/";
     var config;
 
     getConfigAndCallback(baseUrl, function (ajaxConfig) {

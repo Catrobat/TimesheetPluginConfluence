@@ -56,47 +56,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
     }
 
     @Override
-    public AdminHelperConfig setPublicApiToken(String publicApiToken) {
-        AdminHelperConfig configuration = getConfiguration();
-        configuration.setPublicGithubApiToken(publicApiToken);
-        configuration.save();
-        return configuration;
-    }
-
-    @Override
-    public AdminHelperConfig setApiToken(String apiToken) {
-        AdminHelperConfig configuration = getConfiguration();
-        configuration.setGithubApiToken(apiToken);
-        configuration.save();
-        return configuration;
-    }
-
-    @Override
-    public AdminHelperConfig setOrganisation(String organisation) {
-        AdminHelperConfig configuration = getConfiguration();
-        configuration.setGithubOrganisation(organisation);
-        configuration.save();
-        return configuration;
-    }
-
-    @Override
-    public AdminHelperConfig setUserDirectoryId(long userDirectoryId) {
-        AdminHelperConfig config = getConfiguration();
-        config.setUserDirectoryId(userDirectoryId);
-        config.save();
-        return config;
-    }
-
-    @Override
-    public AdminHelperConfig setDefaultGithubTeamId(int defaultGithubTeamId) {
-        AdminHelperConfig config = getConfiguration();
-        config.setDefaultGithubTeamId(defaultGithubTeamId);
-        config.save();
-        return config;
-    }
-
-    @Override
-    public Team addTeam(String teamName, List<Integer> githubTeamIdList, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups) {
+    public Team addTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups) {
         if (teamName == null || teamName.trim().length() == 0) {
             return null;
         }
@@ -111,25 +71,6 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
         Team team = ao.create(Team.class);
         team.setConfiguration(configuration);
         team.setTeamName(teamName);
-        if (githubTeamIdList != null) {
-            for (int githubId : githubTeamIdList) {
-                GithubTeam[] githubTeamArray = ao.find(GithubTeam.class, Query.select().where("\"GITHUB_ID\" = ?", githubId));
-                GithubTeam githubTeam;
-                if (githubTeamArray.length == 0) {
-                    githubTeam = ao.create(GithubTeam.class);
-                } else {
-                    githubTeam = githubTeamArray[0];
-                }
-
-                githubTeam.setGithubId(githubId);
-                githubTeam.save();
-
-                TeamToGithubTeam mapper = ao.create(TeamToGithubTeam.class);
-                mapper.setGithubTeam(githubTeam);
-                mapper.setTeam(team);
-                mapper.save();
-            }
-        }
 
         fillTeam(team, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
         fillTeam(team, TeamToGroup.Role.SENIOR, seniorGroups);
@@ -212,11 +153,6 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
         TeamToGroup[] teamToGroupArray = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
         for (TeamToGroup teamToGroup : teamToGroupArray) {
             ao.delete(teamToGroup);
-        }
-
-        TeamToGithubTeam[] teamToGithubTeamArray = ao.find(TeamToGithubTeam.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
-        for (TeamToGithubTeam teamToGithubTeam : teamToGithubTeamArray) {
-            ao.delete(teamToGithubTeam);
         }
 
         for (Group group : groupArray) {

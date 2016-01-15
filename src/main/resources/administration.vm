@@ -31,6 +31,12 @@
             <a href="#tabs-general"><strong>General Configuration</strong></a>
         </li>
         <li class="menu-item">
+            <a href="#tabs-permissions"><strong>Add/Remove Permissions</strong></a>
+        </li>
+        <li class="menu-item">
+            <a href="#tabs-categories"><strong>Add/Remove Categories</strong></a>
+        </li>
+        <li class="menu-item">
             <a href="#tabs-teams"><strong>Add/Remove Teams</strong></a>
         </li>
     </ul>
@@ -48,13 +54,14 @@
 
                     <div class="description">
                         <ul>
-                            <li>If nothing is given, every Jira Administrator may read/write</li>
-                            <li>If a group is given, every Jira Administrator within this group may read/write</li>
-                            <li>If a single user is given and this user is a Jira Administrator this user may read/write</li>
+                            <li>If nothing is given, every Confluence Administrator may read/write</li>
+                            <li>If a group is given, every Confluence Administrator within this group may read/write</li>
+                            <li>If a single user is given and this user is a Confluence Administrator this user may read/write</li>
                         </ul>
                     </div>
                 </div>
             </fieldset>
+
             <h2>General</h2>
             <fieldset>
                 <div class="field-group">
@@ -68,7 +75,6 @@
                 </div>
             </fieldset>
 
-            </fieldset>
             <h2>Welcome E-Mail</h2>
             <fieldset>
                 <div class="field-group">
@@ -114,40 +120,34 @@
                     </div>
                 </div>
             </fieldset>
-            <h2>GitHub</h2>
+
+            <h2>Available Teams</h2>
             <fieldset>
                 <div class="field-group">
-                    <label for="github_organization">Organization<span
-                            class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="text" id="github_organization" name="github_organization"
-                           title="github_organization">
-                </div>
-                <div class="field-group">
-                    <label for="github_token_public">Public API Token<span
-                            class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="text" id="github_token_public" name="github_token_public"
-                           title="github_token_public">
+                    <label for="available-teams">Available Teams</label>
+                    <input class="text" type="text" id="available-teams" name="available-teams"
+                           title="available-teams">
 
-                    <div class="description">Create a <a
-                            href="https://github.com/blog/1509-personal-api-tokens">token</a> <b>without any rights</b>.
-                        It is just used for searching users and will be visible within this plugin!
+                    <div class="description">
+                        Shows available teams.
                     </div>
-                </div>
-                <div class="field-group">
-                    <label for="github_token">Personal API Token<span
-                            class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="password" id="github_token" name="github_token" title="github_token">
-
-                    <div class="description">Create a <a
-                            href="https://github.com/blog/1509-personal-api-tokens">token</a> with "admin:org" scope.
-                    </div>
-                </div>
-                <div class="field-group">
-                    <label for="default-github-team">Default GitHub Team</label>
-                    <input class="text github-single" type="text" id="default-github-team" name="default-github-team">
                 </div>
             </fieldset>
-            <h2>Team Configuration</h2>
+
+            <h2>Available Categories</h2>
+            <fieldset>
+                <div class="field-group">
+                    <label for="availabe-categories">Available Categories</label>
+                    <input class="text" type="text" id="available-categories" name="available-categories"
+                           title="available-categories">
+
+                    <div class="description">
+                        Shows available categories.
+                    </div>
+                </div>
+            </fieldset>
+
+            <h2>Permission Configuration</h2>
 
             <div id="teams"></div>
             <div class="field-group">
@@ -155,20 +155,57 @@
             </div>
         </form>
     </div>
-    <div class="tabs-pane" id="tabs-teams">
-        <h2>Teams</h2>
+    <div class="tabs-pane" id="tabs-permissions">
+        <h2>Permission Groups</h2>
         <p>
-            Removing a team just effects the configuration and no user will be modified.
+            Removing a group just effects the configuration and no user will be modified.
         </p>
-        <form id="modify-teams" class="aui">
+        <form id="modify-team-permissions" class="aui">
             <fieldset>
                 <div class="field-group">
-                    <label for="team">Team name<span class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="text" id="team" name="team" title="team">
+                    <label for="team-permission">Permission name<span class="aui-icon icon-required"> required</span></label>
+                    <input class="text" type="text" id="team-permission" name="team-permission" title="team-permission">
                 </div>
                 <div class="field-group">
                     <input type="submit" value="Create" class="aui-button aui-button-primary">
-                    <input type="submit" value="Remove" id="remove" class="aui-button">
+                    <input type="submit" value="Remove" id="removePermission" class="aui-button">
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="tabs-pane" id="tabs-categories">
+        <h2>Categories</h2>
+        <p>
+            Removing a category does not modify any user.
+        </p>
+        <form id="modify-categoryList" class="aui">
+            <fieldset>
+                <div class="field-group">
+                    <label for="category-name">Category name<span class="aui-icon icon-required"> required</span></label>
+                    <input class="text" type="text" id="category-name" name="category-name" title="category-name">
+                </div>
+                <div class="field-group">
+                    <input type="submit" value="Create" class="aui-button aui-button-primary">
+                    <input type="submit" value="Remove" id="removeCategory" class="aui-button">
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="tabs-pane" id="tabs-teams">
+        <h2>Teams</h2>
+        <p>
+            Removing a team does not modify any users.
+        </p>
+        <form id="modify-teamList" class="aui">
+            <fieldset>
+                <div class="field-group">
+                    <label for="team-name">Team name<span class="aui-icon icon-required"> required</span></label>
+                    <input class="text" type="text" id="team-name" name="team-name" title="team-name">
+                </div>
+                <div class="field-group">
+                    <input type="submit" value="Create" class="aui-button aui-button-primary">
+                    <input type="submit" value="Remove" id="removeTeam" class="aui-button">
                 </div>
             </fieldset>
         </form>

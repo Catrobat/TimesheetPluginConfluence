@@ -19,7 +19,6 @@
     <title>Modify User</title>
     <meta name="decorator" content="atl.admin"/>
     <meta name="application-base-url" content="$applicationProperties.getBaseUrl()">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"></script>
     $webResourceManager.requireResource("org.catrobat.confluence.timesheet:modify-resources")
 </head>
 <body class="aui-layout aui-theme-default">
@@ -76,5 +75,8 @@
         Note that Jira System Administrators will not be shown in this list.
     </div>
 </div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"></script>
+
 </body>
 </html>

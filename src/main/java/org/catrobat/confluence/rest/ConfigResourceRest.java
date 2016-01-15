@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Fellhofer
+ * Copyright 2016 Adrian Schnedlitz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,61 +17,106 @@
 package org.catrobat.confluence.rest;
 
 
-import com.atlassian.confluence.api.model.people.User;
+import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.crowd.embedded.api.Directory;
 import com.atlassian.crowd.manager.directory.DirectoryManager;
-import com.atlassian.confluence.security.PermissionManager;
-import com.atlassian.user.GroupManager;
-
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.user.UserProfile;
 import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
+import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
+import org.catrobat.confluence.rest.json.JsonCategory;
 import org.catrobat.confluence.rest.json.JsonConfig;
-import org.catrobat.confluence.rest.json.JsonResource;
 import org.catrobat.confluence.rest.json.JsonTeam;
+import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
 import org.catrobat.confluence.services.impl.PermissionServiceImpl;
-import org.kohsuke.github.GHOrganization;
-import org.kohsuke.github.GHTeam;
-import org.kohsuke.github.GitHub;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 @Path("/config")
-public class ConfigResourceRest extends PermissionServiceImpl {
+@Produces({MediaType.APPLICATION_JSON})
+public class ConfigResourceRest {
   private final AdminHelperConfigService configService;
   private final DirectoryManager directoryManager;
+  private final UserManager userManager;
   private final UserAccessor userAccessor;
   private final TeamService teamService;
+  private final CategoryService categoryService;
+  private final PermissionService permissionService;
 
   public ConfigResourceRest(final UserManager userManager, final AdminHelperConfigService configService,
                             final DirectoryManager directoryManager, final TeamService teamService,
-                            final UserAccessor userAccessor) {
-    super(userManager, teamService, configService, userAccessor);
+                            final UserAccessor userAccessor, final CategoryService categoryService,
+                            final PermissionService permissionService) {
     this.configService = configService;
     this.directoryManager = directoryManager;
     this.teamService = teamService;
     this.userAccessor = userAccessor;
+    this.userManager = userManager;
+    this.categoryService = categoryService;
+    this.permissionService = permissionService;
+  }
+
+
+  @GET
+  @Path("/getCategories")
+  public Response getCategories(@Context HttpServletRequest request) {
+
+    List<JsonCategory> categories = new LinkedList<JsonCategory>();
+
+    for(Category category : categoryService.all()) {
+      categories.add(new JsonCategory(category.getID(), category.getName()));
+    }
+
+    return Response.ok(categories).build();
+  }
+
+  @GET
+  @Path("/getTeams")
+  public Response getTeams(@Context HttpServletRequest request) {
+
+    List<JsonTeam> teams = new LinkedList<JsonTeam>();
+    UserProfile user;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
+
+    for(Team team : teamService.all()) {
+      Category[] categories = team.getCategories();
+      int[] categoryIDs = new int[categories.length];
+      for(int i = 0; i < categories.length; i++) {
+        categoryIDs[i] = categories[i].getID();
+      }
+      teams.add(new JsonTeam(team.getID(), team.getTeamName(), categoryIDs));
+    }
+
+    return Response.ok(teams).build();
   }
 
   @GET
   @Path("/getConfig")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getConfig(@Context HttpServletRequest request) {
+
+    /*ToDo: Refactor CheckPermission
     Response unauthorized = checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
+    */
 
     return Response.ok(new JsonConfig(configService)).build();
   }
@@ -80,7 +125,7 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   @Path("/getDirectories")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getDirectories(@Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
@@ -90,7 +135,6 @@ public class ConfigResourceRest extends PermissionServiceImpl {
     for (Directory directory : directoryList) {
       JsonConfig config = new JsonConfig();
       config.setUserDirectoryId(directory.getId());
-      config.setUserDirectoryName(directory.getName());
       jsonDirectoryList.add(config);
     }
 
@@ -101,7 +145,7 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   @Path("/getTeamList")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getTeamList(@Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
@@ -118,25 +162,13 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   @Path("/saveConfig")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response setConfig(final JsonConfig jsonConfig, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
 
-    if (jsonConfig.getGithubToken() != null && jsonConfig.getGithubToken().length() != 0) {
-      configService.setApiToken(jsonConfig.getGithubToken());
-    }
-    configService.setPublicApiToken(jsonConfig.getGithubTokenPublic());
-    configService.setOrganisation(jsonConfig.getGithubOrganization());
-    configService.setUserDirectoryId(jsonConfig.getUserDirectoryId());
     configService.editMail(jsonConfig.getMailFromName(), jsonConfig.getMailFrom(),
             jsonConfig.getMailSubject(), jsonConfig.getMailBody());
-
-    /*
-    for (JsonResource jsonResource : jsonConfig.getResources()) {
-      configService.editResource(jsonResource.getResourceName(), jsonResource.getGroupName());
-    }
-    */
 
     if (jsonConfig.getApprovedGroups() != null) {
       configService.clearApprovedGroups();
@@ -145,56 +177,21 @@ public class ConfigResourceRest extends PermissionServiceImpl {
       }
     }
 
-    /*
-    com.atlassian.jira.user.util.UserManager userManager = ComponentAccessor.getUserManager();
     if (jsonConfig.getApprovedUsers() != null) {
       configService.clearApprovedUsers();
       for (String approvedUserName : jsonConfig.getApprovedUsers()) {
-        ApplicationUser user = jiraUserManager.getUserByName(approvedUserName);
-        if (user != null) {
-          configService.addApprovedUser(user.getKey());
+        UserProfile userProfile = userManager.getUserProfile(approvedUserName);
+        if (userProfile != null) {
+          configService.addApprovedUser(userManager.getRemoteUser().getUserKey().toString());
         }
       }
     }
-    */
 
     if (jsonConfig.getTeams() != null) {
-      String token = configService.getConfiguration().getGithubApiToken();
-      String organizationName = configService.getConfiguration().getGithubOrganisation();
-
-      try {
-        GitHub gitHub = GitHub.connectUsingOAuth(token);
-        GHOrganization organization = gitHub.getOrganization(organizationName);
-        Collection<GHTeam> teamList = organization.getTeams().values();
-
-        if (jsonConfig.getDefaultGithubTeam() != null) {
-          for (GHTeam team : teamList) {
-            if (jsonConfig.getDefaultGithubTeam().toLowerCase().equals(team.getName().toLowerCase())) {
-              configService.setDefaultGithubTeamId(team.getId());
-              break;
-            }
-          }
-        }
-
-        for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
-          configService.removeTeam(jsonTeam.getTeamName());
-
-          List<Integer> githubIdList = new ArrayList<Integer>();
-          for (String teamName : jsonTeam.getGithubTeams()) {
-            for (GHTeam team : teamList) {
-              if (teamName.toLowerCase().equals(team.getName().toLowerCase())) {
-                githubIdList.add(team.getId());
-                break;
-              }
-            }
-          }
-
-          configService.addTeam(jsonTeam.getTeamName(), githubIdList, jsonTeam.getCoordinatorGroups(),
-                  jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups());
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-        return Response.serverError().entity("Some error with GitHub API (e.g. maybe wrong tokens, organisation, teams) occured").build();
+      for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
+        configService.removeTeam(jsonTeam.getTeamName());
+        configService.addTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
+                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups());
       }
     }
 
@@ -202,15 +199,15 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   }
 
   @PUT
-  @Path("/addTeam")
+  @Path("/addTeamPermission")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response addTeam(final String modifyTeam, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+  public Response addTeamPermission(final String modifyTeam, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
 
-    boolean successful = configService.addTeam(modifyTeam, null, null, null, null) != null;
+    boolean successful = configService.addTeam(modifyTeam, null, null, null) != null;
 
     if (successful)
       return Response.noContent().build();
@@ -219,10 +216,10 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   }
 
   @PUT
-  @Path("/editTeam")
+  @Path("/editTeamPermission")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response editTeam(final String[] teams, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+  public Response editTeamPermission(final String[] teams, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
@@ -231,6 +228,8 @@ public class ConfigResourceRest extends PermissionServiceImpl {
       return Response.serverError().build();
     } else if (teams[1].trim().length() == 0) {
       return Response.serverError().entity("Team name must not be empty").build();
+    } else if (teams[1].compareTo(teams[0]) == 0) {
+      return Response.serverError().entity("New Team name must be different").build();
     }
 
     boolean successful = configService.editTeam(teams[0], teams[1]) != null;
@@ -242,10 +241,10 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   }
 
   @PUT
-  @Path("/removeTeam")
+  @Path("/removeTeamPermission")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response removeTeam(final String modifyTeam, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+  public Response removeTeamPermission(final String modifyTeam, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
@@ -259,47 +258,70 @@ public class ConfigResourceRest extends PermissionServiceImpl {
   }
 
   @PUT
-  @Path("/addResource")
+  @Path("/addCategory")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response addResource(final String resourceName, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+  public Response addCategory(final String modifyCategory, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
 
-    if (resourceName == null || resourceName.trim().length() == 0) {
-      return Response.serverError().entity("Resource-Name must not be empty").build();
-    }
-    /*
-    boolean successful = configService.addResource(resourceName, null) != null;
+    boolean successful = categoryService.add(modifyCategory) != null;
 
     if (successful)
       return Response.noContent().build();
-    */
 
-    return Response.serverError().entity("Maybe name already taken?").build();
+    return Response.serverError().build();
   }
 
   @PUT
-  @Path("/removeResource")
+  @Path("/removeCategory")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response removeResource(final String resourceName, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
+  public Response removeCategory(final String modifyCategory, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
     }
 
-    if (resourceName == null || resourceName.trim().length() == 0) {
-      return Response.serverError().entity("Resource-Name must not be empty").build();
-    }
-
-    /*
-    boolean successful = configService.removeResource(resourceName) != null;
+    boolean successful = categoryService.removeCategory(modifyCategory);
 
     if (successful)
       return Response.noContent().build();
-    */
 
-    return Response.serverError().entity("Maybe no resource with given name?").build();
+    return Response.serverError().build();
+  }
+
+  @PUT
+  @Path("/addTeam")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response addTeam(final String modifyTeam, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
+    if (unauthorized != null) {
+      return unauthorized;
+    }
+
+    boolean successful = teamService.add(modifyTeam) != null;
+
+    if (successful)
+      return Response.noContent().build();
+
+    return Response.serverError().build();
+  }
+
+  @PUT
+  @Path("/removeTeam")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response removeTeam(final String modifyTeam, @Context HttpServletRequest request) {
+    Response unauthorized = permissionService.checkPermission(request);
+    if (unauthorized != null) {
+      return unauthorized;
+    }
+
+    boolean successful = teamService.removeTeam(modifyTeam);
+
+    if (successful)
+      return Response.noContent().build();
+
+    return Response.serverError().build();
   }
 }

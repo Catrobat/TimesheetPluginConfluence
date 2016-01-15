@@ -1,6 +1,7 @@
 package org.catrobat.confluence.services;
 
 import com.atlassian.activeobjects.tx.Transactional;
+import com.atlassian.lucene36.search.BooleanClause;
 import org.catrobat.confluence.activeobjects.Team;
 import javax.annotation.Nonnull;
 
@@ -13,6 +14,8 @@ import javax.annotation.Nullable;
 public interface TeamService {
 
 	Team add(String name);
+
+  boolean removeTeam(String teamName);
 
 	List<Team> all();
   

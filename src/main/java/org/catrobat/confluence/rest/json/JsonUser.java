@@ -35,13 +35,7 @@ public final class JsonUser {
     @XmlElement
     private String email;
     @XmlElement
-    private String githubName;
-    @XmlElement
     private String displayName;
-
-    //@XmlElement
-    //private List<JsonResource> resourceList;
-
     @XmlElement
     private List<String> coordinatorList;
     @XmlElement
@@ -50,8 +44,6 @@ public final class JsonUser {
     private List<String> developerList;
     @XmlElement
     private boolean active;
-    @XmlElement
-    private boolean addToDefaultGithubTeam;
 
     public String getUserName() {
         return userName;
@@ -83,14 +75,6 @@ public final class JsonUser {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getGithubName() {
-        return githubName;
-    }
-
-    public void setGithubName(String githubName) {
-        this.githubName = githubName;
     }
 
     public List<String> getCoordinatorList() {
@@ -131,23 +115,5 @@ public final class JsonUser {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    /*
-    public List<JsonResource> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<JsonResource> resourceList) {
-        this.resourceList = resourceList;
-    }
-    */
-
-    public boolean isAddToDefaultGithubTeam() {
-        return addToDefaultGithubTeam;
-    }
-
-    public void setAddToDefaultGithubTeam(boolean addToDefaultGithubTeam) {
-        this.addToDefaultGithubTeam = addToDefaultGithubTeam;
     }
 }

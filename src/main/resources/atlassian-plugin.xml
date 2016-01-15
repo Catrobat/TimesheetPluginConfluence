@@ -15,6 +15,7 @@
     <web-resource key="timesheet-resources" name="Timesheet Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>com.atlassian.auiplugin:aui-label</dependency>
         <dependency>com.atlassian.auiplugin:aui-date-picker</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
         <dependency>com.atlassian.auiplugin:dialog2</dependency>
@@ -106,24 +107,24 @@
         <url-pattern>/timesheet/</url-pattern>
     </servlet>
     <servlet name="visualization" class="org.catrobat.confluence.servlet.VisualizationServlet" key="visualization-servlet">
-        <url-pattern>/visualization</url-pattern>
-        <url-pattern>/visualization/</url-pattern>
+        <url-pattern>/timesheet/visualization</url-pattern>
+        <url-pattern>/timesheet/visualization/</url-pattern>
     </servlet>
     <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet" key="teammanagement-servlet">
         <url-pattern>/teams</url-pattern>
         <url-pattern>/teams/</url-pattern>
     </servlet>
     <servlet name="administration-servlet" class="org.catrobat.confluence.servlet.AdminServlet" key="administration-servlet">
-        <url-pattern>/administration</url-pattern>
-        <url-pattern>/administration/</url-pattern>
+        <url-pattern>/timesheet/administration</url-pattern>
+        <url-pattern>/timesheet/administration/</url-pattern>
     </servlet>
     <servlet name="create-user-servlet" class="org.catrobat.confluence.servlet.CreateUserServlet" key="create-user-servlet">
-        <url-pattern>/create_user</url-pattern>
-        <url-pattern>/create_user/</url-pattern>
+        <url-pattern>/timesheet/create_user</url-pattern>
+        <url-pattern>/timesheet/create_user/</url-pattern>
     </servlet>
     <servlet name="modify-user-servlet" class="org.catrobat.confluence.servlet.ModifyUserServlet" key="modify-user-servlet">
-        <url-pattern>/modify_user</url-pattern>
-        <url-pattern>/modify_user/</url-pattern>
+        <url-pattern>/timesheet/modify_user</url-pattern>
+        <url-pattern>/timesheet/modify_user/</url-pattern>
     </servlet>
     <!-- end of servlets -->
 
@@ -176,20 +177,12 @@
         <entity>org.catrobat.confluence.activeobjects.ApprovedGroup</entity>
         <entity>org.catrobat.confluence.activeobjects.AdminHelperConfig</entity>
         <entity>org.catrobat.confluence.activeobjects.ApprovedUser</entity>
-        <entity>org.catrobat.confluence.activeobjects.GithubTeam</entity>
-        <entity>org.catrobat.confluence.activeobjects.TeamToGithubTeam</entity>
         <entity>org.catrobat.confluence.activeobjects.TeamToGroup</entity>
     </ao>
 
     <!-- rest-resources -->
     <rest key="timesheetRest" path="/timesheet" version="1.0">
         <description>Provides timesheet services.</description>
-    </rest>
-    <rest key="visualizationRest" path="/visualization" version="1.0">
-        <description>Provides visualization services.</description>
-    </rest>
-    <rest key="administrationRest" path="/administration" version="1.0">
-        <description>Provides administration services.</description>
     </rest>
     <!-- end of rest-resources -->
 
@@ -203,22 +196,22 @@
     <!-- single user visualization -->
     <web-item key="visualization_view" name="Link to Visualization View" section="system.user" weight="47">
         <label>Visualization</label>
-        <link linkId="visualization_view_link">/plugins/servlet/visualization/</link>
+        <link linkId="visualization_view_link">/plugins/servlet/timesheet/visualization/</link>
     </web-item>
 
     <!-- administration -->
     <web-item key="administration_view" name="Link to Administration View" section="system.admin/administration" weight="1">
         <description key="item.google.home.desc">Link to Administration menu</description>
         <label key="Timesheet User Permissions" />
-        <link linkId="administration_view_link">/plugins/servlet/administration/</link>
+        <link linkId="administration_view_link">/plugins/servlet/timesheet/administration/</link>
     </web-item>
     <web-item key="create_user_view" name="Link to Create User View" section="system.admin/administration" weight="2">
         <label key="Create Timesheet User" />
-        <link linkId="create_user_view_link">/plugins/servlet/create_user/</link>
+        <link linkId="create_user_view_link">/plugins/servlet/timesheet/create_user/</link>
     </web-item>
     <web-item key="modify_user_view" name="Link to Modify User View" section="system.admin/administration" weight="3">
         <label key="Modify Timesheet User" />
-        <link linkId="modify_user_view_link">/plugins/servlet/modify_user/</link>
+        <link linkId="modify_user_view_link">/plugins/servlet/timesheet/modify_user/</link>
     </web-item>
     <!-- end of web-items -->
 

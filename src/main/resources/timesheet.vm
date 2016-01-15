@@ -1,66 +1,107 @@
 <html>
-  <head>
+<head>
     <title>Timesheet</title>
     <meta name="decorator" content="atl.userprofile">
     $webResourceManager.requireResource("org.catrobat.confluence.timesheet:timesheet-resources")
-  </head>
-  <body>
-    <script type="text/javascript">
-      var timesheetID = $timesheetid;
-    </script>
-    <div id="aui-message-bar"></div>
-		
-		<div id="button-wrapper">
-			<button class="aui-button aui-button-subtle import-google-docs"><span class="aui-icon aui-icon-small aui-iconfont-devtools-checkout"></span> Import from Google Docs</button>
-		</div>
+</head>
 
-		<section role="dialog" class="import-dialog aui-layer aui-dialog2 aui-dialog2-large" aria-hidden="true">
-			<header class="aui-dialog2-header">
-					<h2 class="aui-dialog2-header-main">Import from Google Docs</h2>
-					<!-- Close icon -->
-					<a class="aui-dialog2-header-close">
-							<span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
-					</a>
-			</header>
+<body>
+<script type="text/javascript">
+    var timesheetID = $timesheetid;
+</script>
+<a name="top"></a>
+<div id="aui-message-bar"></div>
+<div class="aui-tabs horizontal-tabs">
+    <ul class="tabs-menu">
+        <li class="menu-item active-tab">
+            <a href="#tabs-timesheet"><strong>Show Sheet</strong></a>
+        </li>
+        <li class="menu-item">
+            <a href="#tabs-timesheet-information"><strong>Settings</strong></a>
+        </li>
+    </ul>
 
-			<div class="aui-dialog2-content">
-				
-				<ol>
-					<li>
-						Make sure the columns of your Google Doc Timesheet are in the following order:
-						<code>Datum</code>, <code>Von</code>, <code>Bis</code>, <code>Dauer in h</code>, <code>Pause</code>, <code>Theorie? Ja = j</code>, <code>T&auml;tigkeit</code>
-					</li>
-					<li>
-						Make sure the values in column <code>Datum</code> is formatted this way: <code>YYYY-MM-DD</code> (e.g. <code>2015-09-21</code>). You can achieve this by
-						<ol>
-							<li>Select Fields in column <code>Datum</code></li>
-							<li>Click on <strong>Format</strong> > <strong>Number</strong> > <strong>More Formats</strong> > <strong>Number Format</strong></li>
-							<li>Paste <code>yyyy"-"mm"-"dd</code> and confirm</li>
-						</ol>
-					</li>
-					<li>Select the rows you want to import</li>
-					<li>Copy records by clicking on <strong>Edit</strong> > <strong>Copy</strong></li>
-					<li>Paste content in the text box below</li>
-				</ol>
+    <div class="tabs-pane" id="tabs-timesheet-information">
+        <p>
+        <form id="timesheet-hours" class="aui">
+            <div class="field-group">
+                <label for="timesheet-hours-remain">Remaining Timesheet Hours</label>
+                <input class="text" type="text" id="timesheet-hours-remain" name="timesheet-hours-remain"
+                       title="timesheet-hours-remain">
 
-				<i>(tested with Google Chrome)</i>
+                <div class="description">
+                    Shows your remaining timesheet hours.
+                </div>
+            </div>
+            <div class="field-group">
+                <label for="timesheet-hours-text">Practical Timesheet Hours</label>
+                <input class="text" type="text" id="timesheet-hours-text" name="timesheet-hours-text"
+                       title="timesheet-hours-text">
 
-				<form class="aui import-form"> 
-					<!--<input type="text" name="import-text" class="text" />-->
-					<textarea name="import-text" class="import-text"></textarea>
-				</form>
+                <div class="description">
+                    Shows your practical timesheet hours.
+                </div>
 
-			</div>
+                <div class="timesheet-hours">
+                    <input type="submit" value="Save" class="aui-button aui-button-primary">
+                </div>
+            </div>
+            <p>
+            <div id="selectTimesheetOfUser"></div>
+        </form>
+    </div>
 
-			<footer class="aui-dialog2-footer">
-				<div class="aui-dialog2-footer-actions">
-					<button class="aui-button aui-button-primary start-import">Import</button>
-				</div>
-			</footer>
-		</section>
+    <div class="tabs-pane active-pane" id="tabs-timesheet">
 
-		<div id="timesheet-table" class="aui aui-table-interactive table">
-			<div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
-		</div>
-  </body>
+        <div id="button-wrapper">
+            <button class="aui-button aui-button-subtle import-google-docs"><span class="aui-icon aui-icon-small aui-iconfont-devtools-checkout"></span> Import from Google Docs</button>
+        </div>
+
+        <section role="dialog" class="import-dialog aui-layer aui-dialog2 aui-dialog2-large" aria-hidden="true">
+            <header class="aui-dialog2-header">
+                <h2 class="aui-dialog2-header-main">Import from Google Docs</h2>
+                <!-- Close icon -->
+                <a class="aui-dialog2-header-close">
+                    <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+                </a>
+            </header>
+
+            <div class="aui-dialog2-content">
+            <ol>
+                <li>
+                    Make sure the columns of your Google Doc Timesheet are in the following order:
+                    <code>Datum</code>, <code>Von</code>, <code>Bis</code>, <code>Dauer in h</code>, <code>Pause</code>, <code>Theorie? Ja = j</code>, <code>T&auml;tigkeit</code>
+                </li>
+                <li>
+                    Make sure the values in column <code>Datum</code> is formatted this way: <code>YYYY-MM-DD</code> (e.g. <code>2015-09-21</code>). You can achieve this by
+                    <ol>
+                        <li>Select Fields in column <code>Datum</code></li>
+                        <li>Click on <strong>Format</strong> > <strong>Number</strong> > <strong>More Formats</strong> > <strong>Number Format</strong></li>
+                        <li>Paste <code>yyyy"-"mm"-"dd</code> and confirm</li>
+                    </ol>
+                </li>
+                <li>Select the rows you want to import</li>
+                    <li>Copy records by clicking on <strong>Edit</strong> > <strong>Copy</strong></li>
+                <li>Paste content in the text box below</li>
+            </ol>
+            <i>(tested with Google Chrome)</i>
+
+            <form class="aui import-form">
+                <!--<input type="text" name="import-text" class="text" />-->
+                <textarea name="import-text" class="import-text"></textarea>
+            </form>
+
+            <footer class="aui-dialog2-footer">
+                <div class="aui-dialog2-footer-actions">
+                    <button class="aui-button aui-button-primary start-import">Import</button>
+                </div>
+            </footer>
+        </section>
+
+        <div id="timesheet-table" class="aui aui-table-interactive table">
+            <div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
+        </div>
+    </div>
+</div>
+</body>
 </html>

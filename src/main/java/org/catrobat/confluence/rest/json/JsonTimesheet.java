@@ -43,7 +43,10 @@ public final class JsonTimesheet {
     this.lectures = lectures;
     this.isActive = isActive;
   }
-  
+
+  public JsonTimesheet() {
+  }
+
   public int getTimesheetID() {
     return timesheetID;
   }

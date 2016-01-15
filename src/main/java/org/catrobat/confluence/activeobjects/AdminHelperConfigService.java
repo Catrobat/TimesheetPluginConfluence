@@ -24,17 +24,7 @@ import java.util.List;
 public interface AdminHelperConfigService {
     AdminHelperConfig getConfiguration();
 
-    AdminHelperConfig setPublicApiToken(String publicApiToken);
-
-    AdminHelperConfig setApiToken(String apiToken);
-
-    AdminHelperConfig setOrganisation(String organisation);
-
-    AdminHelperConfig setUserDirectoryId(long userDirectoryId);
-
-    public AdminHelperConfig setDefaultGithubTeamId(int defaultGithubTeamId);
-
-    Team addTeam(String teamName, List<Integer> githubTeamIdList, List<String> coordinatorGroups,
+    Team addTeam(String teamName, List<String> coordinatorGroups,
                  List<String> seniorGroups, List<String> developerGroups);
 
     AdminHelperConfig editTeam(String oldTeamName, String newTeamName);

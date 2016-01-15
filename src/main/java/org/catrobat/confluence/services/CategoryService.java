@@ -15,5 +15,7 @@ public interface CategoryService
   public List<Category> all();
 
   Category add(String name);
+
+  boolean removeCategory(String name);
   
 }

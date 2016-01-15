@@ -42,6 +42,15 @@ public class PermissionServiceImpl implements PermissionService {
     return userProfile;
   }
 
+  public UserProfile checkIfUsernameExists(String userName) {
+    UserProfile userProfile = userManager.getUserProfile(userName);
+
+    if (userProfile == null) {
+      throw new NotAuthorizedException("User does not exist.");
+    }
+    return userProfile;
+  }
+
   public boolean checkIfUserExists(String userName) {
     UserProfile userProfile = userManager.getUserProfile(userName);
     if (userProfile == null) {
@@ -57,10 +66,9 @@ public class PermissionServiceImpl implements PermissionService {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     } else if (!userManager.isSystemAdmin(userKey)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
+    } else if (!isApproved(userAccessor.getUserByKey(userKey).getFullName())) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
     }
-    //else if (!permissionCondition.isApproved(username)) {
-    //return Response.status(Response.Status.UNAUTHORIZED).build();
-    //}
 
     return null;
   }
@@ -91,6 +99,10 @@ public class PermissionServiceImpl implements PermissionService {
 
   public boolean isApproved(String userName) {
     return isApproved(userManager.getUserProfile(userName));
+  }
+
+  public boolean userIsAdmin(String userName) {
+    return userManager.isAdmin(userName);
   }
 
   private boolean userOwnsSheet(UserProfile user, Timesheet sheet) {

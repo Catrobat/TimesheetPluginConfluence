@@ -28,9 +28,8 @@ AJS.toInit(function () {
 
     //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-    restBaseUrl = baseUrl + "/rest/administration/latest/";
+    restBaseUrl = baseUrl + "/rest/timesheet/latest/";
     var teams = [];
-    var localTempResources = [];
     var editNameDialog;
 
     function scrollToAnchor(aid) {
@@ -38,18 +37,81 @@ AJS.toInit(function () {
         AJS.$('html,body').animate({scrollTop: aTag.offset().top}, 'slow');
     }
 
-    function populateForm() {
+    function fetchData() {
+        fetchTeamsAndCategories();
+
+        var allUsers = AJS.$.ajax({
+            type: 'GET',
+            url: restBaseUrl + 'user/getUsers',
+            contentType: "application/json"
+        });
+
+        AJS.$.when(allUsers)
+            .done(populateForm)
+            .fail(function (error) {
+                AJS.messages.error({
+                  title: 'There was an error while fetching user data.',
+                  body: '<p>Reason: ' + error.responseText + '</p>'
+                });
+                console.log(error);
+            });
+    }
+
+    function fetchTeamsAndCategories() {
+        var categoriesFetched = AJS.$.ajax({
+             type: 'GET',
+             url: restBaseUrl + 'config/getCategories',
+             contentType: "application/json"
+        });
+
+        var teamsFetched = AJS.$.ajax({
+             type: 'GET',
+             url: restBaseUrl + 'config/getTeams',
+             contentType: "application/json"
+        });
+
+        AJS.$.when(teamsFetched, categoriesFetched)
+            .done(displayAvailableTeams)
+            .done(displayAvailableCategories)
+            .fail(function (error) {
+                AJS.messages.error({
+                  title: 'There was an error while fetching data.',
+                  body: '<p>Reason: ' + error.responseText + '</p>'
+                });
+                console.log(error);
+            });
+    }
+
+    function displayAvailableTeams(teamsFetched, categoriesFetched) {
+        AJS.$(".loadingDiv").show();
+        var availableTeamNames = [];
+        AJS.$("#available-teams").empty();
+        for(var i = 0; i < teamsFetched[0].length; i++){
+            var team = teamsFetched[0][i];
+            availableTeamNames.push(team['teamName']);
+        }
+        AJS.$("#available-teams").val(availableTeamNames.toString());
+        AJS.$(".loadingDiv").hide();
+    }
+
+    function displayAvailableCategories(teamsFetched, categoriesFetched) {
+        AJS.$(".loadingDiv").show();
+        var availableCategoryNames = [];
+        AJS.$("#available-categories").empty();
+        for(var i = 0; i < categoriesFetched[0].length; i++){
+            var category = categoriesFetched[0][i];
+            availableCategoryNames.push(category['categoryName']);
+        }
+        AJS.$("#available-categories").val(availableCategoryNames.toString());
+        AJS.$(".loadingDiv").hide();
+    }
+
+    function populateForm(allUsers) {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
             url: restBaseUrl + 'config/getConfig',
             dataType: "json",
             success: function (config) {
-                if (config.githubToken)
-                    AJS.$("#github_token").attr("placeholder", config.githubToken);
-                if (config.githubTokenPublic)
-                    AJS.$("#github_token_public").val(unescapeHtml(config.githubTokenPublic));
-                if (config.githubOrganization)
-                    AJS.$("#github_organization").val(unescapeHtml(config.githubOrganization));
                 if (config.mailFromName)
                     AJS.$("#mail-from-name").val(config.mailFromName);
                 if (config.mailFrom)
@@ -58,53 +120,48 @@ AJS.toInit(function () {
                     AJS.$("#mail-subject").val(config.mailSubject);
                 if (config.mailBody)
                     AJS.$("#mail-body").val(config.mailBody);
-                localTempResources = [];
 
-                teams = [];
+                var teams = [];
                 AJS.$("#teams").empty();
                 for (var i = 0; i < config.teams.length; i++) {
                     var team = config.teams[i];
                     teams.push(team['teamName']);
-                    console.log(team);
 
                     var tempTeamName = team['teamName'].replace(/\W/g, '-');
-                    AJS.$("#teams").append("<h3>" + team['name'] +
+                    AJS.$("#teams").append("<h3>" + team['teamName'] +
                     "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
                     "<span class=\"aui-icon aui-icon-small aui-iconfont-edit\">Editing</span> Edit</button></h3><fieldset>");
-                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-github-teams\">GitHub Teams</label><input class=\"text github\" type=\"text\" id=\"" + tempTeamName + "-github-teams\" name=\"github-teams\" value=\"" + team["githubTeams"] + "\"></div>");
-                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-coordinator\">Coordinator</label><input class=\"text jira-group\" type=\"text\" id=\"" + tempTeamName + "-coordinator\" value=\"" + team['coordinatorGroups'] + "\"></div>");
-                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-senior\">Senior</label><input class=\"text jira-group\" type=\"text\" id=\"" + tempTeamName + "-senior\" value=\"" + team['seniorGroups'] + "\"></div>");
-                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-developer\">Developer</label><input class=\"text jira-group\" type=\"text\" id=\"" + tempTeamName + "-developer\" value=\"" + team['developerGroups'] + "\"></div>");
+                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-coordinator\">Coordinator</label><input class=\"text coordinator\" type=\"text\" id=\"" + tempTeamName + "-coordinator\" value=\"" + team['coordinatorGroups'] + "\"></div>");
+                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-senior\">Senior</label><input class=\"text senior\" type=\"text\" id=\"" + tempTeamName + "-senior\" value=\"" + team['seniorGroups'] + "\"></div>");
+                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-developer\">User</label><input class=\"text user\" type=\"text\" id=\"" + tempTeamName + "-developer\" value=\"" + team['developerGroups'] + "\"></div>");
                     AJS.$("#teams").append("</fieldset>");
                 }
 
-
-                var singleGithubData = [];
-                /*
-                for(var i = 0; i < config.availableGithubTeams.length; i++) {
-                    singleGithubData.push({id: config.availableGithubTeams[i], text: config.availableGithubTeams[i]});
+                var userNameList = [];
+                for (var i = 0; i < allUsers.length; i++) {
+                    userNameList.push(allUsers[i]['userName']);
                 }
-                */
-                AJS.$(".github-single").auiSelect2({
-                    placeholder: "Search for team",
-                    minimumInputLength: 0,
-                    data: singleGithubData
-                });
 
-                AJS.$(".github-single").auiSelect2("data", {
-                    id: config.defaultGithubTeam,
-                    text: config.defaultGithubTeam
-                });
-
-                if (config.availableGithubTeams) {
-                    AJS.$(".github").auiSelect2({
-                        placeholder: "Search for teams",
-                        tags: config.availableGithubTeams,
+                if (config.approvedUsers) {
+                    AJS.$(".coordinator").auiSelect2({
+                        placeholder: "Search for user",
+                        tags: userNameList.sort(),
+                        tokenSeparators: [",", " "]
+                    });
+                    AJS.$(".senior").auiSelect2({
+                        placeholder: "Search for user",
+                        tags: userNameList.sort(),
+                        tokenSeparators: [",", " "]
+                    });
+                    AJS.$(".user").auiSelect2({
+                        placeholder: "Search for user",
+                        tags: userNameList.sort(),
                         tokenSeparators: [",", " "]
                     });
                 }
 
-                AJS.$("#userdirectory").auiSelect2({
+
+               AJS.$("#userdirectory").auiSelect2({
                     placeholder: "Search for directories",
                     minimumInputLength: 0,
                     ajax: {
@@ -123,12 +180,13 @@ AJS.toInit(function () {
                     }
 
                 });
-
+                /*)
                 AJS.$(".single-jira-group").auiSelect2({
                     placeholder: "Search for group",
                     minimumInputLength: 0,
                     ajax: {
-                        url: restBaseUrl + 'rest/api/2/groups/picker',
+                        //url: baseUrl + 'rest/api/2/groups/picker',
+                        url: baseUrl + 'rest/prototype/1/search/user',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -150,6 +208,7 @@ AJS.toInit(function () {
                     tokenSeparators: [",", " "],
                     ajax: {
                         url: baseUrl + '/rest/prototype/1/search/user-or-group',
+                        //url: baseUrl + 'rest/prototype/1/search/user',
                         dataType: "json",
                         data: function (term, page) {
                             return {query: term};
@@ -180,7 +239,7 @@ AJS.toInit(function () {
                         callback(data);
                     }
                 });
-
+                */
                 var approved = [];
                 if (config.approvedGroups) {
                     for (var i = 0; i < config.approvedGroups.length; i++) {
@@ -214,36 +273,22 @@ AJS.toInit(function () {
     }
 
     function updateConfig() {
-        if ((!AJS.$("#github_token").val() && !AJS.$("#github_token").attr("placeholder")) || !AJS.$("#github_organization").val()
-            || !AJS.$("#github_token_public").val()) {
-            AJS.messages.error({
-                title: "Error!",
-                body: "API Tokens and Organisation must be filled out"
-            });
-            return;
-        }
-
         var config = {};
-        config.githubToken = AJS.$("#github_token").val();
-        config.githubTokenPublic = AJS.$("#github_token_public").val();
-        config.githubOrganization = AJS.$("#github_organization").val();
         config.mailFromName = AJS.$("#mail-from-name").val();
         config.mailFrom = AJS.$("#mail-from").val();
         config.mailSubject = AJS.$("#mail-subject").val();
         config.mailBody = AJS.$("#mail-body").val();
-        config.userDirectoryId = AJS.$("#userdirectory").auiSelect2("val");
-        config.defaultGithubTeam = AJS.$("#default-github-team").auiSelect2("val");
-
         var usersAndGroups = AJS.$("#plugin-permission").auiSelect2("val");
         var approvedUsers = [];
         var approvedGroups = [];
+        /*
         for (var i = 0; i < usersAndGroups.length; i++) {
             if (usersAndGroups[i].match("^users-")) {
                 approvedUsers.push(usersAndGroups[i].split("users-")[1]);
             } else if (usersAndGroups[i].match("^groups-")) {
                 approvedGroups.push(usersAndGroups[i].split("groups-")[1]);
             }
-        }
+        }*/
 
         config.approvedUsers = approvedUsers;
         config.approvedGroups = approvedGroups;
@@ -251,9 +296,7 @@ AJS.toInit(function () {
         for (var i = 0; i < teams.length; i++) {
             var tempTeamName = teams[i].replace(/\W/g, '-');
             var tempTeam = {};
-            tempTeam.name = teams[i];
-            tempTeam.githubTeams = AJS.$("#" + tempTeamName + "-github-teams").auiSelect2("val");
-
+            tempTeam.teamName = teams[i];
             tempTeam.coordinatorGroups = AJS.$("#" + tempTeamName + "-coordinator").auiSelect2("val");
             for (var j = 0; j < tempTeam.coordinatorGroups.length; j++) {
                 tempTeam.coordinatorGroups[j] = tempTeam.coordinatorGroups[j].replace(/^groups-/i, "");
@@ -296,13 +339,13 @@ AJS.toInit(function () {
         });
     }
 
-    function addTeam() {
+    function addTeamPermission() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: restBaseUrl + 'config/addTeam',
+            url: restBaseUrl + 'config/addTeamPermission',
             type: "PUT",
             contentType: "application/json",
-            data: AJS.$("#team").attr("value"),
+            data: AJS.$("#team-permission").attr("value"),
             processData: false,
             success: function () {
                 AJS.messages.success({
@@ -321,7 +364,57 @@ AJS.toInit(function () {
         });
     }
 
-    function editTeam(teamName) {
+    function addCategory() {
+        AJS.$(".loadingDiv").show();
+        AJS.$.ajax({
+            url: restBaseUrl + 'config/addCategory',
+            type: "PUT",
+            contentType: "application/json",
+            data: AJS.$("#category-name").attr("value"),
+            processData: false,
+            success: function () {
+                AJS.messages.success({
+                    title: "Success!",
+                    body: "Category added!"
+                });
+                AJS.$(".loadingDiv").hide();
+            },
+            error: function (error) {
+                AJS.messages.error({
+                    title: "Error!",
+                    body: "Something went wrong!<br />" + error.responseText
+                });
+                AJS.$(".loadingDiv").hide();
+            }
+        });
+    }
+
+    function addTeam() {
+        AJS.$(".loadingDiv").show();
+        AJS.$.ajax({
+            url: restBaseUrl + 'config/addTeam',
+            type: "PUT",
+            contentType: "application/json",
+            data: AJS.$("#team-name").attr("value"),
+            processData: false,
+            success: function () {
+                AJS.messages.success({
+                    title: "Success!",
+                    body: "Team added!"
+                });
+                AJS.$(".loadingDiv").hide();
+            },
+            error: function (error) {
+                AJS.messages.error({
+                    title: "Error!",
+                    body: "Something went wrong!<br />" + error.responseText
+                });
+                AJS.$(".loadingDiv").hide();
+            }
+        });
+    }
+
+    function editTeamPermission(teamName) {
         // may be in background and therefore needs to be removed
         if (editNameDialog) {
             try {
@@ -341,19 +434,19 @@ AJS.toInit(function () {
         var content = "<form class=\"aui\">\n" +
             "    <fieldset>\n" +
             "        <div class=\"field-group\">\n" +
-            "            <label for=\"new-name\">New Team Name</label>\n" +
+            "            <label for=\"new-name\">New Team Permission Name</label>\n" +
             "            <input class=\"text\" type=\"text\" id=\"new-name\" name=\"new-name\" title=\"new-name\">\n" +
             "        </div>\n" +
             "    </fieldset>\n" +
             " </form> ";
 
-        editNameDialog.addHeader("New Team Name for " + teamName);
+        editNameDialog.addHeader("New Team Permission Name for " + teamName);
         editNameDialog.addPanel("Panel 1", content, "panel-body");
 
         editNameDialog.addButton("Save", function (dialog) {
             AJS.$(".loadingDiv").show();
             AJS.$.ajax({
-                url: restBaseUrl + 'config/editTeam',
+                url: restBaseUrl + 'config/editTeamPermission',
                 type: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify([teamName, AJS.$("#new-name").val()]),
@@ -363,7 +456,7 @@ AJS.toInit(function () {
                         title: "Success!",
                         body: "Team edited!"
                     });
-                    populateForm();
+                    fetchData();
                     scrollToAnchor('top');
                     AJS.$(".loadingDiv").hide();
                 },
@@ -388,13 +481,13 @@ AJS.toInit(function () {
         editNameDialog.show();
     }
 
-    function removeTeam() {
+    function removeTeamPermission() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
-            url: restBaseUrl + 'config/removeTeam',
+            url: restBaseUrl + 'config/removeTeamPermission',
             type: "PUT",
             contentType: "application/json",
-            data: AJS.$("#team").attr("value"),
+            data: AJS.$("#team-permission").attr("value"),
             processData: false,
             success: function () {
                 AJS.messages.success({
@@ -413,7 +506,57 @@ AJS.toInit(function () {
         });
     }
 
-    populateForm();
+    function removeCategory() {
+        AJS.$(".loadingDiv").show();
+        AJS.$.ajax({
+            url: restBaseUrl + 'config/removeCategory',
+            type: "PUT",
+            contentType: "application/json",
+            data: AJS.$("#category-name").attr("value"),
+            processData: false,
+            success: function () {
+                AJS.messages.success({
+                    title: "Success!",
+                    body: "Category removed!"
+                });
+                AJS.$(".loadingDiv").hide();
+            },
+            error: function () {
+                AJS.messages.error({
+                    title: "Error!",
+                    body: "Something went wrong!"
+                });
+                AJS.$(".loadingDiv").hide();
+            }
+        });
+    }
+
+    function removeTeam() {
+        AJS.$(".loadingDiv").show();
+        AJS.$.ajax({
+            url: restBaseUrl + 'config/removeTeam',
+            type: "PUT",
+            contentType: "application/json",
+            data: AJS.$("#team-name").attr("value"),
+            processData: false,
+            success: function () {
+                AJS.messages.success({
+                    title: "Success!",
+                    body: "Team removed!"
+                });
+                AJS.$(".loadingDiv").hide();
+            },
+            error: function () {
+                AJS.messages.error({
+                    title: "Error!",
+                    body: "Something went wrong!"
+                });
+                AJS.$(".loadingDiv").hide();
+            }
+        });
+    }
+
+    fetchData();
 
     AJS.$("#general").submit(function (e) {
         e.preventDefault();
@@ -425,13 +568,37 @@ AJS.toInit(function () {
         }
     });
 
-    AJS.$("#modify-teams").submit(function (e) {
+    AJS.$("#modify-team-permissions").submit(function (e) {
+        e.preventDefault();
+        addTeamPermission();
+        scrollToAnchor('top');
+    });
+
+    AJS.$("#removePermission").click(function (e) {
+        e.preventDefault();
+        removeTeamPermission();
+        scrollToAnchor('top');
+    });
+
+    AJS.$("#modify-categoryList").submit(function (e) {
+        e.preventDefault();
+        addCategory();
+        scrollToAnchor('top');
+    });
+
+    AJS.$("#removeCategory").click(function (e) {
+        e.preventDefault();
+        removeCategory();
+        scrollToAnchor('top');
+    });
+
+    AJS.$("#modify-teamList").submit(function (e) {
         e.preventDefault();
         addTeam();
         scrollToAnchor('top');
     });
 
-    AJS.$("#remove").click(function (e) {
+    AJS.$("#removeTeam").click(function (e) {
         e.preventDefault();
         removeTeam();
         scrollToAnchor('top');
@@ -439,7 +606,7 @@ AJS.toInit(function () {
 
     AJS.$("a[href='#tabs-general']").click(function () {
         AJS.$("#teams").html("");
-        populateForm();
+        fetchData();
     });
 
     function unescapeHtml(safe) {

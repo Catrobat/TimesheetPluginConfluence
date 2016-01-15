@@ -1,9 +1,7 @@
 package org.catrobat.confluence.activeobjects;
 
-import java.util.Date;
 import net.java.ao.Entity;
 import net.java.ao.OneToMany;
-import net.java.ao.Preload;
 
 public interface Timesheet extends Entity
 {

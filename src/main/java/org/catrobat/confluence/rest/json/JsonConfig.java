@@ -16,14 +16,7 @@
 
 package org.catrobat.confluence.rest.json;
 
-import com.atlassian.confluence.api.model.people.User;
-import com.atlassian.crowd.exception.DirectoryNotFoundException;
-import com.atlassian.crowd.manager.directory.DirectoryManager;
-
-import com.atlassian.user.UserManager;
-import com.atlassian.confluence.user.UserAccessor;
 import org.catrobat.confluence.activeobjects.*;
-import org.catrobat.confluence.helper.GithubHelper;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -40,29 +33,13 @@ import java.util.TreeMap;
 public final class JsonConfig {
 
     @XmlElement
-    private String githubToken;
-    @XmlElement
-    private String githubTokenPublic;
-    @XmlElement
-    private String githubOrganization;
-    @XmlElement
-    private String defaultGithubTeam;
-    /*
-    @XmlElement
-    private List<JsonResource> resources;
-    */
-    @XmlElement
     private List<JsonTeam> teams;
     @XmlElement
     private List<String> approvedGroups;
     @XmlElement
     private List<String> approvedUsers;
     @XmlElement
-    private List<String> availableGithubTeams;
-    @XmlElement
     private long userDirectoryId;
-    @XmlElement
-    private String userDirectoryName;
     @XmlElement
     private String mailFromName;
     @XmlElement
@@ -78,21 +55,6 @@ public final class JsonConfig {
 
     public JsonConfig(AdminHelperConfigService configService) {
         AdminHelperConfig toCopy = configService.getConfiguration();
-        if (toCopy.getGithubApiToken() != null && toCopy.getGithubApiToken().length() != 0) {
-            this.githubToken = "enter token if you want to change it";
-        } else {
-            this.githubToken = null;
-        }
-        this.githubTokenPublic = toCopy.getPublicGithubApiToken();
-        this.githubOrganization = toCopy.getGithubOrganisation();
-
-        /*
-        Map<String, JsonResource> tempMap = new TreeMap<String, JsonResource>();
-        for (Resource resource : toCopy.getResources()) {
-            tempMap.put(resource.getResourceName().toLowerCase(), new JsonResource(resource));
-        }
-        this.resources = new ArrayList<JsonResource>(tempMap.values());
-        */
 
         Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
         for (Team team : toCopy.getTeams()) {
@@ -102,16 +64,11 @@ public final class JsonConfig {
         this.teams = new ArrayList<JsonTeam>();
         this.teams.addAll(teamMap.values());
 
+        //ToDO: not correct
         this.approvedUsers = new ArrayList<String>();
-        /*
-        UserManager userManager = ComponentAccessor.getUserManager();
-
         for (ApprovedUser approvedUser : toCopy.getApprovedUsers()) {
-            if (userManager.getUserByKey(approvedUser.getUserKey()) != null) {
-                ApplicationUser user = userManager.getUserByKey(approvedUser.getUserKey());
-                if (user != null) {
-                    approvedUsers.add(user.getUsername());
-                }
+            if (approvedUser.getUserKey() != null) {
+                approvedUsers.add(approvedUser.getUserKey());
             }
         }
 
@@ -120,39 +77,11 @@ public final class JsonConfig {
             approvedGroups.add(approvedGroup.getGroupName());
         }
 
-        GithubHelper githubHelper = new GithubHelper(configService);
-        this.availableGithubTeams = githubHelper.getAvailableTeams();
-        this.defaultGithubTeam = githubHelper.getTeamName(toCopy.getDefaultGithubTeamId());
-
         this.userDirectoryId = toCopy.getUserDirectoryId();
-        DirectoryManager directoryManager = ComponentAccessor.getComponent(DirectoryManager.class);
-        try {
-            this.userDirectoryName = directoryManager.findDirectoryById(userDirectoryId).getName();
-        } catch (DirectoryNotFoundException e) {
-            this.userDirectoryId = -1;
-            this.userDirectoryName = null;
-        }
-        */
         this.mailFromName = toCopy.getMailFromName();
         this.mailFrom = toCopy.getMailFrom();
         this.mailSubject = toCopy.getMailSubject();
         this.mailBody = toCopy.getMailBody();
-    }
-
-    public String getGithubToken() {
-        return githubToken;
-    }
-
-    public void setGithubToken(String githubToken) {
-        this.githubToken = githubToken;
-    }
-
-    public String getGithubOrganization() {
-        return githubOrganization;
-    }
-
-    public void setGithubOrganization(String githubOrganization) {
-        this.githubOrganization = githubOrganization;
     }
 
     public List<JsonTeam> getTeams() {
@@ -171,22 +100,6 @@ public final class JsonConfig {
         this.approvedGroups = approvedGroups;
     }
 
-    public List<String> getAvailableGithubTeams() {
-        return availableGithubTeams;
-    }
-
-    public void setAvailableGithubTeams(List<String> availableGithubTeams) {
-        this.availableGithubTeams = availableGithubTeams;
-    }
-
-    public String getGithubTokenPublic() {
-        return githubTokenPublic;
-    }
-
-    public void setGithubTokenPublic(String githubTokenPublic) {
-        this.githubTokenPublic = githubTokenPublic;
-    }
-
     public List<String> getApprovedUsers() {
         return approvedUsers;
     }
@@ -201,32 +114,6 @@ public final class JsonConfig {
 
     public void setUserDirectoryId(long userDirectoryId) {
         this.userDirectoryId = userDirectoryId;
-    }
-
-    public String getUserDirectoryName() {
-        return userDirectoryName;
-    }
-
-    public void setUserDirectoryName(String userDirectoryName) {
-        this.userDirectoryName = userDirectoryName;
-    }
-
-    /*
-    public List<JsonResource> getResources() {
-        return resources;
-    }
-
-    public void setResources(List<JsonResource> resources) {
-        this.resources = resources;
-    }
-    */
-
-    public String getDefaultGithubTeam() {
-        return defaultGithubTeam;
-    }
-
-    public void setDefaultGithubTeam(String defaultGithubTeam) {
-        this.defaultGithubTeam = defaultGithubTeam;
     }
 
     public String getMailFromName() {

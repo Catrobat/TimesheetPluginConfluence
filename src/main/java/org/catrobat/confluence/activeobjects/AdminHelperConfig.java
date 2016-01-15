@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Fellhofer
+ * Copyright 2014 Adrian Schnedlitz, Stephan Fellhofer
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,52 +23,37 @@ import net.java.ao.schema.StringLength;
 
 @Preload
 public interface AdminHelperConfig extends Entity {
-    String getPublicGithubApiToken();
 
-    void setPublicGithubApiToken(String publicGithubApiToken);
+  long getUserDirectoryId();
 
-    String getGithubApiToken();
+  void setUserDirectoryId(long userDirectoryId);
 
-    void setGithubApiToken(String githubApiToken);
+  String getMailFromName();
 
-    String getGithubOrganisation();
+  void setMailFromName(String fromName);
 
-    void setGithubOrganisation(String githubOrganisation);
+  String getMailFrom();
 
-    long getUserDirectoryId();
+  void setMailFrom(String from);
 
-    void setUserDirectoryId(long userDirectoryId);
+  @StringLength(StringLength.UNLIMITED)
+  String getMailSubject();
 
-    int getDefaultGithubTeamId();
+  @StringLength(StringLength.UNLIMITED)
+  void setMailSubject(String subject);
 
-    void setDefaultGithubTeamId(int defaultGithubTeamId);
+  @StringLength(StringLength.UNLIMITED)
+  String getMailBody();
 
-    String getMailFromName();
+  @StringLength(StringLength.UNLIMITED)
+  void setMailBody(String body);
 
-    void setMailFromName(String fromName);
+  @OneToMany(reverse = "getConfiguration")
+  ApprovedGroup[] getApprovedGroups();
 
-    String getMailFrom();
+  @OneToMany(reverse = "getConfiguration")
+  ApprovedUser[] getApprovedUsers();
 
-    void setMailFrom(String from);
-
-    @StringLength(StringLength.UNLIMITED)
-    String getMailSubject();
-
-    @StringLength(StringLength.UNLIMITED)
-    void setMailSubject(String subject);
-
-    @StringLength(StringLength.UNLIMITED)
-    String getMailBody();
-
-    @StringLength(StringLength.UNLIMITED)
-    void setMailBody(String body);
-
-    @OneToMany(reverse = "getConfiguration")
-    ApprovedGroup[] getApprovedGroups();
-
-    @OneToMany(reverse = "getConfiguration")
-    ApprovedUser[] getApprovedUsers();
-
-    @OneToMany(reverse = "getConfiguration")
-    Team[] getTeams();
+  @OneToMany(reverse = "getConfiguration")
+  Team[] getTeams();
 }

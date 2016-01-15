@@ -18,14 +18,14 @@
 
 var restBaseUrl;
 var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-restBaseUrl = baseUrl + "/rest/administration/latest/";
+restBaseUrl = baseUrl + "/rest/timesheet/latest/";
 
 function populateTeamTable(config, tableId, resourceId) {
     AJS.$(tableId).empty();
     for (var i = 0; i < config.teams.length; i++) {
         var obj = config.teams[i];
-        var teamName = obj['name'].replace(/\W/g, "-");
-        AJS.$(tableId).append("<tr><td headers=\"basic-team\">" + obj['name'] +
+        var teamName = obj['teamName'].replace(/\W/g, "-");
+        AJS.$(tableId).append("<tr><td headers=\"basic-team\">" + obj['teamName'] +
         "</td><td headers=\"basic-coordinator\"><input class=\"radio\" type=\"radio\" name=\"" + teamName +
         "\" id=\"" + teamName + "-coordinator\" value=\"coordinator\"></td><td headers=\"basic-senior\"><input class=\"radio\" type=\"radio\" name=\"" +
         teamName + "\" id=\"" + teamName + "-senior\" value=\"senior\"></td><td headers=\"basic-developer\"><input class=\"radio\" type=\"radio\" name=\"" +

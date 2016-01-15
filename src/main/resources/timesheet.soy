@@ -9,7 +9,7 @@
     <span class="th range">Von - Bis</span>
     <span class="th pause">Pause</span>
     <span class="th duration">Dauer</span>
-    {if length(keys($teams)) > 1} 
+    {if length(keys($teams)) > 1}
       <span class="th team">Team</span>
     {/if}
     <span class="th category">Kategorie</span>
@@ -29,7 +29,7 @@
     <span class="td range">{$entry.begin} - {$entry.end}</span>
     <span class="td pause">{$entry.pause}</span>
     <span class="td duration">{$entry.duration}</span>
-    {if length(keys($teams)) > 1} 
+    {if length(keys($teams)) > 1}
       <span class="td">{$entry.team}</span>
     {/if}
     <span class="td">{$entry.category}</span>
@@ -41,7 +41,7 @@
           {param icon: 'edit' /}
         {/call}
       </button>
-      <button class="aui-button aui-button-subtle delete"> 
+      <button class="aui-button aui-button-subtle delete">
         {call aui.icons.icon} 
           {param useIconFont: true /} 
           {param icon: 'remove-label' /} 

@@ -69,7 +69,7 @@ AJS.toInit(function () {
 
     //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-    restBaseUrl = baseUrl + "/rest/administration/latest/";
+    restBaseUrl = baseUrl + "/rest/timesheet/latest/";
 
     var config;
     getConfigAndCallback(baseUrl, function (ajaxConfig) {
@@ -122,6 +122,7 @@ AJS.toInit(function () {
                     page: Number.MAX_VALUE,
                     valueNames: ["username", "first-name", "last-name", "email", "github", "action"]
                 });
+
                 userList.on('updated', function () {
                     AJS.$("#user-table").trigger("update");
                 });
@@ -268,14 +269,6 @@ AJS.toInit(function () {
                 userToModify.seniorList.push(teamList[i]);
             } else if (value == "developer") {
                 userToModify.developerList.push(teamList[i]);
-            }
-        }
-
-        userToModify.resourceList = [];
-        for (i = 0; i < config.resources.length; i++) {
-            var resource = config.resources[i];
-            if (AJS.$('#' + resource.resourceName.replace(/\W/g, "-")).attr('checked')) {
-                userToModify.resourceList.push(resource);
             }
         }
 

@@ -3,10 +3,7 @@ package ut.org.catrobat.confluence.rest;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import junit.framework.Assert;
-import org.catrobat.confluence.activeobjects.Category;
-import org.catrobat.confluence.activeobjects.Team;
-import org.catrobat.confluence.activeobjects.Timesheet;
-import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.rest.TimesheetRest;
 import org.catrobat.confluence.rest.json.JsonCategory;
 import org.catrobat.confluence.rest.json.JsonTeam;
@@ -43,6 +40,7 @@ public class TimesheetRestTest {
   private TimesheetEntryService entryService;
   private Team team;
   private DBFillerService dbFillerService;
+  private AdminHelperConfigService adminHelperConfigService;
 
   private SimpleDateFormat sdf;
 
@@ -62,11 +60,9 @@ public class TimesheetRestTest {
     timeSheetEntry = Mockito.mock(TimesheetEntry.class);
     team = Mockito.mock(Team.class);
     dbFillerService = Mockito.mock(DBFillerServiceImpl.class);
+    adminHelperConfigService = Mockito.mock(AdminHelperConfigService.class);
 
-    timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller);
-
-    //GetTeams + GetCategories
-    Mockito.when(userManager.getRemoteUser()).thenReturn(userProfile);
+    timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller, adminHelperConfigService);
     Mockito.when(permissionService.checkIfUserExists(request)).thenReturn(userProfile);
     Mockito.when(userProfile.getUsername()).thenReturn("testUser");
     Mockito.when(permissionService.userCanViewTimesheet(userProfile, timeSheet)).thenReturn(true);

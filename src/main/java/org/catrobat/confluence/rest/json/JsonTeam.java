@@ -1,10 +1,8 @@
 package org.catrobat.confluence.rest.json;
 
 import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
-import org.catrobat.confluence.activeobjects.GithubTeam;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.TeamToGroup;
-import org.catrobat.confluence.helper.GithubHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,13 +24,15 @@ public class JsonTeam {
   @XmlElement
 	private int[] teamCategories;
   @XmlElement
-  private List<String> githubTeams;
-  @XmlElement
   private List<String> coordinatorGroups;
   @XmlElement
   private List<String> seniorGroups;
   @XmlElement
   private List<String> developerGroups;
+
+  public JsonTeam() {
+
+  }
 
   public JsonTeam(int teamID, String teamName, int[] teamCategories) {
     this.teamID = teamID;
@@ -42,7 +42,6 @@ public class JsonTeam {
 
   public JsonTeam(String name) {
     this.teamName = name;
-    githubTeams = new ArrayList<String>();
     coordinatorGroups = new ArrayList<String>();
     seniorGroups = new ArrayList<String>();
     developerGroups = new ArrayList<String>();
@@ -50,13 +49,6 @@ public class JsonTeam {
 
   public JsonTeam(Team toCopy, AdminHelperConfigService configService) {
     this.teamName = toCopy.getTeamName();
-    GithubHelper githubHelper = new GithubHelper(configService);
-
-    this.githubTeams = new ArrayList<String>();
-    for (GithubTeam githubTeam : toCopy.getGithubTeams()) {
-      githubTeams.add(githubHelper.getTeamName(githubTeam.getGithubId()));
-    }
-
     this.coordinatorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.COORDINATOR);
     this.seniorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.SENIOR);
     this.developerGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.DEVELOPER);
@@ -84,14 +76,6 @@ public class JsonTeam {
 
   public void setTeamCategories(int[] teamCategories) {
     this.teamCategories = teamCategories;
-  }
-
-  public List<String> getGithubTeams() {
-    return githubTeams;
-  }
-
-  public void setGithubTeams(List<String> githubTeams) {
-    this.githubTeams = githubTeams;
   }
 
   public List<String> getCoordinatorGroups() {

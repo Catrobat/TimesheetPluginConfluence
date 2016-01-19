@@ -16,14 +16,10 @@
 
 package org.catrobat.confluence.rest.json;
 
-import com.atlassian.confluence.api.model.people.User;
-import com.atlassian.crowd.exception.DirectoryNotFoundException;
-import com.atlassian.crowd.manager.directory.DirectoryManager;
-
-import com.atlassian.user.UserManager;
-import com.atlassian.confluence.user.UserAccessor;
-import org.catrobat.confluence.activeobjects.*;
-import org.catrobat.confluence.helper.GithubHelper;
+import org.catrobat.confluence.activeobjects.AdminHelperConfig;
+import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
+import org.catrobat.confluence.activeobjects.Resource;
+import org.catrobat.confluence.activeobjects.Team;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -47,10 +43,8 @@ public final class JsonConfig {
     private String githubOrganization;
     @XmlElement
     private String defaultGithubTeam;
-    /*
     @XmlElement
     private List<JsonResource> resources;
-    */
     @XmlElement
     private List<JsonTeam> teams;
     @XmlElement
@@ -83,16 +77,16 @@ public final class JsonConfig {
         } else {
             this.githubToken = null;
         }
+
         this.githubTokenPublic = toCopy.getPublicGithubApiToken();
         this.githubOrganization = toCopy.getGithubOrganisation();
 
-        /*
+        //ToDo: hier crasht es weil Resource empty ist
         Map<String, JsonResource> tempMap = new TreeMap<String, JsonResource>();
         for (Resource resource : toCopy.getResources()) {
             tempMap.put(resource.getResourceName().toLowerCase(), new JsonResource(resource));
         }
         this.resources = new ArrayList<JsonResource>(tempMap.values());
-        */
 
         Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
         for (Team team : toCopy.getTeams()) {
@@ -114,17 +108,20 @@ public final class JsonConfig {
                 }
             }
         }
+        */
 
         this.approvedGroups = new ArrayList<String>();
+        /*
         for (ApprovedGroup approvedGroup : toCopy.getApprovedGroups()) {
             approvedGroups.add(approvedGroup.getGroupName());
         }
+        */
 
-        GithubHelper githubHelper = new GithubHelper(configService);
-        this.availableGithubTeams = githubHelper.getAvailableTeams();
-        this.defaultGithubTeam = githubHelper.getTeamName(toCopy.getDefaultGithubTeamId());
+        this.availableGithubTeams =  new ArrayList<String>();
+        this.defaultGithubTeam =  "";
 
         this.userDirectoryId = toCopy.getUserDirectoryId();
+        /*
         DirectoryManager directoryManager = ComponentAccessor.getComponent(DirectoryManager.class);
         try {
             this.userDirectoryName = directoryManager.findDirectoryById(userDirectoryId).getName();
@@ -133,6 +130,9 @@ public final class JsonConfig {
             this.userDirectoryName = null;
         }
         */
+        this.userDirectoryId = -1;
+        this.userDirectoryName = null;
+
         this.mailFromName = toCopy.getMailFromName();
         this.mailFrom = toCopy.getMailFrom();
         this.mailSubject = toCopy.getMailSubject();
@@ -211,7 +211,6 @@ public final class JsonConfig {
         this.userDirectoryName = userDirectoryName;
     }
 
-    /*
     public List<JsonResource> getResources() {
         return resources;
     }
@@ -219,7 +218,6 @@ public final class JsonConfig {
     public void setResources(List<JsonResource> resources) {
         this.resources = resources;
     }
-    */
 
     public String getDefaultGithubTeam() {
         return defaultGithubTeam;

@@ -431,11 +431,23 @@ AJS.toInit(function () {
         scrollToAnchor('top');
     });
 
-    AJS.$("#remove").click(function (e) {
-        e.preventDefault();
-        removeTeam();
-        scrollToAnchor('top');
-    });
+    AJS.$("#modify-resources").submit(function (e) {
+           e.preventDefault();
+           addResource();
+           scrollToAnchor('top');
+       });
+
+       AJS.$("#remove").click(function (e) {
+           e.preventDefault();
+           removeTeam();
+           scrollToAnchor('top');
+       });
+
+       AJS.$("#remove-resource").click(function (e) {
+           e.preventDefault();
+           removeResource();
+           scrollToAnchor('top');
+       });
 
     AJS.$("a[href='#tabs-general']").click(function () {
         AJS.$("#teams").html("");

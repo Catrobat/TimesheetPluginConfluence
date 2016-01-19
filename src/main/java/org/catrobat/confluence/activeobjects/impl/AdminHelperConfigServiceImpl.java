@@ -96,7 +96,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
     }
 
     @Override
-    public Team addTeam(String teamName, List<Integer> githubTeamIdList, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups) {
+    public Team addTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups) {
         if (teamName == null || teamName.trim().length() == 0) {
             return null;
         }
@@ -111,25 +111,6 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
         Team team = ao.create(Team.class);
         team.setConfiguration(configuration);
         team.setTeamName(teamName);
-        if (githubTeamIdList != null) {
-            for (int githubId : githubTeamIdList) {
-                GithubTeam[] githubTeamArray = ao.find(GithubTeam.class, Query.select().where("\"GITHUB_ID\" = ?", githubId));
-                GithubTeam githubTeam;
-                if (githubTeamArray.length == 0) {
-                    githubTeam = ao.create(GithubTeam.class);
-                } else {
-                    githubTeam = githubTeamArray[0];
-                }
-
-                githubTeam.setGithubId(githubId);
-                githubTeam.save();
-
-                TeamToGithubTeam mapper = ao.create(TeamToGithubTeam.class);
-                mapper.setGithubTeam(githubTeam);
-                mapper.setTeam(team);
-                mapper.save();
-            }
-        }
 
         fillTeam(team, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
         fillTeam(team, TeamToGroup.Role.SENIOR, seniorGroups);
@@ -202,6 +183,56 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
     }
 
     @Override
+    public AdminHelperConfig addResource(String resourceName, String groupName) {
+        if (resourceName == null || resourceName.trim().length() == 0) {
+            return null;
+        }
+        String tempResourceName = escapeHtml4(resourceName.trim());
+        Resource[] resources = ao.find(Resource.class, Query.select().where("upper(\"RESOURCE_NAME\") = upper(?)", tempResourceName));
+        if (resources.length != 0) {
+            return null;
+        }
+
+        AdminHelperConfig config = getConfiguration();
+        Resource resource = ao.create(Resource.class);
+        resource.setResourceName(tempResourceName);
+        resource.setGroupName(groupName);
+        resource.setConfiguration(config);
+        resource.save();
+
+        return config;
+    }
+
+    @Override
+    public AdminHelperConfig editResource(String resourceName, String newGroupName) {
+        if (resourceName == null || resourceName.trim().length() == 0) {
+            return null;
+        }
+        String tempResourceName = escapeHtml4(resourceName.trim());
+        Resource[] resources = ao.find(Resource.class, Query.select().where("upper(\"RESOURCE_NAME\") = upper(?)", tempResourceName));
+        if (resources.length == 0) {
+            return null;
+        }
+        resources[0].setGroupName(newGroupName);
+        resources[0].save();
+
+        return getConfiguration();
+    }
+
+    @Override
+    public AdminHelperConfig removeResource(String resourceName) {
+        String tempResourceName = null;
+        if (resourceName != null) {
+            tempResourceName = escapeHtml4(resourceName.trim());
+        }
+
+        Resource[] resources = ao.find(Resource.class, Query.select().where("upper(\"RESOURCE_NAME\") = upper(?)", tempResourceName));
+        ao.delete(resources);
+
+        return getConfiguration();
+    }
+
+    @Override
     public AdminHelperConfig removeTeam(String teamName) {
         Team[] teamArray = ao.find(Team.class, Query.select().where("upper(\"TEAM_NAME\") = upper(?)", teamName));
         if (teamArray.length == 0) {
@@ -212,11 +243,6 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
         TeamToGroup[] teamToGroupArray = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
         for (TeamToGroup teamToGroup : teamToGroupArray) {
             ao.delete(teamToGroup);
-        }
-
-        TeamToGithubTeam[] teamToGithubTeamArray = ao.find(TeamToGithubTeam.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
-        for (TeamToGithubTeam teamToGithubTeam : teamToGithubTeamArray) {
-            ao.delete(teamToGithubTeam);
         }
 
         for (Group group : groupArray) {

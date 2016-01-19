@@ -60,6 +60,9 @@ public interface AdminHelperConfig extends Entity {
     @StringLength(StringLength.UNLIMITED)
     String getMailBody();
 
+    @OneToMany(reverse = "getConfiguration")
+    Resource[] getResources();
+
     @StringLength(StringLength.UNLIMITED)
     void setMailBody(String body);
 

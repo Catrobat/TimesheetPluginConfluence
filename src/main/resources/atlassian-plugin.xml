@@ -176,8 +176,6 @@
         <entity>org.catrobat.confluence.activeobjects.ApprovedGroup</entity>
         <entity>org.catrobat.confluence.activeobjects.AdminHelperConfig</entity>
         <entity>org.catrobat.confluence.activeobjects.ApprovedUser</entity>
-        <entity>org.catrobat.confluence.activeobjects.GithubTeam</entity>
-        <entity>org.catrobat.confluence.activeobjects.TeamToGithubTeam</entity>
         <entity>org.catrobat.confluence.activeobjects.TeamToGroup</entity>
     </ao>
 

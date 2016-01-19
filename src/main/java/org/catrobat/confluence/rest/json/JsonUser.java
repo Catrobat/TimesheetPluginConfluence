@@ -38,10 +38,8 @@ public final class JsonUser {
     private String githubName;
     @XmlElement
     private String displayName;
-
-    //@XmlElement
-    //private List<JsonResource> resourceList;
-
+    @XmlElement
+    private List<JsonResource> resourceList;
     @XmlElement
     private List<String> coordinatorList;
     @XmlElement
@@ -133,7 +131,6 @@ public final class JsonUser {
         this.displayName = displayName;
     }
 
-    /*
     public List<JsonResource> getResourceList() {
         return resourceList;
     }
@@ -141,7 +138,6 @@ public final class JsonUser {
     public void setResourceList(List<JsonResource> resourceList) {
         this.resourceList = resourceList;
     }
-    */
 
     public boolean isAddToDefaultGithubTeam() {
         return addToDefaultGithubTeam;

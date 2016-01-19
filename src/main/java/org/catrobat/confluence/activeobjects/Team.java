@@ -14,9 +14,6 @@ public interface Team extends Entity {
 
   void setConfiguration(AdminHelperConfig configuration);
 
-  @ManyToMany(value = TeamToGithubTeam.class, reverse = "getTeam", through = "getGithubTeam")
-  GithubTeam[] getGithubTeams();
-
   @ManyToMany(value = TeamToGroup.class, reverse = "getTeam", through = "getGroup")
   Group[] getGroups();
 

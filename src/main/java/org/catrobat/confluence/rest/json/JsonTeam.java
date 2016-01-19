@@ -1,10 +1,8 @@
 package org.catrobat.confluence.rest.json;
 
 import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
-import org.catrobat.confluence.activeobjects.GithubTeam;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.TeamToGroup;
-import org.catrobat.confluence.helper.GithubHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,12 +48,8 @@ public class JsonTeam {
 
   public JsonTeam(Team toCopy, AdminHelperConfigService configService) {
     this.teamName = toCopy.getTeamName();
-    GithubHelper githubHelper = new GithubHelper(configService);
 
     this.githubTeams = new ArrayList<String>();
-    for (GithubTeam githubTeam : toCopy.getGithubTeams()) {
-      githubTeams.add(githubHelper.getTeamName(githubTeam.getGithubId()));
-    }
 
     this.coordinatorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.COORDINATOR);
     this.seniorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.SENIOR);

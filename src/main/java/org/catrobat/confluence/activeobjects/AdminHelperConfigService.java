@@ -34,10 +34,16 @@ public interface AdminHelperConfigService {
 
     public AdminHelperConfig setDefaultGithubTeamId(int defaultGithubTeamId);
 
-    Team addTeam(String teamName, List<Integer> githubTeamIdList, List<String> coordinatorGroups,
+    Team addTeam(String teamName, List<String> coordinatorGroups,
                  List<String> seniorGroups, List<String> developerGroups);
 
     AdminHelperConfig editTeam(String oldTeamName, String newTeamName);
+
+    AdminHelperConfig addResource(String resourceName, String groupName);
+
+    AdminHelperConfig editResource(String resourceName, String newGroupName);
+
+    AdminHelperConfig removeResource(String resourceName);
 
     AdminHelperConfig removeTeam(String teamName);
 

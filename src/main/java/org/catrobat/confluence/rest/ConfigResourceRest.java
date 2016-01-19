@@ -123,20 +123,13 @@ public class ConfigResourceRest extends PermissionServiceImpl {
       return unauthorized;
     }
 
-    if (jsonConfig.getGithubToken() != null && jsonConfig.getGithubToken().length() != 0) {
-      configService.setApiToken(jsonConfig.getGithubToken());
-    }
-    configService.setPublicApiToken(jsonConfig.getGithubTokenPublic());
-    configService.setOrganisation(jsonConfig.getGithubOrganization());
     configService.setUserDirectoryId(jsonConfig.getUserDirectoryId());
     configService.editMail(jsonConfig.getMailFromName(), jsonConfig.getMailFrom(),
             jsonConfig.getMailSubject(), jsonConfig.getMailBody());
 
-    /*
     for (JsonResource jsonResource : jsonConfig.getResources()) {
       configService.editResource(jsonResource.getResourceName(), jsonResource.getGroupName());
     }
-    */
 
     if (jsonConfig.getApprovedGroups() != null) {
       configService.clearApprovedGroups();
@@ -159,42 +152,10 @@ public class ConfigResourceRest extends PermissionServiceImpl {
     */
 
     if (jsonConfig.getTeams() != null) {
-      String token = configService.getConfiguration().getGithubApiToken();
-      String organizationName = configService.getConfiguration().getGithubOrganisation();
-
-      try {
-        GitHub gitHub = GitHub.connectUsingOAuth(token);
-        GHOrganization organization = gitHub.getOrganization(organizationName);
-        Collection<GHTeam> teamList = organization.getTeams().values();
-
-        if (jsonConfig.getDefaultGithubTeam() != null) {
-          for (GHTeam team : teamList) {
-            if (jsonConfig.getDefaultGithubTeam().toLowerCase().equals(team.getName().toLowerCase())) {
-              configService.setDefaultGithubTeamId(team.getId());
-              break;
-            }
-          }
-        }
-
-        for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
-          configService.removeTeam(jsonTeam.getTeamName());
-
-          List<Integer> githubIdList = new ArrayList<Integer>();
-          for (String teamName : jsonTeam.getGithubTeams()) {
-            for (GHTeam team : teamList) {
-              if (teamName.toLowerCase().equals(team.getName().toLowerCase())) {
-                githubIdList.add(team.getId());
-                break;
-              }
-            }
-          }
-
-          configService.addTeam(jsonTeam.getTeamName(), githubIdList, jsonTeam.getCoordinatorGroups(),
-                  jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups());
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-        return Response.serverError().entity("Some error with GitHub API (e.g. maybe wrong tokens, organisation, teams) occured").build();
+      for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
+        configService.removeTeam(jsonTeam.getTeamName());
+        configService.addTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
+                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups());
       }
     }
 
@@ -210,7 +171,7 @@ public class ConfigResourceRest extends PermissionServiceImpl {
       return unauthorized;
     }
 
-    boolean successful = configService.addTeam(modifyTeam, null, null, null, null) != null;
+    boolean successful = configService.addTeam(modifyTeam, null, null, null) != null;
 
     if (successful)
       return Response.noContent().build();

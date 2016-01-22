@@ -48,6 +48,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Path("/config")
+@Produces({MediaType.APPLICATION_JSON})
 public class ConfigResourceRest extends PermissionServiceImpl {
   private final AdminHelperConfigService configService;
   private final DirectoryManager directoryManager;

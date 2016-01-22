@@ -34,7 +34,7 @@ import org.catrobat.confluence.services.TeamService;
 import org.catrobat.confluence.services.TimesheetEntryService;
 import org.catrobat.confluence.services.TimesheetService;
 
-@Path("/")
+@Path("/content")
 @Produces({MediaType.APPLICATION_JSON})
 public class TimesheetRest {
   

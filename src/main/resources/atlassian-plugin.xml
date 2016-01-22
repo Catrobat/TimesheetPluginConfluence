@@ -177,6 +177,7 @@
         <entity>org.catrobat.confluence.activeobjects.AdminHelperConfig</entity>
         <entity>org.catrobat.confluence.activeobjects.ApprovedUser</entity>
         <entity>org.catrobat.confluence.activeobjects.TeamToGroup</entity>
+        <entity>org.catrobat.confluence.activeobjects.Resource</entity>
     </ao>
 
     <!-- rest-resources -->

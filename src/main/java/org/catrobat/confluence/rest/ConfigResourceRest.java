@@ -32,7 +32,6 @@ import org.catrobat.confluence.rest.json.JsonTeam;
 import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
-import org.catrobat.confluence.services.impl.PermissionServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -74,7 +73,7 @@ public class ConfigResourceRest {
 
     List<JsonCategory> categories = new LinkedList<JsonCategory>();
 
-    for(Category category : categoryService.all()) {
+    for (Category category : categoryService.all()) {
       categories.add(new JsonCategory(category.getID(), category.getName()));
     }
 
@@ -94,10 +93,10 @@ public class ConfigResourceRest {
       return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
     }
 
-    for(Team team : teamService.all()) {
+    for (Team team : teamService.all()) {
       Category[] categories = team.getCategories();
       int[] categoryIDs = new int[categories.length];
-      for(int i = 0; i < categories.length; i++) {
+      for (int i = 0; i < categories.length; i++) {
         categoryIDs[i] = categories[i].getID();
       }
       teams.add(new JsonTeam(team.getID(), team.getTeamName(), categoryIDs));
@@ -291,6 +290,7 @@ public class ConfigResourceRest {
     return Response.serverError().build();
   }
 
+  /*
   @PUT
   @Path("/addTeam")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -324,4 +324,5 @@ public class ConfigResourceRest {
 
     return Response.serverError().build();
   }
+  */
 }

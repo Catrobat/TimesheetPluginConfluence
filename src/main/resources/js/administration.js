@@ -121,12 +121,11 @@ AJS.toInit(function () {
                 if (config.mailBody)
                     AJS.$("#mail-body").val(config.mailBody);
 
-                var teams = [];
+                teams = [];
                 AJS.$("#teams").empty();
                 for (var i = 0; i < config.teams.length; i++) {
                     var team = config.teams[i];
                     teams.push(team['teamName']);
-
                     var tempTeamName = team['teamName'].replace(/\W/g, '-');
                     AJS.$("#teams").append("<h3>" + team['teamName'] +
                     "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
@@ -160,7 +159,6 @@ AJS.toInit(function () {
                     });
                 }
 
-
                AJS.$("#userdirectory").auiSelect2({
                     placeholder: "Search for directories",
                     minimumInputLength: 0,
@@ -178,7 +176,6 @@ AJS.toInit(function () {
                             return {results: select2data};
                         }
                     }
-
                 });
                 /*)
                 AJS.$(".single-jira-group").auiSelect2({
@@ -281,6 +278,7 @@ AJS.toInit(function () {
         var usersAndGroups = AJS.$("#plugin-permission").auiSelect2("val");
         var approvedUsers = [];
         var approvedGroups = [];
+
         /*
         for (var i = 0; i < usersAndGroups.length; i++) {
             if (usersAndGroups[i].match("^users-")) {
@@ -297,6 +295,7 @@ AJS.toInit(function () {
             var tempTeamName = teams[i].replace(/\W/g, '-');
             var tempTeam = {};
             tempTeam.teamName = teams[i];
+
             tempTeam.coordinatorGroups = AJS.$("#" + tempTeamName + "-coordinator").auiSelect2("val");
             for (var j = 0; j < tempTeam.coordinatorGroups.length; j++) {
                 tempTeam.coordinatorGroups[j] = tempTeam.coordinatorGroups[j].replace(/^groups-/i, "");
@@ -311,7 +310,6 @@ AJS.toInit(function () {
             for (var j = 0; j < tempTeam.developerGroups.length; j++) {
                 tempTeam.developerGroups[j] = tempTeam.developerGroups[j].replace(/^groups-/i, "");
             }
-
             config.teams.push(tempTeam);
         }
 
@@ -339,13 +337,13 @@ AJS.toInit(function () {
         });
     }
 
-    function addTeamPermission() {
+    function addTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
             url: restBaseUrl + 'config/addTeamPermission',
             type: "PUT",
             contentType: "application/json",
-            data: AJS.$("#team-permission").attr("value"),
+            data: AJS.$("#team-name").attr("value"),
             processData: false,
             success: function () {
                 AJS.messages.success({
@@ -389,6 +387,7 @@ AJS.toInit(function () {
         });
     }
 
+    /*
     function addTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
@@ -413,8 +412,9 @@ AJS.toInit(function () {
             }
         });
     }
+    */
 
-    function editTeamPermission(teamName) {
+    function editTeam(teamName) {
         // may be in background and therefore needs to be removed
         if (editNameDialog) {
             try {
@@ -434,13 +434,13 @@ AJS.toInit(function () {
         var content = "<form class=\"aui\">\n" +
             "    <fieldset>\n" +
             "        <div class=\"field-group\">\n" +
-            "            <label for=\"new-name\">New Team Permission Name</label>\n" +
+            "            <label for=\"new-name\">New Team Name</label>\n" +
             "            <input class=\"text\" type=\"text\" id=\"new-name\" name=\"new-name\" title=\"new-name\">\n" +
             "        </div>\n" +
             "    </fieldset>\n" +
             " </form> ";
 
-        editNameDialog.addHeader("New Team Permission Name for " + teamName);
+        editNameDialog.addHeader("New Team Name for " + teamName);
         editNameDialog.addPanel("Panel 1", content, "panel-body");
 
         editNameDialog.addButton("Save", function (dialog) {
@@ -481,13 +481,13 @@ AJS.toInit(function () {
         editNameDialog.show();
     }
 
-    function removeTeamPermission() {
+    function removeTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
             url: restBaseUrl + 'config/removeTeamPermission',
             type: "PUT",
             contentType: "application/json",
-            data: AJS.$("#team-permission").attr("value"),
+            data: AJS.$("#team-name").attr("value"),
             processData: false,
             success: function () {
                 AJS.messages.success({
@@ -531,6 +531,7 @@ AJS.toInit(function () {
         });
     }
 
+    /*
     function removeTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
@@ -555,6 +556,7 @@ AJS.toInit(function () {
             }
         });
     }
+    */
 
     fetchData();
 
@@ -568,15 +570,15 @@ AJS.toInit(function () {
         }
     });
 
-    AJS.$("#modify-team-permissions").submit(function (e) {
+    AJS.$("#modify-team").submit(function (e) {
         e.preventDefault();
-        addTeamPermission();
+        addTeam();
         scrollToAnchor('top');
     });
 
-    AJS.$("#removePermission").click(function (e) {
+    AJS.$("#removeTeam").click(function (e) {
         e.preventDefault();
-        removeTeamPermission();
+        removeTeam();
         scrollToAnchor('top');
     });
 
@@ -589,18 +591,6 @@ AJS.toInit(function () {
     AJS.$("#removeCategory").click(function (e) {
         e.preventDefault();
         removeCategory();
-        scrollToAnchor('top');
-    });
-
-    AJS.$("#modify-teamList").submit(function (e) {
-        e.preventDefault();
-        addTeam();
-        scrollToAnchor('top');
-    });
-
-    AJS.$("#removeTeam").click(function (e) {
-        e.preventDefault();
-        removeTeam();
         scrollToAnchor('top');
     });
 

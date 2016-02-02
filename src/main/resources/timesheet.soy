@@ -5,15 +5,15 @@
  */
 {template .timesheetHeader}
   <div class="tr">
-    <span class="th date">Datum</span>
-    <span class="th range">Von - Bis</span>
+    <span class="th date">Date</span>
+    <span class="th range">Start - End</span>
     <span class="th pause">Pause</span>
-    <span class="th duration">Dauer</span>
+    <span class="th duration">Duration</span>
     {if length(keys($teams)) > 1}
       <span class="th team">Team</span>
     {/if}
-    <span class="th category">Kategorie</span>
-    <span class="th">T&auml;tigkeit</span>
+    <span class="th category">Category</span>
+    <span class="th">Task Description</span>
     <span class="th"></span>
   </div>
 {/template}

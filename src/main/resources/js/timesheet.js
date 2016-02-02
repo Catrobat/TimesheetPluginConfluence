@@ -14,11 +14,15 @@ AJS.toInit(function () {
 });
 
 function initButtons() {
-  AJS.$("#timesheet-hours").submit(function (e) {
+  AJS.$("#timesheet-information").submit(function (e) {
       e.preventDefault();
       if (AJS.$(document.activeElement).val() === 'Save') {
           getExistingTimesheetHours();
-      } else if (AJS.$(document.activeElement).val() === 'Show') {
+      }
+  });
+  AJS.$("#timesheet-settings").submit(function (e) {
+      e.preventDefault();
+      if (AJS.$(document.activeElement).val() === 'Show') {
           var selectedUser = AJS.$("#user-select2-field").val().split(',');
           getTimesheetOfUser(selectedUser);
       }

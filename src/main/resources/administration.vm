@@ -31,13 +31,10 @@
             <a href="#tabs-general"><strong>General Configuration</strong></a>
         </li>
         <li class="menu-item">
-            <a href="#tabs-permissions"><strong>Add/Remove Permissions</strong></a>
+            <a href="#tabs-teams"><strong>Add/Remove Team</strong></a>
         </li>
         <li class="menu-item">
-            <a href="#tabs-categories"><strong>Add/Remove Categories</strong></a>
-        </li>
-        <li class="menu-item">
-            <a href="#tabs-teams"><strong>Add/Remove Teams</strong></a>
+            <a href="#tabs-categories"><strong>Add/Remove Category</strong></a>
         </li>
     </ul>
     <div class="tabs-pane active-pane" id="tabs-general">
@@ -147,7 +144,7 @@
                 </div>
             </fieldset>
 
-            <h2>Permission Configuration</h2>
+            <h2>Team Configuration</h2>
 
             <div id="teams"></div>
             <div class="field-group">
@@ -155,26 +152,26 @@
             </div>
         </form>
     </div>
-    <div class="tabs-pane" id="tabs-permissions">
-        <h2>Permission Groups</h2>
+    <div class="tabs-pane" id="tabs-teams">
+        <h2>Team</h2>
         <p>
-            Removing a group just effects the configuration and no user will be modified.
+            Removing a team just effects the configuration and no user will be modified.
         </p>
-        <form id="modify-team-permissions" class="aui">
+        <form id="modify-team" class="aui">
             <fieldset>
                 <div class="field-group">
-                    <label for="team-permission">Permission name<span class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="text" id="team-permission" name="team-permission" title="team-permission">
+                    <label for="team-name">Team name<span class="aui-icon icon-required"> required</span></label>
+                    <input class="text" type="text" id="team-name" name="team-name" title="team-name">
                 </div>
                 <div class="field-group">
                     <input type="submit" value="Create" class="aui-button aui-button-primary">
-                    <input type="submit" value="Remove" id="removePermission" class="aui-button">
+                    <input type="submit" value="Remove" id="removeTeam" class="aui-button">
                 </div>
             </fieldset>
         </form>
     </div>
     <div class="tabs-pane" id="tabs-categories">
-        <h2>Categories</h2>
+        <h2>Category</h2>
         <p>
             Removing a category does not modify any user.
         </p>
@@ -187,25 +184,6 @@
                 <div class="field-group">
                     <input type="submit" value="Create" class="aui-button aui-button-primary">
                     <input type="submit" value="Remove" id="removeCategory" class="aui-button">
-                </div>
-            </fieldset>
-        </form>
-    </div>
-
-    <div class="tabs-pane" id="tabs-teams">
-        <h2>Teams</h2>
-        <p>
-            Removing a team does not modify any users.
-        </p>
-        <form id="modify-teamList" class="aui">
-            <fieldset>
-                <div class="field-group">
-                    <label for="team-name">Team name<span class="aui-icon icon-required"> required</span></label>
-                    <input class="text" type="text" id="team-name" name="team-name" title="team-name">
-                </div>
-                <div class="field-group">
-                    <input type="submit" value="Create" class="aui-button aui-button-primary">
-                    <input type="submit" value="Remove" id="removeTeam" class="aui-button">
                 </div>
             </fieldset>
         </form>

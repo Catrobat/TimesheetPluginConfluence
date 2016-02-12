@@ -16,11 +16,11 @@
 
 package org.catrobat.confluence.servlet;
 
-import com.atlassian.user.GroupManager;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.atlassian.user.GroupManager;
 import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
 
 import javax.servlet.ServletException;
@@ -29,17 +29,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AdminServlet extends HelperServlet {
-    private final TemplateRenderer renderer;
+  private final TemplateRenderer renderer;
 
-    public AdminServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
-                        WebSudoManager webSudoManager, GroupManager groupManager, AdminHelperConfigService configurationService) {
-        super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
-        this.renderer = renderer;
-    }
+  public AdminServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
+                      WebSudoManager webSudoManager, GroupManager groupManager, AdminHelperConfigService configurationService) {
+    super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
+    this.renderer = renderer;
+  }
 
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        super.doGet(request, response);
-        renderer.render("administration.vm", response.getWriter());
-    }
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    super.doGet(request, response);
+    renderer.render("administration.vm", response.getWriter());
+  }
 }

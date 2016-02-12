@@ -25,16 +25,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JsonTimesheet {
 
-	@XmlElement
-	private int timesheetID;
-	@XmlElement
-	private String lectures;
-	@XmlElement
-	private int targetHourPractice;
-	@XmlElement
-	private int targetHourTheory;
-	@XmlElement
-	private boolean isActive;
+  @XmlElement
+  private int timesheetID;
+  @XmlElement
+  private String lectures;
+  @XmlElement
+  private int targetHourPractice;
+  @XmlElement
+  private int targetHourTheory;
+  @XmlElement
+  private boolean isActive;
 
   public JsonTimesheet(int timesheetID, int targetHourPractice, int targetHourTheory, String lectures, boolean isActive) {
     this.timesheetID = timesheetID;
@@ -98,8 +98,8 @@ public final class JsonTimesheet {
     if (targetHourPractice != that.targetHourPractice) return false;
     if (targetHourTheory != that.targetHourTheory) return false;
     if (isActive != that.isActive) return false;
-    return lectures.equals(that.lectures);
 
+    return lectures.equals(that.lectures);
   }
 
   @Override

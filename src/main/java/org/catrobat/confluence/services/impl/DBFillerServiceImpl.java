@@ -1,24 +1,33 @@
+/*
+ * Copyright 2015 Christof Rabensteiner
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
-import org.catrobat.confluence.activeobjects.Category;
-import org.catrobat.confluence.activeobjects.CategoryToTeam;
-import org.catrobat.confluence.activeobjects.Team;
-import org.catrobat.confluence.activeobjects.Timesheet;
-import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.DBFillerService;
 import org.catrobat.confluence.services.TeamService;
 import org.catrobat.confluence.services.TimesheetService;
 
-/**
- * @author chri
- */
-public class DBFillerServiceImpl implements DBFillerService{
+public class DBFillerServiceImpl implements DBFillerService {
 
-  private final ActiveObjects ao; 
+  private final ActiveObjects ao;
   private final CategoryService cs;
   private final TeamService ts;
   private final TimesheetService tss;
@@ -51,7 +60,7 @@ public class DBFillerServiceImpl implements DBFillerService{
     Category c6 = cs.add("Other");
     Category c7 = cs.add("Planning Game");
     Category c8 = cs.add("Refactoring");
-    
+
     Team t1 = ts.add("Catroid");
     Team t2 = ts.add("HTML5Scratch");
     Team t3 = ts.add("IRC");
@@ -62,7 +71,7 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t1.setTeam(t1);
     c2t1.setCategory(c1);
     c2t1.save();
-    
+
     CategoryToTeam c2t2 = ao.create(CategoryToTeam.class);
     c2t2.setTeam(t1);
     c2t2.setCategory(c2);
@@ -72,7 +81,7 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t3.setTeam(t1);
     c2t3.setCategory(c3);
     c2t3.save();
-        
+
     CategoryToTeam c2t4 = ao.create(CategoryToTeam.class);
     c2t4.setTeam(t1);
     c2t4.setCategory(c4);
@@ -82,7 +91,7 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t5.setTeam(t1);
     c2t5.setCategory(c5);
     c2t5.save();
-    
+
     //categories of team2
     CategoryToTeam c2t6 = ao.create(CategoryToTeam.class);
     c2t6.setTeam(t2);
@@ -100,18 +109,18 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t9.setTeam(t2);
     c2t9.setCategory(c8);
     c2t9.save();
-    
+
     //team3
     CategoryToTeam c2t10 = ao.create(CategoryToTeam.class);
     c2t10.setTeam(t3);
     c2t10.setCategory(c6);
     c2t10.save();
-    
+
     CategoryToTeam c2t11 = ao.create(CategoryToTeam.class);
     c2t11.setTeam(t3);
     c2t11.setCategory(c7);
     c2t11.save();
-    
+
     //team arduino
     CategoryToTeam c2t12 = ao.create(CategoryToTeam.class);
     c2t12.setTeam(t4);
@@ -129,16 +138,16 @@ public class DBFillerServiceImpl implements DBFillerService{
     c2t15.setTeam(t4);
     c2t15.setCategory(c4);
     c2t15.save();
-    
+
     UserKey key = um.getRemoteUserKey();
-    if(key != null) {
+    if (key != null) {
       String userKey = key.getStringValue();
       Timesheet sheet = tss.add(userKey, 150, 0, "Project Softwareentwicklung");
       System.out.println("user key was " + userKey);
       System.out.println("created timesheet: " + sheet.getID());
-    } 
+    }
   }
-  
+
   @Override
   public void printDBStatus() {
     System.out.println("  Timesheet:      " + ao.find(Timesheet.class).length);

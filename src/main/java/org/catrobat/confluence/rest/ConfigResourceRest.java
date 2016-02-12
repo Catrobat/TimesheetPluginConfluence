@@ -66,7 +66,6 @@ public class ConfigResourceRest {
     this.permissionService = permissionService;
   }
 
-
   @GET
   @Path("/getCategories")
   public Response getCategories(@Context HttpServletRequest request) {
@@ -190,7 +189,7 @@ public class ConfigResourceRest {
       for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
         configService.removeTeam(jsonTeam.getTeamName());
         configService.addTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
-                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups());
+                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
       }
     }
 
@@ -206,7 +205,7 @@ public class ConfigResourceRest {
       return unauthorized;
     }
 
-    boolean successful = configService.addTeam(modifyTeam, null, null, null) != null;
+    boolean successful = configService.addTeam(modifyTeam, null, null, null, null) != null;
 
     if (successful)
       return Response.noContent().build();

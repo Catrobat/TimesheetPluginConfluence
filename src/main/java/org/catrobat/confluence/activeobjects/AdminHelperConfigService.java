@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Fellhofer
+ * Copyright 2016 Adrian Schnedlitz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,32 +22,37 @@ import java.util.List;
 
 @Transactional
 public interface AdminHelperConfigService {
-    AdminHelperConfig getConfiguration();
 
-    Team addTeam(String teamName, List<String> coordinatorGroups,
-                 List<String> seniorGroups, List<String> developerGroups);
+  AdminHelperConfig getConfiguration();
 
-    AdminHelperConfig editTeam(String oldTeamName, String newTeamName);
+  Team addTeam(String teamName, List<String> coordinatorGroups,
+               List<String> seniorGroups, List<String> developerGroups, List<String> teamCategoryNames);
 
-    AdminHelperConfig removeTeam(String teamName);
+  AdminHelperConfig editTeam(String oldTeamName, String newTeamName);
 
-    AdminHelperConfig editMail(String mailFromName, String mailFrom, String mailSubject, String mailBody);
+  AdminHelperConfig removeTeam(String teamName);
 
-    List<String> getGroupsForRole(String teamName, TeamToGroup.Role role);
+  AdminHelperConfig editMail(String mailFromName, String mailFrom, String mailSubject, String mailBody);
 
-    boolean isGroupApproved(String groupName);
+  List<String> getGroupsForRole(String teamName, TeamToGroup.Role role);
 
-    boolean isUserApproved(String userKey);
+  List<String> getCategoryNamesForTeam(String teamName);
 
-    ApprovedGroup addApprovedGroup(String approvedGroupName);
+  int[] getCategoryIDsForTeam(String teamName);
 
-    AdminHelperConfig removeApprovedGroup(String approvedGroupName);
+  boolean isGroupApproved(String groupName);
 
-    ApprovedUser addApprovedUser(String approvedUserKey);
+  boolean isUserApproved(String userKey);
 
-    AdminHelperConfig removeApprovedUser(String approvedUserKey);
+  ApprovedGroup addApprovedGroup(String approvedGroupName);
 
-    void clearApprovedGroups();
+  AdminHelperConfig removeApprovedGroup(String approvedGroupName);
 
-    void clearApprovedUsers();
+  ApprovedUser addApprovedUser(String approvedUserKey);
+
+  AdminHelperConfig removeApprovedUser(String approvedUserKey);
+
+  void clearApprovedGroups();
+
+  void clearApprovedUsers();
 }

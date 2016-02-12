@@ -40,13 +40,19 @@ AJS.toInit(function () {
     function fetchData() {
         fetchTeamsAndCategories();
 
-        var allUsers = AJS.$.ajax({
+        var allUsersFetched = AJS.$.ajax({
             type: 'GET',
             url: restBaseUrl + 'user/getUsers',
             contentType: "application/json"
         });
 
-        AJS.$.when(allUsers)
+        var categoriesFetched = AJS.$.ajax({
+             type: 'GET',
+             url: restBaseUrl + 'config/getCategories',
+             contentType: "application/json"
+        });
+
+        AJS.$.when(allUsersFetched, categoriesFetched)
             .done(populateForm)
             .fail(function (error) {
                 AJS.messages.error({
@@ -106,7 +112,7 @@ AJS.toInit(function () {
         AJS.$(".loadingDiv").hide();
     }
 
-    function populateForm(allUsers) {
+    function populateForm(allUsers, allCategories) {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
             url: restBaseUrl + 'config/getConfig',
@@ -126,6 +132,7 @@ AJS.toInit(function () {
                 for (var i = 0; i < config.teams.length; i++) {
                     var team = config.teams[i];
                     teams.push(team['teamName']);
+
                     var tempTeamName = team['teamName'].replace(/\W/g, '-');
                     AJS.$("#teams").append("<h3>" + team['teamName'] +
                     "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
@@ -133,12 +140,18 @@ AJS.toInit(function () {
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-coordinator\">Coordinator</label><input class=\"text coordinator\" type=\"text\" id=\"" + tempTeamName + "-coordinator\" value=\"" + team['coordinatorGroups'] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-senior\">Senior</label><input class=\"text senior\" type=\"text\" id=\"" + tempTeamName + "-senior\" value=\"" + team['seniorGroups'] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-developer\">User</label><input class=\"text user\" type=\"text\" id=\"" + tempTeamName + "-developer\" value=\"" + team['developerGroups'] + "\"></div>");
+                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-category\">Category</label><input class=\"text category\" type=\"text\" id=\"" + tempTeamName + "-category\" value=\"" + team['teamCategoryNames'] + "\"></div>");
                     AJS.$("#teams").append("</fieldset>");
                 }
 
                 var userNameList = [];
-                for (var i = 0; i < allUsers.length; i++) {
-                    userNameList.push(allUsers[i]['userName']);
+                for (var i = 0; i < allUsers[0].length; i++) {
+                    userNameList.push(allUsers[0][i]['userName']);
+                }
+
+                var categoryList = [];
+                for (var i = 0; i < allCategories[0].length; i++) {
+                    categoryList.push(allCategories[0][i]['categoryName']);
                 }
 
                 if (config.approvedUsers) {
@@ -155,6 +168,11 @@ AJS.toInit(function () {
                     AJS.$(".user").auiSelect2({
                         placeholder: "Search for user",
                         tags: userNameList.sort(),
+                        tokenSeparators: [",", " "]
+                    });
+                    AJS.$(".category").auiSelect2({
+                        placeholder: "Search for category",
+                        tags: categoryList.sort(),
                         tokenSeparators: [",", " "]
                     });
                 }
@@ -309,6 +327,11 @@ AJS.toInit(function () {
             tempTeam.developerGroups = AJS.$("#" + tempTeamName + "-developer").auiSelect2("val");
             for (var j = 0; j < tempTeam.developerGroups.length; j++) {
                 tempTeam.developerGroups[j] = tempTeam.developerGroups[j].replace(/^groups-/i, "");
+            }
+
+            tempTeam.teamCategoryNames = AJS.$("#" + tempTeamName + "-category").auiSelect2("val");
+            for (var j = 0; j < tempTeam.teamCategoryNames.length; j++) {
+                tempTeam.teamCategoryNames[j] = tempTeam.teamCategoryNames[j].replace(/^groups-/i, "");
             }
             config.teams.push(tempTeam);
         }

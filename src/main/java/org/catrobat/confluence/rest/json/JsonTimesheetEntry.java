@@ -15,12 +15,11 @@
  */
 package org.catrobat.confluence.rest.json;
 
-import java.util.Date;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Date;
 
 @SuppressWarnings("unused")
 @XmlRootElement
@@ -28,25 +27,25 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public final class JsonTimesheetEntry {
 
   @XmlElement
-	private int entryID;
-	
-  @XmlElement
-	private Date beginDate;
+  private int entryID;
 
   @XmlElement
-	private Date endDate;
+  private Date beginDate;
 
   @XmlElement
-	private int pauseMinutes;
-	
+  private Date endDate;
+
   @XmlElement
-	private String description;
-	
+  private int pauseMinutes;
+
   @XmlElement
-	private int teamID;
-  
+  private String description;
+
   @XmlElement
-	private int categoryID;
+  private int teamID;
+
+  @XmlElement
+  private int categoryID;
 
   @XmlElement
   private boolean isGoogleDocImport;
@@ -65,7 +64,7 @@ public final class JsonTimesheetEntry {
     this.categoryID = categoryID;
     this.isGoogleDocImport = isGoogleDocImport;
   }
-  
+
   public int getEntryID() {
     return entryID;
   }
@@ -144,8 +143,8 @@ public final class JsonTimesheetEntry {
     if (isGoogleDocImport != that.isGoogleDocImport) return false;
     if (!beginDate.equals(that.beginDate)) return false;
     if (!endDate.equals(that.endDate)) return false;
-    return description.equals(that.description);
 
+    return description.equals(that.description);
   }
 
   @Override
@@ -157,15 +156,16 @@ public final class JsonTimesheetEntry {
     result = 31 * result + description.hashCode();
     result = 31 * result + teamID;
     result = 31 * result + categoryID;
+
     return result;
   }
 
-	public String toReadableString() {
-		return beginDate + " - " + endDate + ": " + description + 
-				"; TeamID: " + teamID + "; CategoryID: " + categoryID
+  public String toReadableString() {
+    return beginDate + " - " + endDate + ": " + description +
+            "; TeamID: " + teamID + "; CategoryID: " + categoryID
             + "; isGoogleDocImport: " + isGoogleDocImport;
-	}
-	
+  }
+
   @Override
   public String toString() {
     return "JsonTimesheetEntry{" +

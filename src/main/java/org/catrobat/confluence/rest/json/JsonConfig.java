@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Fellhofer
+ * Copyright 2016 Adrian Schnedlitz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,119 +32,119 @@ import java.util.TreeMap;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JsonConfig {
 
-    @XmlElement
-    private List<JsonTeam> teams;
-    @XmlElement
-    private List<String> approvedGroups;
-    @XmlElement
-    private List<String> approvedUsers;
-    @XmlElement
-    private long userDirectoryId;
-    @XmlElement
-    private String mailFromName;
-    @XmlElement
-    private String mailFrom;
-    @XmlElement
-    private String mailSubject;
-    @XmlElement
-    private String mailBody;
+  @XmlElement
+  private List<JsonTeam> teams;
+  @XmlElement
+  private List<String> approvedGroups;
+  @XmlElement
+  private List<String> approvedUsers;
+  @XmlElement
+  private long userDirectoryId;
+  @XmlElement
+  private String mailFromName;
+  @XmlElement
+  private String mailFrom;
+  @XmlElement
+  private String mailSubject;
+  @XmlElement
+  private String mailBody;
 
-    public JsonConfig() {
+  public JsonConfig() {
 
+  }
+
+  public JsonConfig(AdminHelperConfigService configService) {
+    AdminHelperConfig toCopy = configService.getConfiguration();
+
+    Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
+    for (Team team : toCopy.getTeams()) {
+      teamMap.put(team.getTeamName(), new JsonTeam(team, configService));
     }
 
-    public JsonConfig(AdminHelperConfigService configService) {
-        AdminHelperConfig toCopy = configService.getConfiguration();
+    this.teams = new ArrayList<JsonTeam>();
+    this.teams.addAll(teamMap.values());
 
-        Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
-        for (Team team : toCopy.getTeams()) {
-            teamMap.put(team.getTeamName(), new JsonTeam(team, configService));
-        }
-
-        this.teams = new ArrayList<JsonTeam>();
-        this.teams.addAll(teamMap.values());
-
-        //ToDO: not correct
-        this.approvedUsers = new ArrayList<String>();
-        for (ApprovedUser approvedUser : toCopy.getApprovedUsers()) {
-            if (approvedUser.getUserKey() != null) {
-                approvedUsers.add(approvedUser.getUserKey());
-            }
-        }
-
-        this.approvedGroups = new ArrayList<String>();
-        for (ApprovedGroup approvedGroup : toCopy.getApprovedGroups()) {
-            approvedGroups.add(approvedGroup.getGroupName());
-        }
-
-        this.userDirectoryId = toCopy.getUserDirectoryId();
-        this.mailFromName = toCopy.getMailFromName();
-        this.mailFrom = toCopy.getMailFrom();
-        this.mailSubject = toCopy.getMailSubject();
-        this.mailBody = toCopy.getMailBody();
+    //ToDO: not correct
+    this.approvedUsers = new ArrayList<String>();
+    for (ApprovedUser approvedUser : toCopy.getApprovedUsers()) {
+      if (approvedUser.getUserKey() != null) {
+        approvedUsers.add(approvedUser.getUserKey());
+      }
     }
 
-    public List<JsonTeam> getTeams() {
-        return teams;
+    this.approvedGroups = new ArrayList<String>();
+    for (ApprovedGroup approvedGroup : toCopy.getApprovedGroups()) {
+      approvedGroups.add(approvedGroup.getGroupName());
     }
 
-    public void setTeams(List<JsonTeam> teams) {
-        this.teams = teams;
-    }
+    this.userDirectoryId = toCopy.getUserDirectoryId();
+    this.mailFromName = toCopy.getMailFromName();
+    this.mailFrom = toCopy.getMailFrom();
+    this.mailSubject = toCopy.getMailSubject();
+    this.mailBody = toCopy.getMailBody();
+  }
 
-    public List<String> getApprovedGroups() {
-        return approvedGroups;
-    }
+  public List<JsonTeam> getTeams() {
+    return teams;
+  }
 
-    public void setApprovedGroups(List<String> approvedGroups) {
-        this.approvedGroups = approvedGroups;
-    }
+  public void setTeams(List<JsonTeam> teams) {
+    this.teams = teams;
+  }
 
-    public List<String> getApprovedUsers() {
-        return approvedUsers;
-    }
+  public List<String> getApprovedGroups() {
+    return approvedGroups;
+  }
 
-    public void setApprovedUsers(List<String> approvedUsers) {
-        this.approvedUsers = approvedUsers;
-    }
+  public void setApprovedGroups(List<String> approvedGroups) {
+    this.approvedGroups = approvedGroups;
+  }
 
-    public long getUserDirectoryId() {
-        return userDirectoryId;
-    }
+  public List<String> getApprovedUsers() {
+    return approvedUsers;
+  }
 
-    public void setUserDirectoryId(long userDirectoryId) {
-        this.userDirectoryId = userDirectoryId;
-    }
+  public void setApprovedUsers(List<String> approvedUsers) {
+    this.approvedUsers = approvedUsers;
+  }
 
-    public String getMailFromName() {
-        return mailFromName;
-    }
+  public long getUserDirectoryId() {
+    return userDirectoryId;
+  }
 
-    public void setMailFromName(String mailFromName) {
-        this.mailFromName = mailFromName;
-    }
+  public void setUserDirectoryId(long userDirectoryId) {
+    this.userDirectoryId = userDirectoryId;
+  }
 
-    public String getMailFrom() {
-        return mailFrom;
-    }
+  public String getMailFromName() {
+    return mailFromName;
+  }
 
-    public void setMailFrom(String mailFrom) {
-        this.mailFrom = mailFrom;
-    }
+  public void setMailFromName(String mailFromName) {
+    this.mailFromName = mailFromName;
+  }
 
-    public String getMailSubject() {
-        return mailSubject;
-    }
+  public String getMailFrom() {
+    return mailFrom;
+  }
 
-    public void setMailSubject(String mailSubject) {
-        this.mailSubject = mailSubject;
-    }
+  public void setMailFrom(String mailFrom) {
+    this.mailFrom = mailFrom;
+  }
 
-    public String getMailBody() {
-        return mailBody;
-    }
+  public String getMailSubject() {
+    return mailSubject;
+  }
 
-    public void setMailBody(String mailBody) {
-        this.mailBody = mailBody;
-    }
+  public void setMailSubject(String mailSubject) {
+    this.mailSubject = mailSubject;
+  }
+
+  public String getMailBody() {
+    return mailBody;
+  }
+
+  public void setMailBody(String mailBody) {
+    this.mailBody = mailBody;
+  }
 }

@@ -1,28 +1,46 @@
+/*
+ * Copyright 2016 Adrian Schnedlitz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.catrobat.confluence.rest.json;
 
 import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.TeamToGroup;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("unused")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JsonTeam {
-  
+
   @XmlElement
-	private int teamID;
+  private int teamID;
   @XmlElement
-	private String teamName;
+  private String teamName;
   @XmlElement
-	private int[] teamCategories;
+  private int[] teamCategories;
+  @XmlElement
+  private List<String> teamCategoryNames;
   @XmlElement
   private List<String> coordinatorGroups;
   @XmlElement
@@ -31,7 +49,7 @@ public class JsonTeam {
   private List<String> developerGroups;
 
   public JsonTeam() {
-
+    
   }
 
   public JsonTeam(int teamID, String teamName, int[] teamCategories) {
@@ -52,6 +70,7 @@ public class JsonTeam {
     this.coordinatorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.COORDINATOR);
     this.seniorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.SENIOR);
     this.developerGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.DEVELOPER);
+    this.teamCategoryNames = configService.getCategoryNamesForTeam(this.teamName);
   }
 
   public int getTeamID() {
@@ -70,12 +89,12 @@ public class JsonTeam {
     this.teamName = teamName;
   }
 
-  public int[] getTeamCategories() {
-    return teamCategories;
+  public List<String> getTeamCategoryNames() {
+    return teamCategoryNames;
   }
 
-  public void setTeamCategories(int[] teamCategories) {
-    this.teamCategories = teamCategories;
+  public void setTeamCategoryNames(List<String> teamCategoryNames) {
+    this.teamCategoryNames = teamCategoryNames;
   }
 
   public List<String> getCoordinatorGroups() {

@@ -9,17 +9,23 @@ var listOfUsers = [];
 AJS.toInit(function () {
 	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
 	restBaseUrl = baseUrl + "/rest/timesheet/latest/";
+
+	initSaveButton();
+
 	fetchUsers();
 	fetchData();
 });
 
-function initButtons() {
+function initSaveButton() {
   AJS.$("#timesheet-information").submit(function (e) {
       e.preventDefault();
       if (AJS.$(document.activeElement).val() === 'Save') {
           getExistingTimesheetHours();
       }
   });
+}
+
+function initSelectTimesheetButton(){
   AJS.$("#timesheet-settings").submit(function (e) {
       e.preventDefault();
       if (AJS.$(document.activeElement).val() === 'Show') {
@@ -61,7 +67,7 @@ function initUserSelect(jsonConfig, jsonUser) {
     });
 
     if(isTeamCoordinator){
-        initButtons();
+        initSelectTimesheetButton();
         AJS.$("#selectTimesheetOfUser").show();
     } else {
         AJS.$("#selectTimesheetOfUser").hide();

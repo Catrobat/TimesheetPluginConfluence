@@ -1,9 +1,31 @@
+/*
+ * Copyright 2016 Adrian Schnedlitz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.catrobat.confluence.servlet;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
+import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserProfile;
+import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.Maps;
-import javax.servlet.*;
+import org.catrobat.confluence.activeobjects.Timesheet;
+import org.catrobat.confluence.services.PermissionService;
+import org.catrobat.confluence.services.TimesheetService;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,45 +33,39 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import com.atlassian.sal.api.auth.LoginUriProvider;
-import com.atlassian.templaterenderer.TemplateRenderer;
-import org.catrobat.confluence.activeobjects.Timesheet;
-import org.catrobat.confluence.services.PermissionService;
-import org.catrobat.confluence.services.TimesheetService;
-
 public class TimesheetServlet extends HttpServlet {
 
   private final LoginUriProvider loginUriProvider;
   private final TemplateRenderer templateRenderer;
-  private final TimesheetService sheetService; 
-	private final PermissionService permissionService;
+  private final TimesheetService sheetService;
+  private final PermissionService permissionService;
 
-	public TimesheetServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
-		this.loginUriProvider = loginUriProvider;
-		this.templateRenderer = templateRenderer;
-		this.sheetService = sheetService;
-		this.permissionService = permissionService;
-	}
+  public TimesheetServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
+    this.loginUriProvider = loginUriProvider;
+    this.templateRenderer = templateRenderer;
+    this.sheetService = sheetService;
+    this.permissionService = permissionService;
+  }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
-			UserProfile userProfile = permissionService.checkIfUserExists(request);
-			String userKey = userProfile.getUserKey().getStringValue(); 
-			Timesheet sheet = sheetService.getTimesheetByUser(userKey);
-			
-			if(sheet == null) {
-				sheet = sheetService.add(userKey, 150, 0, "");
-			}
-			
-			Map<String, Object> paramMap = Maps.newHashMap();
-			paramMap.put("timesheetid", sheet.getID());
-			response.setContentType("text/html;charset=utf-8");
-			templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
-		
-		} catch (NotAuthorizedException e) {
-			redirectToLogin(request, response);
-		}
+      UserProfile userProfile = permissionService.checkIfUserExists(request);
+      String userKey = userProfile.getUserKey().getStringValue();
+      Timesheet sheet = sheetService.getTimesheetByUser(userKey);
+
+      if (sheet == null) {
+        sheet = sheetService.add(userKey, 150, 0, "");
+      }
+
+      Map<String, Object> paramMap = Maps.newHashMap();
+      paramMap.put("timesheetid", sheet.getID());
+      response.setContentType("text/html;charset=utf-8");
+      templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
+
+    } catch (NotAuthorizedException e) {
+      redirectToLogin(request, response);
+    }
   }
 
   private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {

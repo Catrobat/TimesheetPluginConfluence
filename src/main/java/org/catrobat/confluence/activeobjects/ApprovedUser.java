@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Fellhofer
+ * Copyright 2016 Adrian Schnedlitz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,12 @@ import net.java.ao.Preload;
 
 @Preload
 public interface ApprovedUser extends Entity {
-    AdminHelperConfig getConfiguration();
 
-    void setConfiguration(AdminHelperConfig configuration);
+  AdminHelperConfig getConfiguration();
 
-    String getUserKey();
+  void setConfiguration(AdminHelperConfig configuration);
 
-    void setUserKey(String userKey);
+  String getUserKey();
+
+  void setUserKey(String userKey);
 }

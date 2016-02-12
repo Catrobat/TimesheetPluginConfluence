@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Stephan Fellhofer
+ * Copyright 2016 Adrian Schnedlitz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,14 @@ import net.java.ao.Preload;
 
 @Preload
 public interface Group extends Entity {
-    String getGroupName();
 
-    void setGroupName(String groupName);
+  String getGroupName();
 
-    @OneToMany(reverse = "getGroup")
-    TeamToGroup[] getTeamToGroups();
+  void setGroupName(String groupName);
 
-    @ManyToMany(value = TeamToGroup.class, reverse = "getGroup", through = "getTeam")
-    Team[] getTeams();
+  @OneToMany(reverse = "getGroup")
+  TeamToGroup[] getTeamToGroups();
+
+  @ManyToMany(value = TeamToGroup.class, reverse = "getGroup", through = "getTeam")
+  Team[] getTeams();
 }

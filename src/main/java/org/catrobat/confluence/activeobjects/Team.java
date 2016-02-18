@@ -26,9 +26,9 @@ public interface Team extends Entity {
 
   void setTeamName(String name);
 
-  AdminHelperConfig getConfiguration();
+  Config getConfiguration();
 
-  void setConfiguration(AdminHelperConfig configuration);
+  void setConfiguration(Config configuration);
 
   @ManyToMany(value = TeamToGroup.class, reverse = "getTeam", through = "getGroup")
   Group[] getGroups();

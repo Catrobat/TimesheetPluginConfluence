@@ -72,7 +72,7 @@
                 </div>
             </fieldset>
 
-            <h2>Welcome E-Mail</h2>
+            <h2>E-Mail Notifications</h2>
             <fieldset>
                 <div class="field-group">
                     <label for="mail-">From Name</label>
@@ -93,63 +93,92 @@
                     </div>
                 </div>
             </fieldset>
+
+            <h3>Out Of Time</h3>
             <fieldset>
                 <div class="field-group">
-                    <label for="mail-subject">Subject</label>
-                    <input class="text" type="text" id="mail-subject" name="mail-subject"
-                           title="mail-subject">
+                    <label for="mail-subject-out-of-time">Subject</label>
+                    <input class="text" type="text" id="mail-subject-out-of-time" name="mail-subject-out-of-time"
+                           title="mail-subject-out-of-time">
                     <div class="description">
-                        The subject of the mail.
+                        The subject of the mail, if a student has no time left.
                     </div>
                 </div>
             </fieldset>
             <fieldset>
                 <div class="field-group">
-                    <label for="mail-body">Body</label>
-                    <textarea name="mail-body" id="mail-body"></textarea>
+                    <label for="mail-body-out-of-time">Body</label>
+                    <textarea name="mail-body-out-of-time" id="mail-body-out-of-time"></textarea>
                     <div class="description">
-                        The actual text of the mail. Following strings will be replaced by Jira:
+                        The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>
-                            <li><span class="mono">{{name}}</span>: The name of the new user</li>
-                            <li><span class="mono">{{username}}</span>: The username of the new user</li>
-                            <li><span class="mono">{{password}}</span>: The password for the new user</li>
+                            <li><span class="mono">{{name}}</span>: The name of the user</li>
+                            <li><span class="mono">{{time}}</span>: The remaining timesheet hours of the user</li>
                         </ul>
                     </div>
                 </div>
             </fieldset>
 
-            <h2>Available Teams</h2>
-            <fieldset>
-                <div class="field-group">
-                    <label for="available-teams">Available Teams</label>
-                    <input class="text" type="text" id="available-teams" name="available-teams"
-                           title="available-teams">
+           <h3>Inactive</h3>
+           <fieldset>
+               <div class="field-group">
+                   <label for="mail-subject-inactive">Subject</label>
+                   <input class="text" type="text" id="mail-subject-inactive" name="mail-subject-inactive"
+                          title="mail-subject-inactive">
+                   <div class="description">
+                       The subject of the mail, if a student was not active since two weeks.
+                   </div>
+               </div>
+           </fieldset>
+           <fieldset>
+               <div class="field-group">
+                   <label for="mail-body-inactive">Body</label>
+                   <textarea name="mail-body-inactive" id="mail-body-inactive"></textarea>
+                   <div class="description">
+                       The text of the mail. Following strings will be replaced by Confluence automatically:
+                       <ul>
+                           <li><span class="mono">{{name}}</span>: The name of the user</li>
+                           <li><span class="mono">{{date}}</span>: The date of the users last entry</li>
+                       </ul>
+                   </div>
+               </div>
+           </fieldset>
 
-                    <div class="description">
-                        Shows available teams.
-                    </div>
-                </div>
-            </fieldset>
+           <h3>Administrator Changed Timesheet Entry</h3>
+           <fieldset>
+               <div class="field-group">
+                   <label for="mail-subject-entry-change">Subject</label>
+                       <input class="text" type="text" id="mail-subject-entry-change" name="mail-subject-entry-change"
+                              title="mail-subject-entry-change">
+                   <div class="description">
+                       The subject of the mail, if an administrator changed an user timesheet entry.
+                   </div>
+               </div>
+           </fieldset>
+           <fieldset>
+               <div class="field-group">
+                   <label for="mail-body-entry-change">Body</label>
+                   <textarea name="mail-body-entry-change" id="mail-body-entry-change"></textarea>
+                   <div class="description">
+                       The text of the mail. Following strings will be replaced by Confluence automatically:
+                       <ul>
+                           <li><span class="mono">{{name}}</span>: The name of the user</li>
+                           <li><span class="mono">{{original}}</span>: The original user entry</li>
+                           <li><span class="mono">{{actual}}</span>: The actual user entry (changed by the Administrator)</li>
+                       </ul>
+                   </div>
+               </div>
+           </fieldset>
 
-            <h2>Available Categories</h2>
-            <fieldset>
-                <div class="field-group">
-                    <label for="availabe-categories">Available Categories</label>
-                    <input class="text" type="text" id="available-categories" name="available-categories"
-                           title="available-categories">
+           <h2>Export</h2>
+           <p>Download all user timesheets as <a href="download/all">CSV</a>.</p>
 
-                    <div class="description">
-                        Shows available categories.
-                    </div>
-                </div>
-            </fieldset>
+           <h2>Team Configuration</h2>
 
-            <h2>Team Configuration</h2>
-
-            <div id="teams"></div>
-            <div class="field-group">
-                <input type="submit" value="Save" class="aui-button aui-button-primary">
-            </div>
+           <div id="teams"></div>
+           <div class="field-group">
+               <input type="submit" value="Save" class="aui-button aui-button-primary">
+           </div>
         </form>
     </div>
     <div class="tabs-pane" id="tabs-teams">

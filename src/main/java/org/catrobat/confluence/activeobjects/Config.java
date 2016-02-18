@@ -22,7 +22,7 @@ import net.java.ao.Preload;
 import net.java.ao.schema.StringLength;
 
 @Preload
-public interface AdminHelperConfig extends Entity {
+public interface Config extends Entity {
 
   long getUserDirectoryId();
 
@@ -37,16 +37,40 @@ public interface AdminHelperConfig extends Entity {
   void setMailFrom(String from);
 
   @StringLength(StringLength.UNLIMITED)
-  String getMailSubject();
+  String getMailSubjectTime();
 
   @StringLength(StringLength.UNLIMITED)
-  void setMailSubject(String subject);
+  void setMailSubjectTime(String subject);
 
   @StringLength(StringLength.UNLIMITED)
-  String getMailBody();
+  String getMailSubjectInactive();
 
   @StringLength(StringLength.UNLIMITED)
-  void setMailBody(String body);
+  void setMailSubjectInactive(String subject);
+
+  @StringLength(StringLength.UNLIMITED)
+  String getMailSubjectEntry();
+
+  @StringLength(StringLength.UNLIMITED)
+  void setMailSubjectEntry(String subject);
+
+  @StringLength(StringLength.UNLIMITED)
+  String getMailBodyTime();
+
+  @StringLength(StringLength.UNLIMITED)
+  void setMailBodyTime(String body);
+
+  @StringLength(StringLength.UNLIMITED)
+  String getMailBodyInactive();
+
+  @StringLength(StringLength.UNLIMITED)
+  void setMailBodyInactive(String body);
+
+  @StringLength(StringLength.UNLIMITED)
+  String getMailBodyEntry();
+
+  @StringLength(StringLength.UNLIMITED)
+  void setMailBodyEntry(String body);
 
   @OneToMany(reverse = "getConfiguration")
   ApprovedGroup[] getApprovedGroups();

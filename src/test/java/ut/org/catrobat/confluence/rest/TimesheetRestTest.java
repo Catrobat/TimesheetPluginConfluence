@@ -40,7 +40,8 @@ public class TimesheetRestTest {
   private TimesheetEntryService entryService;
   private Team team;
   private DBFillerService dbFillerService;
-  private AdminHelperConfigService adminHelperConfigService;
+  private ConfigService configService;
+  private MailService mailService;
 
   private SimpleDateFormat sdf;
 
@@ -60,9 +61,10 @@ public class TimesheetRestTest {
     timeSheetEntry = Mockito.mock(TimesheetEntry.class);
     team = Mockito.mock(Team.class);
     dbFillerService = Mockito.mock(DBFillerServiceImpl.class);
-    adminHelperConfigService = Mockito.mock(AdminHelperConfigService.class);
+    configService = Mockito.mock(ConfigService.class);
+    mailService = Mockito.mock(MailService.class);
 
-    timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller, adminHelperConfigService);
+    timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller, configService, mailService);
     Mockito.when(permissionService.checkIfUserExists(request)).thenReturn(userProfile);
     Mockito.when(userProfile.getUsername()).thenReturn("testUser");
     Mockito.when(permissionService.userCanViewTimesheet(userProfile, timeSheet)).thenReturn(true);

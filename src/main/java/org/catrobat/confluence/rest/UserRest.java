@@ -17,7 +17,6 @@
 package org.catrobat.confluence.rest;
 
 import com.atlassian.confluence.user.UserAccessor;
-import com.atlassian.core.user.preferences.UserPreferences;
 import com.atlassian.crowd.embedded.api.PasswordCredential;
 import com.atlassian.crowd.exception.*;
 import com.atlassian.crowd.exception.embedded.InvalidGroupException;
@@ -30,12 +29,11 @@ import com.atlassian.mail.MailException;
 import com.atlassian.mail.queue.SingleMailQueueItem;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.user.Group;
-import com.atlassian.user.GroupManager;
 import com.atlassian.user.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.catrobat.confluence.activeobjects.AdminHelperConfig;
-import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
+import org.catrobat.confluence.activeobjects.Config;
+import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.rest.json.JsonConfig;
 import org.catrobat.confluence.rest.json.JsonUser;
 import org.catrobat.confluence.services.TeamService;
@@ -54,12 +52,12 @@ import java.util.TreeMap;
 @Path("/user")
 public class UserRest extends PermissionServiceImpl {
   public static final String DISABLED_GROUP = "Disabled";
-  private final AdminHelperConfigService configService;
+  private final ConfigService configService;
   private final DirectoryManager directoryManager;
   private final UserAccessor userAccessor;
   private final UserManager userManager;
 
-  public UserRest(final UserManager userManager, final AdminHelperConfigService configService, final TeamService teamService,
+  public UserRest(final UserManager userManager, final ConfigService configService, final TeamService teamService,
                   final DirectoryManager directoryManager, final UserAccessor userAccessor) {
     super(userManager, teamService, configService, userAccessor);
     this.configService = configService;
@@ -127,7 +125,7 @@ public class UserRest extends PermissionServiceImpl {
   }
 
   private void sendEmail(String name, String username, String emailAddress, String password) {
-    AdminHelperConfig config = configService.getConfiguration();
+    Config config = configService.getConfiguration();
 
     Email email = new Email(emailAddress);
     email.setFromName(config.getMailFromName() != null && config.getMailFromName().length() != 0 ?
@@ -136,10 +134,10 @@ public class UserRest extends PermissionServiceImpl {
             config.getMailFrom() : "no-reply@catrob.at");
     email.setEncoding("UTF-8");
     email.setMimeType("text/plain");
-    email.setSubject(config.getMailSubject() != null && config.getMailSubject().length() != 0
-            ? config.getMailSubject() : "Welcome to Catrobat");
+    email.setSubject(config.getMailSubjectTime() != null && config.getMailSubjectTime().length() != 0
+            ? config.getMailSubjectTime() : "Welcome to Catrobat");
 
-    String body = config.getMailBody();
+    String body = config.getMailBodyTime();
     if (body == null || body.length() == 0) {
       email.setBody("Hi " + name + ",\n" +
               "Your account has been created and you may login to Jira " +

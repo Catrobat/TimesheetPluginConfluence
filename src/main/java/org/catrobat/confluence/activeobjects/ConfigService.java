@@ -21,18 +21,20 @@ import com.atlassian.activeobjects.tx.Transactional;
 import java.util.List;
 
 @Transactional
-public interface AdminHelperConfigService {
+public interface ConfigService {
 
-  AdminHelperConfig getConfiguration();
+  Config getConfiguration();
 
   Team addTeam(String teamName, List<String> coordinatorGroups,
                List<String> seniorGroups, List<String> developerGroups, List<String> teamCategoryNames);
 
-  AdminHelperConfig editTeam(String oldTeamName, String newTeamName);
+  Config editTeam(String oldTeamName, String newTeamName);
 
-  AdminHelperConfig removeTeam(String teamName);
+  Config removeTeam(String teamName);
 
-  AdminHelperConfig editMail(String mailFromName, String mailFrom, String mailSubject, String mailBody);
+  Config editMail(String mailFromName, String mailFrom, String mailSubjectTime,
+                  String mailSubjectInactive, String mailSubjectEntry,
+                  String mailBodyTime, String mailBodyInactive, String mailBodyEntry);
 
   List<String> getGroupsForRole(String teamName, TeamToGroup.Role role);
 
@@ -46,11 +48,11 @@ public interface AdminHelperConfigService {
 
   ApprovedGroup addApprovedGroup(String approvedGroupName);
 
-  AdminHelperConfig removeApprovedGroup(String approvedGroupName);
+  Config removeApprovedGroup(String approvedGroupName);
 
   ApprovedUser addApprovedUser(String approvedUserKey);
 
-  AdminHelperConfig removeApprovedUser(String approvedUserKey);
+  Config removeApprovedUser(String approvedUserKey);
 
   void clearApprovedGroups();
 

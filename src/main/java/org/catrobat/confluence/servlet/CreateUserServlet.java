@@ -21,7 +21,7 @@ import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.user.GroupManager;
-import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
+import org.catrobat.confluence.activeobjects.ConfigService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class CreateUserServlet extends HelperServlet {
   private final TemplateRenderer renderer;
 
   public CreateUserServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
-                           WebSudoManager webSudoManager, GroupManager groupManager, AdminHelperConfigService configurationService) {
+                           WebSudoManager webSudoManager, GroupManager groupManager, ConfigService configurationService) {
     super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
     this.renderer = renderer;
   }

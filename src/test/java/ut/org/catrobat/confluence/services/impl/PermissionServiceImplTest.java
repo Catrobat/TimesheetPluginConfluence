@@ -49,7 +49,7 @@ public class PermissionServiceImplTest {
   private TimesheetService sheetService;
   private TimesheetEntryService entryService;
   private SimpleDateFormat sdf;
-  private AdminHelperConfigService adminHelperConfig;
+  private ConfigService config;
   private UserAccessor userAccessor;
 
   @Before
@@ -57,12 +57,12 @@ public class PermissionServiceImplTest {
   {
     teamService = Mockito.mock(TeamService.class);
     userManager = Mockito.mock(UserManager.class);
-    adminHelperConfig = Mockito.mock(AdminHelperConfigService.class);
+    config = Mockito.mock(ConfigService.class);
     userAccessor = Mockito.mock(UserAccessor.class);
 
     assertNotNull(entityManager);
 
-    permissionService = new PermissionServiceImpl(userManager, teamService, adminHelperConfig, userAccessor);
+    permissionService = new PermissionServiceImpl(userManager, teamService, config, userAccessor);
 
     //arrange
     coord = Mockito.mock(UserProfile.class);

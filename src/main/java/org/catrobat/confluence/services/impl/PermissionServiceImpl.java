@@ -37,14 +37,14 @@ public class PermissionServiceImpl implements PermissionService {
 
   private final UserManager userManager;
   private final TeamService teamService;
-  private final AdminHelperConfigService adminHelperConfigService;
+  private final ConfigService configService;
   private final UserAccessor userAccessor;
 
   public PermissionServiceImpl(UserManager userManager, TeamService teamService,
-                               AdminHelperConfigService adminHelperConfigService, UserAccessor userAccessor) {
+                               ConfigService configService, UserAccessor userAccessor) {
     this.userManager = userManager;
     this.teamService = teamService;
-    this.adminHelperConfigService = adminHelperConfigService;
+    this.configService = configService;
     this.userAccessor = userAccessor;
   }
 
@@ -93,18 +93,18 @@ public class PermissionServiceImpl implements PermissionService {
       return false;
     }
 
-    AdminHelperConfig config = adminHelperConfigService.getConfiguration();
+    Config config = configService.getConfiguration();
     if (config.getApprovedGroups().length == 0 && config.getApprovedUsers().length == 0) {
       return true;
     }
 
-    if (adminHelperConfigService.isUserApproved(applicationUser.getUserKey().getStringValue())) {
+    if (configService.isUserApproved(applicationUser.getUserKey().getStringValue())) {
       return true;
     }
 
     Collection<String> groupNameCollection = userAccessor.getGroupNamesForUserName(applicationUser.getUsername());
     for (String groupName : groupNameCollection) {
-      if (adminHelperConfigService.isGroupApproved(groupName))
+      if (configService.isGroupApproved(groupName))
         return true;
     }
 

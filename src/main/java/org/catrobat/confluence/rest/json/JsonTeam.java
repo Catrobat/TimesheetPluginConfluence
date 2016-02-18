@@ -16,7 +16,7 @@
 
 package org.catrobat.confluence.rest.json;
 
-import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
+import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.TeamToGroup;
 
@@ -65,7 +65,7 @@ public class JsonTeam {
     developerGroups = new ArrayList<String>();
   }
 
-  public JsonTeam(Team toCopy, AdminHelperConfigService configService) {
+  public JsonTeam(Team toCopy, ConfigService configService) {
     this.teamName = toCopy.getTeamName();
     this.coordinatorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.COORDINATOR);
     this.seniorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.SENIOR);

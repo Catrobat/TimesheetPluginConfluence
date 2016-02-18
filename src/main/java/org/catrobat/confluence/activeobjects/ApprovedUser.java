@@ -22,9 +22,9 @@ import net.java.ao.Preload;
 @Preload
 public interface ApprovedUser extends Entity {
 
-  AdminHelperConfig getConfiguration();
+  Config getConfiguration();
 
-  void setConfiguration(AdminHelperConfig configuration);
+  void setConfiguration(Config configuration);
 
   String getUserKey();
 

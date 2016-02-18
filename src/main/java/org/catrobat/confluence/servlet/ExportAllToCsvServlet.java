@@ -19,27 +19,41 @@ package org.catrobat.confluence.servlet;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
-import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.user.GroupManager;
 import org.catrobat.confluence.activeobjects.ConfigService;
+import org.catrobat.confluence.helper.CsvExporterAll;
+import org.catrobat.confluence.services.TimesheetService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintStream;
 
-public class AdminServlet extends HelperServlet {
-  private final TemplateRenderer renderer;
+public class ExportAllToCsvServlet extends HelperServlet {
 
-  public AdminServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
-                      WebSudoManager webSudoManager, GroupManager groupManager, ConfigService configurationService) {
+  private final TimesheetService timesheetService;
+  private final UserManager userManager;
+
+  public ExportAllToCsvServlet(UserManager userManager, LoginUriProvider loginUriProvider, WebSudoManager webSudoManager,
+                               GroupManager groupManager, ConfigService configurationService,
+                               TimesheetService timesheetService) {
     super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
-    this.renderer = renderer;
+    this.timesheetService = timesheetService;
+    this.userManager = userManager;
   }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     super.doGet(request, response);
-    renderer.render("administration.vm", response.getWriter());
+
+    response.setContentType("text/csv; charset=utf-8");
+    response.setHeader("Content-Disposition", "attachment; filename=\"timesheets.csv\"");
+
+    CsvExporterAll csvExporterAll = new CsvExporterAll(timesheetService.all(), userManager);
+    PrintStream printStream = new PrintStream(response.getOutputStream(), false, "UTF-8");
+    printStream.print(csvExporterAll.getCsvString());
+    printStream.flush();
+    printStream.close();
   }
 }

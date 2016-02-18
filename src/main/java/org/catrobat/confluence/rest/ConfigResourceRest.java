@@ -23,13 +23,14 @@ import com.atlassian.crowd.embedded.api.Directory;
 import com.atlassian.crowd.manager.directory.DirectoryManager;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
-import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
 import org.catrobat.confluence.activeobjects.Category;
+import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.rest.json.JsonCategory;
 import org.catrobat.confluence.rest.json.JsonConfig;
 import org.catrobat.confluence.rest.json.JsonTeam;
 import org.catrobat.confluence.services.CategoryService;
+import org.catrobat.confluence.services.MailService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
 
@@ -45,18 +46,19 @@ import java.util.List;
 @Path("/config")
 @Produces({MediaType.APPLICATION_JSON})
 public class ConfigResourceRest {
-  private final AdminHelperConfigService configService;
+  private final ConfigService configService;
   private final DirectoryManager directoryManager;
   private final UserManager userManager;
   private final UserAccessor userAccessor;
   private final TeamService teamService;
   private final CategoryService categoryService;
   private final PermissionService permissionService;
+  private final MailService mailService;
 
-  public ConfigResourceRest(final UserManager userManager, final AdminHelperConfigService configService,
+  public ConfigResourceRest(final UserManager userManager, final ConfigService configService,
                             final DirectoryManager directoryManager, final TeamService teamService,
                             final UserAccessor userAccessor, final CategoryService categoryService,
-                            final PermissionService permissionService) {
+                            final PermissionService permissionService, final MailService mailService) {
     this.configService = configService;
     this.directoryManager = directoryManager;
     this.teamService = teamService;
@@ -64,6 +66,7 @@ public class ConfigResourceRest {
     this.userManager = userManager;
     this.categoryService = categoryService;
     this.permissionService = permissionService;
+    this.mailService = mailService;
   }
 
   @GET
@@ -166,7 +169,9 @@ public class ConfigResourceRest {
     }
 
     configService.editMail(jsonConfig.getMailFromName(), jsonConfig.getMailFrom(),
-            jsonConfig.getMailSubject(), jsonConfig.getMailBody());
+            jsonConfig.getMailSubjectTime(), jsonConfig.getMailSubjectInactive(),
+            jsonConfig.getMailSubjectEntry(), jsonConfig.getMailBodyTime(),
+            jsonConfig.getMailBodyInactive(), jsonConfig.getMailBodyEntry());
 
     if (jsonConfig.getApprovedGroups() != null) {
       configService.clearApprovedGroups();

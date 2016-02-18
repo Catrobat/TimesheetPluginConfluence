@@ -17,11 +17,14 @@
 package org.catrobat.confluence.rest;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
+import com.atlassian.confluence.mail.template.ConfluenceMailQueueItem;
+import com.atlassian.mail.queue.MailQueueItem;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.rest.json.*;
 import org.catrobat.confluence.services.*;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
@@ -29,10 +32,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import static com.atlassian.confluence.mail.template.ConfluenceMailQueueItem.MIME_TYPE_TEXT;
 
 @Path("/")
 @Produces({MediaType.APPLICATION_JSON})
@@ -45,11 +47,12 @@ public class TimesheetRest {
   private final UserManager userManager;
   private final PermissionService permissionService;
   private final DBFillerService dbfiller;
-  private final AdminHelperConfigService configService;
+  private final ConfigService configService;
+  private final MailService mailService;
 
-  public TimesheetRest(TimesheetEntryService es, TimesheetService ss,
-                       CategoryService cs, UserManager um, TeamService ts,
-                       PermissionService ps, DBFillerService df, final AdminHelperConfigService ahcs) {
+  public TimesheetRest(final TimesheetEntryService es, final TimesheetService ss, final CategoryService cs,
+                       final UserManager um, final TeamService ts, PermissionService ps,
+                       final DBFillerService df, final ConfigService ahcs, final MailService mS) {
     this.userManager = um;
     this.teamService = ts;
     this.entryService = es;
@@ -58,6 +61,7 @@ public class TimesheetRest {
     this.permissionService = ps;
     this.dbfiller = df;
     this.configService = ahcs;
+    this.mailService = mS;
   }
 
   private void checkIfCategoryIsAssociatedWithTeam(@Nullable Team team, @Nullable Category category) {
@@ -188,6 +192,10 @@ public class TimesheetRest {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
+    if (sheet.getTargetHoursTheory() < 10) {
+      sendEmailNotification(user.getEmail(), "time", sheet, user);
+    }
+
     JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID,
             sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
             sheet.getLecture(), sheet.getIsActive());
@@ -201,9 +209,11 @@ public class TimesheetRest {
                                                  @PathParam("timesheetID") int timesheetID) {
 
     Timesheet sheet;
+    UserProfile user;
 
     try {
       sheet = sheetService.getTimesheetByID(timesheetID);
+      user = permissionService.checkIfUserExists(request);
     } catch (NotAuthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
     }
@@ -213,6 +223,10 @@ public class TimesheetRest {
     }
 
     TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet);
+
+    if (dateIsOlderThanTwoWeeks(entries[0].getBeginDate())) {
+      sendEmailNotification(user.getEmail(), "inactive", sheet, user);
+    }
 
     List<JsonTimesheetEntry> jsonEntries = new ArrayList<JsonTimesheetEntry>(entries.length);
 
@@ -451,5 +465,61 @@ public class TimesheetRest {
     } else {
       return Response.ok("you're not admin").build();
     }
+  }
+
+  private void sendEmailNotification(String emailTo, String reason, Timesheet sheet, UserProfile user) {
+    Config config = configService.getConfiguration();
+
+    //for testing only!
+    emailTo = config.getMailFrom();
+
+    String mailBody = "";
+    String mailSubject = "";
+
+    if (reason == "time") {
+      mailSubject = config.getMailSubjectTime() != null && config.getMailSubjectTime().length() != 0
+              ? config.getMailSubjectTime() : "Out Of Time Notification";
+      mailBody = config.getMailBodyTime() != null && config.getMailBodyTime().length() != 0
+              ? config.getMailBodyTime() : "Hi " + user.getFullName() + ",\n" +
+              "you have only" + sheet.getTargetHoursTheory() + " hours left! \n" +
+              "Please contact you coordinator, or one of the administrators\n\n" +
+              "Best regards,\n" +
+              "Catrobat-Admins";
+    } else if (reason == "inactive") {
+      mailSubject = config.getMailSubjectInactive() != null && config.getMailSubjectInactive().length() != 0
+              ? config.getMailSubjectInactive() : "Inactive Notification";
+      mailBody = config.getMailBodyInactive() != null && config.getMailBodyInactive().length() != 0
+              ? config.getMailBodyInactive() : "Hi " + user.getFullName() + ",\n" +
+              "we could not see any activity in your timesheet since the last two weeks.\n" +
+              "Information: an inactive entry was created automatically.\n\n" +
+              "Best regards,\n" +
+              "Catrobat-Admins";
+    } else if (reason == "entry") {
+      mailSubject = config.getMailSubjectEntry() != null &&
+              config.getMailSubjectEntry().length() != 0
+              ? config.getMailSubjectEntry() : "Timesheet Entry Changed Notification";
+      mailBody = config.getMailBodyEntry() != null &&
+              config.getMailBodyEntry().length() != 0
+              ? config.getMailBodyEntry() : "Hi " + user.getFullName() + ",\n" +
+              "External changes were applied to your timesheet\n" +
+              "Information: OLD ENTRY + NEW ENTRY.\n\n" +
+              "Best regards,\n" +
+              "Catrobat-Admins";
+    }
+
+    mailBody = mailBody.replaceAll("\\{\\{name\\}\\}", user.getFullName());
+    mailBody = mailBody.replaceAll("\\{\\{time\\}\\}", Integer.toString(sheet.getTargetHoursTheory()));
+    mailBody = mailBody.replaceAll("\\{\\{date\\}\\}", sheet.getEntries()[0].getBeginDate().toString());
+    mailBody = mailBody.replaceAll("\\{\\{original\\}\\}", "OLD ENTRY");
+    mailBody = mailBody.replaceAll("\\{\\{actual\\}\\}", "NEW ENTRY");
+
+    MailQueueItem item = new ConfluenceMailQueueItem(emailTo, mailSubject, mailBody, MIME_TYPE_TEXT);
+    mailService.sendEmail(item);
+  }
+
+  private boolean dateIsOlderThanTwoWeeks(Date date) {
+    DateTime twoWeeksAgo = new DateTime().minusDays(14);
+    DateTime datetime = new DateTime(date);
+    return (datetime.compareTo(twoWeeksAgo) < 0);
   }
 }

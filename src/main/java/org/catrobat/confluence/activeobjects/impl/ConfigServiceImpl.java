@@ -24,33 +24,42 @@ import org.catrobat.confluence.services.CategoryService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
+public class ConfigServiceImpl implements ConfigService {
 
   private final ActiveObjects ao;
   private final CategoryService cs;
 
-  public AdminHelperConfigServiceImpl(ActiveObjects ao, CategoryService cs) {
+  public ConfigServiceImpl(ActiveObjects ao, CategoryService cs) {
     this.ao = ao;
     this.cs = cs;
   }
 
   @Override
-  public AdminHelperConfig editMail(String mailFromName, String mailFrom, String mailSubject, String mailBody) {
-    AdminHelperConfig config = getConfiguration();
+  public Config editMail(String mailFromName, String mailFrom, String mailSubjectTime,
+                         String mailSubjectInactive, String mailSubjectEntry,
+                         String mailBodyTime, String mailBodyInactive, String mailBodyEntry) {
+    Config config = getConfiguration();
     config.setMailFromName(mailFromName);
     config.setMailFrom(mailFrom);
-    config.setMailSubject(mailSubject);
-    config.setMailBody(mailBody);
+
+    config.setMailSubjectTime(mailSubjectTime);
+    config.setMailSubjectInactive(mailSubjectInactive);
+    config.setMailSubjectEntry(mailSubjectEntry);
+
+    config.setMailBodyTime(mailBodyTime);
+    config.setMailBodyInactive(mailBodyInactive);
+    config.setMailBodyEntry(mailBodyEntry);
+
     config.save();
     return config;
   }
 
   @Override
-  public AdminHelperConfig getConfiguration() {
-    AdminHelperConfig[] config = ao.find(AdminHelperConfig.class);
+  public Config getConfiguration() {
+    Config[] config = ao.find(Config.class);
     if (config.length == 0) {
-      ao.create(AdminHelperConfig.class).save();
-      config = ao.find(AdminHelperConfig.class);
+      ao.create(Config.class).save();
+      config = ao.find(Config.class);
     }
 
     return config[0];
@@ -69,7 +78,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
       return null;
     }
 
-    AdminHelperConfig configuration = getConfiguration();
+    Config configuration = getConfiguration();
     Team team = ao.create(Team.class);
     team.setConfiguration(configuration);
     team.setTeamName(teamName);
@@ -162,7 +171,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
   }
 
   @Override
-  public AdminHelperConfig editTeam(String oldTeamName, String newTeamName) {
+  public Config editTeam(String oldTeamName, String newTeamName) {
     if (oldTeamName == null || newTeamName == null) {
       return null;
     }
@@ -185,7 +194,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
   }
 
   @Override
-  public AdminHelperConfig removeTeam(String teamName) {
+  public Config removeTeam(String teamName) {
     Team[] teamArray = ao.find(Team.class, Query.select().where("upper(\"TEAM_NAME\") = upper(?)", teamName));
     if (teamArray.length == 0) {
       return null;
@@ -204,8 +213,8 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
     }
 
     CategoryToTeam[] categoryToTeamArray = ao.find(CategoryToTeam.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
-    for (CategoryToTeam  categoryToTeam : categoryToTeamArray)
-      if(categoryToTeam.getTeam() != null) {
+    for (CategoryToTeam categoryToTeam : categoryToTeamArray)
+      if (categoryToTeam.getTeam() != null) {
         ao.delete(categoryToTeam);
       }
 
@@ -271,7 +280,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
   @Override
   public List<String> getCategoryNamesForTeam(String teamName) {
     Team[] team = ao.find(Team.class, "TEAM_NAME = ?", teamName);
-    if(team.length == 0) {
+    if (team.length == 0) {
       return null;
     }
     List<String> categoryList = new ArrayList<String>();
@@ -325,7 +334,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
   }
 
   @Override
-  public AdminHelperConfig removeApprovedGroup(String approvedGroupName) {
+  public Config removeApprovedGroup(String approvedGroupName) {
     if (approvedGroupName != null) {
       approvedGroupName = approvedGroupName.trim();
     }
@@ -341,7 +350,7 @@ public class AdminHelperConfigServiceImpl implements AdminHelperConfigService {
   }
 
   @Override
-  public AdminHelperConfig removeApprovedUser(String approvedUserKey) {
+  public Config removeApprovedUser(String approvedUserKey) {
     if (approvedUserKey != null) {
       approvedUserKey = approvedUserKey.trim();
     }

@@ -38,7 +38,6 @@ AJS.toInit(function () {
     }
 
     function fetchData() {
-        fetchTeamsAndCategories();
 
         var allUsersFetched = AJS.$.ajax({
             type: 'GET',
@@ -63,55 +62,6 @@ AJS.toInit(function () {
             });
     }
 
-    function fetchTeamsAndCategories() {
-        var categoriesFetched = AJS.$.ajax({
-             type: 'GET',
-             url: restBaseUrl + 'config/getCategories',
-             contentType: "application/json"
-        });
-
-        var teamsFetched = AJS.$.ajax({
-             type: 'GET',
-             url: restBaseUrl + 'config/getTeams',
-             contentType: "application/json"
-        });
-
-        AJS.$.when(teamsFetched, categoriesFetched)
-            .done(displayAvailableTeams)
-            .done(displayAvailableCategories)
-            .fail(function (error) {
-                AJS.messages.error({
-                  title: 'There was an error while fetching data.',
-                  body: '<p>Reason: ' + error.responseText + '</p>'
-                });
-                console.log(error);
-            });
-    }
-
-    function displayAvailableTeams(teamsFetched, categoriesFetched) {
-        AJS.$(".loadingDiv").show();
-        var availableTeamNames = [];
-        AJS.$("#available-teams").empty();
-        for(var i = 0; i < teamsFetched[0].length; i++){
-            var team = teamsFetched[0][i];
-            availableTeamNames.push(team['teamName']);
-        }
-        AJS.$("#available-teams").val(availableTeamNames.toString());
-        AJS.$(".loadingDiv").hide();
-    }
-
-    function displayAvailableCategories(teamsFetched, categoriesFetched) {
-        AJS.$(".loadingDiv").show();
-        var availableCategoryNames = [];
-        AJS.$("#available-categories").empty();
-        for(var i = 0; i < categoriesFetched[0].length; i++){
-            var category = categoriesFetched[0][i];
-            availableCategoryNames.push(category['categoryName']);
-        }
-        AJS.$("#available-categories").val(availableCategoryNames.toString());
-        AJS.$(".loadingDiv").hide();
-    }
-
     function populateForm(allUsers, allCategories) {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
@@ -122,10 +72,21 @@ AJS.toInit(function () {
                     AJS.$("#mail-from-name").val(config.mailFromName);
                 if (config.mailFrom)
                     AJS.$("#mail-from").val(config.mailFrom);
+
                 if (config.mailSubject)
-                    AJS.$("#mail-subject").val(config.mailSubject);
+                    AJS.$("#mail-subject-out-of-time").val(config.mailSubject);
+                if (config.mailSubject)
+                    AJS.$("#mail-subject-inactive").val(config.mailSubject);
+                if (config.mailSubject)
+                    AJS.$("#mail-subject-entry-change").val(config.mailSubject);
+
+
                 if (config.mailBody)
-                    AJS.$("#mail-body").val(config.mailBody);
+                    AJS.$("#mail-body-out-of-time").val(config.mailBody);
+                if (config.mailBody)
+                    AJS.$("#mail-body-inactive").val(config.mailBody);
+                if (config.mailBody)
+                    AJS.$("#mail-body-entry-change").val(config.mailBody);
 
                 teams = [];
                 AJS.$("#teams").empty();
@@ -291,8 +252,15 @@ AJS.toInit(function () {
         var config = {};
         config.mailFromName = AJS.$("#mail-from-name").val();
         config.mailFrom = AJS.$("#mail-from").val();
-        config.mailSubject = AJS.$("#mail-subject").val();
-        config.mailBody = AJS.$("#mail-body").val();
+
+        config.mailSubject = AJS.$("#mail-subject-out-of-time").val();
+        config.mailSubject = AJS.$("#mail-subject-inactive").val();
+        config.mailSubject = AJS.$("mail-subject-entry-change").val();
+
+        config.mailBody = AJS.$("#mail-body-out-of-time").val();
+        config.mailBody = AJS.$("#mail-body-inactive").val();
+        config.mailBody = AJS.$("#mail-body-entry-change").val();
+
         var usersAndGroups = AJS.$("#plugin-permission").auiSelect2("val");
         var approvedUsers = [];
         var approvedGroups = [];

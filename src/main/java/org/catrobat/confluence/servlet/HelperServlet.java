@@ -21,7 +21,7 @@ import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.user.GroupManager;
-import org.catrobat.confluence.activeobjects.AdminHelperConfigService;
+import org.catrobat.confluence.activeobjects.ConfigService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,11 +37,11 @@ public abstract class HelperServlet extends HttpServlet {
   private final LoginUriProvider loginUriProvider;
   private final WebSudoManager webSudoManager;
   private final GroupManager groupManager;
-  private final AdminHelperConfigService configurationService;
+  private final ConfigService configurationService;
 
   public HelperServlet(final UserManager userManager, final LoginUriProvider loginUriProvider,
                        final WebSudoManager webSudoManager, final GroupManager groupManager,
-                       final AdminHelperConfigService configurationService) {
+                       final ConfigService configurationService) {
     this.userManager = checkNotNull(userManager, "userManager");
     this.loginUriProvider = checkNotNull(loginUriProvider, "loginProvider");
     this.webSudoManager = checkNotNull(webSudoManager, "webSudoManager");

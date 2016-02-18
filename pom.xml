@@ -116,6 +116,11 @@
             <artifactId>github-api</artifactId>
             <version>1.59</version>
         </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.4.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -125,6 +130,9 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <systemPropertyVariables>
+                        <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
+                    </systemPropertyVariables>
                     <pluginArtifacts>
                         <pluginArtifact>
                             <groupId>com.atlassian.activeobjects</groupId>
@@ -158,8 +166,9 @@
     <properties>
         <confluence.version>5.6.6</confluence.version>
         <confluence.data.version>5.6.6</confluence.data.version>
-        <amps.version>5.0.4</amps.version>
+        <amps.version>5.0.13</amps.version>
         <ao.version>0.26.0</ao.version>
+        <rest.version>2.7.1</rest.version>
         <plugin.testrunner.version>1.2.0</plugin.testrunner.version>
     </properties>
 </project>

@@ -126,6 +126,10 @@
         <url-pattern>/timesheet/modify_user</url-pattern>
         <url-pattern>/timesheet/modify_user/</url-pattern>
     </servlet>
+    <servlet key="download-all-servlet" class="org.catrobat.confluence.servlet.ExportAllToCsvServlet">
+        <url-pattern>/timesheet/administration/download/all</url-pattern>
+        <url-pattern>/timesheet/administration/download/all/</url-pattern>
+    </servlet>
     <!-- end of servlets -->
 
     <!-- import from the product container -->
@@ -157,10 +161,11 @@
     <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.impl.CategoryServiceImpl"/>
     <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.impl.PermissionServiceImpl"/>
     <component key="dbfiller-service" name="DBFiller Service" class="org.catrobat.confluence.services.impl.DBFillerServiceImpl"/>
+    <component key="mail-service" name="Mail Service" class="org.catrobat.confluence.services.impl.MailServiceImpl"/>
     <!-- end of timesheet-components -->
 
     <!-- administration-components -->
-    <component key="adminHelperConfiguration" name="Admin Helper Config Service" class="org.catrobat.confluence.activeobjects.impl.AdminHelperConfigServiceImpl"/>
+    <component key="configuration" name="Config Service" class="org.catrobat.confluence.activeobjects.impl.ConfigServiceImpl"/>
     <!-- end of administration-components -->
 
     <ao key="ao-module">
@@ -173,9 +178,9 @@
         <entity>org.catrobat.confluence.activeobjects.CategoryToTeam</entity>
 
         <!-- administration -->
-        <entity>org.catrobat.confluence.activeobjects.AdminHelperConfig</entity>
+        <entity>org.catrobat.confluence.activeobjects.Config</entity>
         <entity>org.catrobat.confluence.activeobjects.ApprovedGroup</entity>
-        <entity>org.catrobat.confluence.activeobjects.AdminHelperConfig</entity>
+        <entity>org.catrobat.confluence.activeobjects.Config</entity>
         <entity>org.catrobat.confluence.activeobjects.ApprovedUser</entity>
         <entity>org.catrobat.confluence.activeobjects.TeamToGroup</entity>
     </ao>

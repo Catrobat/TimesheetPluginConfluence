@@ -45,16 +45,24 @@ public final class JsonConfig {
   @XmlElement
   private String mailFrom;
   @XmlElement
-  private String mailSubject;
+  private String mailSubjectTime;
   @XmlElement
-  private String mailBody;
+  private String mailSubjectInactive;
+  @XmlElement
+  private String mailSubjectEntry;
+  @XmlElement
+  private String mailBodyTime;
+  @XmlElement
+  private String mailBodyInactive;
+  @XmlElement
+  private String mailBodyEntry;
 
   public JsonConfig() {
 
   }
 
-  public JsonConfig(AdminHelperConfigService configService) {
-    AdminHelperConfig toCopy = configService.getConfiguration();
+  public JsonConfig(ConfigService configService) {
+    Config toCopy = configService.getConfiguration();
 
     Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
     for (Team team : toCopy.getTeams()) {
@@ -80,8 +88,14 @@ public final class JsonConfig {
     this.userDirectoryId = toCopy.getUserDirectoryId();
     this.mailFromName = toCopy.getMailFromName();
     this.mailFrom = toCopy.getMailFrom();
-    this.mailSubject = toCopy.getMailSubject();
-    this.mailBody = toCopy.getMailBody();
+
+    this.mailSubjectTime = toCopy.getMailSubjectTime();
+    this.mailSubjectInactive = toCopy.getMailSubjectInactive();
+    this.mailSubjectEntry = toCopy.getMailSubjectEntry();
+
+    this.mailBodyTime = toCopy.getMailBodyTime();
+    this.mailBodyInactive = toCopy.getMailBodyInactive();
+    this.mailBodyEntry = toCopy.getMailBodyEntry();
   }
 
   public List<JsonTeam> getTeams() {
@@ -132,19 +146,51 @@ public final class JsonConfig {
     this.mailFrom = mailFrom;
   }
 
-  public String getMailSubject() {
-    return mailSubject;
+  public String getMailSubjectTime() {
+    return mailSubjectTime;
   }
 
-  public void setMailSubject(String mailSubject) {
-    this.mailSubject = mailSubject;
+  public void setMailSubjectTime(String mailSubjectTime) {
+    this.mailSubjectTime = mailSubjectTime;
   }
 
-  public String getMailBody() {
-    return mailBody;
+  public String getMailSubjectInactive() {
+    return mailSubjectInactive;
   }
 
-  public void setMailBody(String mailBody) {
-    this.mailBody = mailBody;
+  public void setMailSubjectInactive(String mailSubjectInactive) {
+    this.mailSubjectInactive = mailSubjectInactive;
+  }
+
+  public String getMailSubjectEntry() {
+    return mailSubjectEntry;
+  }
+
+  public void setMailSubjectEntry(String mailSubjectEntry) {
+    this.mailSubjectEntry = mailSubjectEntry;
+  }
+
+  public String getMailBodyTime() {
+    return mailBodyTime;
+  }
+
+  public void setMailBodyTime(String mailBodyTime) {
+    this.mailBodyTime = mailBodyTime;
+  }
+
+  public String getMailBodyInactive() {
+    return mailBodyInactive;
+  }
+
+  public void setMailBodyInactive(String mailBodyInactive) {
+    this.mailBodyInactive = mailBodyInactive;
+  }
+
+  public String getMailBodyEntry() {
+    return mailBodyEntry;
+  }
+
+  public void setMailBodyEntry(String mailBodyEntry) {
+    this.mailBodyEntry = mailBodyEntry;
   }
 }

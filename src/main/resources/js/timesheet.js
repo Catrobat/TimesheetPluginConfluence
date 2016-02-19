@@ -135,8 +135,9 @@ function getTimesheetOfUser(selectedUser) {
   var timesheetFetched = AJS.$.ajax({
     type: 'GET',
     url: restBaseUrl + 'timesheetID/fromUser/' + selectedUser[0],
-    contentType: "applicatPion/json"
+    contentType: "application/json"
   });
+
   AJS.$.when(timesheetFetched)
   .done(fetchDataCoordinator)
   .fail(function (error) {

@@ -16,10 +16,10 @@
 
 <html>
 <head>
-    <title>Modify User</title>
+    <title>User Information</title>
     <meta name="decorator" content="atl.admin"/>
     <meta name="application-base-url" content="$applicationProperties.getBaseUrl()">
-    $webResourceManager.requireResource("org.catrobat.confluence.timesheet:modify-resources")
+    $webResourceManager.requireResource("org.catrobat.confluence.timesheet:user-information-resources")
 </head>
 <body class="aui-layout aui-theme-default">
 <div id="aui-message-bar"></div>
@@ -41,17 +41,8 @@
         <div class="aui-page-panel-inner">
             <section class="aui-page-panel-content">
                 <p>
-                    If a user is enabled, a Github user name and GitHub team affiliation can be added by clicking on
-                    'add&nbsp;GitHub&nbsp;name'. The GitHub user name and/or GitHub team affiliation can be changed by
-                    clicking on the old user name. 'Disable&nbsp;user' will add the user to the 'Disabled' group and
-                    remove him/her from all other LDAP user groups. The 'Disabled' group prohibits the user from logging
-                    into this account. If a GitHub user name is assigned to the disabled account, the GitHub user name
-                    will be deleted from all GitHub teams within the organization.
-                </p>
-                <p>
-                    'Enable user' will open a prompt where teams and roles can be selected for this user.
-                    After clicking 'OK' all previous affiliations with user groups (especially the 'Disabled' group)
-                    will be deleted and new ones will be created according to the selections in the prompt.
+                    This is a basic information overview of all available LDAP users. The basic implementation
+                    provides a search function and shows the project members timesheet states.
                 </p>
                 <table id="user-table" class="aui aui-table-interactive aui-table-sortable">
                     <thead>
@@ -60,8 +51,8 @@
                         <th id="basic-fist-name">First Name</th>
                         <th id="basic-last-name">Last Name</th>
                         <th id="basic-email">E-Mail</th>
-                        <th id="basic-github">GitHub Username</th>
-                        <th id="basic-action">Action</th>
+                        <th id="basic-state">User Status</th>
+                        <th id="basic-timesheet-state">Timesheet Status</th>
                     </tr>
                     </thead>
                     <tbody class="list" id="user-body">
@@ -72,7 +63,7 @@
         </div>
     </div>
     <div class="note">
-        Note that Jira System Administrators will not be shown in this list.
+        Note that Confluence System Administrators will not be shown in this list.
     </div>
 </div>
 

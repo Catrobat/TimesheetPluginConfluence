@@ -18,9 +18,11 @@ package org.catrobat.confluence.rest;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.confluence.mail.template.ConfluenceMailQueueItem;
+import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.mail.queue.MailQueueItem;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
+import com.atlassian.user.User;
 import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.rest.json.*;
 import org.catrobat.confluence.services.*;
@@ -49,10 +51,12 @@ public class TimesheetRest {
   private final DBFillerService dbfiller;
   private final ConfigService configService;
   private final MailService mailService;
+  private final UserAccessor userAccessor;
 
   public TimesheetRest(final TimesheetEntryService es, final TimesheetService ss, final CategoryService cs,
                        final UserManager um, final TeamService ts, PermissionService ps,
-                       final DBFillerService df, final ConfigService ahcs, final MailService mS) {
+                       final DBFillerService df, final ConfigService ahcs, final MailService mS,
+                       final UserAccessor ua) {
     this.userManager = um;
     this.teamService = ts;
     this.entryService = es;
@@ -62,6 +66,7 @@ public class TimesheetRest {
     this.dbfiller = df;
     this.configService = ahcs;
     this.mailService = mS;
+    this.userAccessor = ua;
   }
 
   private void checkIfCategoryIsAssociatedWithTeam(@Nullable Team team, @Nullable Category category) {
@@ -293,6 +298,61 @@ public class TimesheetRest {
               entry.getCategory().getID(), entry.getIsGoogleDocImport()));
     }
     return Response.ok(jsonEntries).build();
+  }
+
+  @GET
+  @Path("timesheets/getStates")
+  public Response getTimesheetStates(@Context HttpServletRequest request) {
+
+    List<Timesheet> timesheetList = new LinkedList<Timesheet>();
+    List<JsonUser> jsonUserList = new ArrayList<JsonUser>();
+    List<User> allUsers = userAccessor.getUsersWithConfluenceAccessAsList();
+    UserProfile userProfile;
+
+    try {
+      userProfile = permissionService.checkIfUserExists(request);
+      timesheetList = sheetService.all();
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
+
+    if (timesheetList == null) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+
+    for (User user : allUsers) {
+
+      JsonUser jsonUser = new JsonUser();
+      jsonUser.setEmail(user.getEmail());
+      jsonUser.setUserName(user.getName());
+
+      String displayName = user.getFullName();
+      int lastSpaceIndex = displayName.lastIndexOf(' ');
+      if (lastSpaceIndex >= 0) {
+        jsonUser.setFirstName(displayName.substring(0, lastSpaceIndex));
+        jsonUser.setLastName(displayName.substring(lastSpaceIndex + 1));
+      } else {
+        jsonUser.setFirstName(displayName);
+      }
+
+      boolean isActive = false;
+
+      for (Timesheet timesheet : timesheetList) {
+        if (timesheet.getUserKey().equals(userAccessor.
+                getUserByName(user.getName()).getKey().toString())) {
+          if(timesheet.getIsActive()) {
+            isActive = timesheet.getIsActive();
+          } else {
+            isActive = false;
+          }
+        }
+      }
+
+      jsonUser.setActive(isActive);
+      jsonUserList.add(jsonUser);
+    }
+
+    return Response.ok(jsonUserList).build();
   }
 
   @POST

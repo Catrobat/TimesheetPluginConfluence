@@ -28,12 +28,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class CreateUserServlet extends HelperServlet {
+public class UserInformationServlet extends HelperServlet {
 
   private final TemplateRenderer renderer;
 
-  public CreateUserServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
-                           WebSudoManager webSudoManager, GroupManager groupManager, ConfigService configurationService) {
+  public UserInformationServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
+                                WebSudoManager webSudoManager, GroupManager groupManager, ConfigService configurationService) {
     super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
     this.renderer = renderer;
   }
@@ -41,6 +41,6 @@ public class CreateUserServlet extends HelperServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     super.doGet(request, response);
-    renderer.render("create_user.vm", response.getWriter());
+    renderer.render("user_information.vm", response.getWriter());
   }
 }

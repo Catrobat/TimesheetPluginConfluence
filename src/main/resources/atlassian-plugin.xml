@@ -79,22 +79,12 @@
         <context>administration</context>
     </web-resource>
 
-    <web-resource key="create-resources" name="Create User Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
-
-        <resource type="download" name="create_user.js" location="/js/create_user.js"/>
-        <resource type="download" name="user.js" location="/js/user.js"/>
-        <resource type="download" name="administration.css" location="/css/administration.css"/>
-        <context>create</context>
-    </web-resource>
-
-    <web-resource key="modify-resources" name="Modify User Resources">
+    <web-resource key="user-information-resources" name="User Information Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
         <dependency>com.atlassian.auiplugin:aui-table-sortable</dependency>
 
-        <resource type="download" name="modify_user.js" location="/js/modify_user.js"/>
+        <resource type="download" name="user_information.js" location="/js/user_information.js"/>
         <resource type="download" name="user.js" location="/js/user.js"/>
         <resource type="download" name="administration.css" location="/css/administration.css"/>
         <context>modify</context>
@@ -118,13 +108,9 @@
         <url-pattern>/timesheet/administration</url-pattern>
         <url-pattern>/timesheet/administration/</url-pattern>
     </servlet>
-    <servlet name="create-user-servlet" class="org.catrobat.confluence.servlet.CreateUserServlet" key="create-user-servlet">
-        <url-pattern>/timesheet/create_user</url-pattern>
-        <url-pattern>/timesheet/create_user/</url-pattern>
-    </servlet>
-    <servlet name="modify-user-servlet" class="org.catrobat.confluence.servlet.ModifyUserServlet" key="modify-user-servlet">
-        <url-pattern>/timesheet/modify_user</url-pattern>
-        <url-pattern>/timesheet/modify_user/</url-pattern>
+    <servlet name="user-information-servlet" class="org.catrobat.confluence.servlet.UserInformationServlet" key="modify-user-servlet">
+        <url-pattern>/timesheet/user/information</url-pattern>
+        <url-pattern>/timesheet/user/information/</url-pattern>
     </servlet>
     <servlet key="download-all-servlet" class="org.catrobat.confluence.servlet.ExportAllToCsvServlet">
         <url-pattern>/timesheet/administration/download/all</url-pattern>
@@ -210,13 +196,9 @@
         <label key="Timesheet User Permissions" />
         <link linkId="administration_view_link">/plugins/servlet/timesheet/administration/</link>
     </web-item>
-    <web-item key="create_user_view" name="Link to Create User View" section="system.admin/administration" weight="2">
-        <label key="Create Timesheet User" />
-        <link linkId="create_user_view_link">/plugins/servlet/timesheet/create_user/</link>
-    </web-item>
-    <web-item key="modify_user_view" name="Link to Modify User View" section="system.admin/administration" weight="3">
-        <label key="Modify Timesheet User" />
-        <link linkId="modify_user_view_link">/plugins/servlet/timesheet/modify_user/</link>
+    <web-item key="user_information" name="Link to User Information View" section="system.admin/administration" weight="3">
+        <label key="Timesheet User Information" />
+        <link linkId="user_information_view_link">/plugins/servlet/timesheet/user/information/</link>
     </web-item>
     <!-- end of web-items -->
 

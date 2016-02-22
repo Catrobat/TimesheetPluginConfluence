@@ -131,6 +131,46 @@ public class TimesheetRest {
   }
 
   @GET
+  @Path("teamInformation")
+  public Response getAllTeams(@Context HttpServletRequest request) {
+
+    List<JsonTeam> teams = new LinkedList<JsonTeam>();
+
+    for (Team team : teamService.all()) {
+      int[] teamCategoryIDs = new int[team.getCategories().length];
+      for(int i = 0; i < team.getCategories().length; i++) {
+        teamCategoryIDs[i] = team.getCategories()[i].getID();
+      }
+
+      teams.add(new JsonTeam(team.getID(), team.getTeamName(), teamCategoryIDs));
+    }
+
+    return Response.ok(teams).build();
+    /*
+    List<JsonTeam> teams = new LinkedList<JsonTeam>();
+    UserProfile user;
+
+    try {
+      user = permissionService.checkIfUserExists(request);
+    } catch (NotAuthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+    }
+
+    String userName = user.getUsername();
+
+    for (Team team : teamService.getTeamsOfUser(userName)) {
+      Category[] categories = team.getCategories();
+      int[] categoryIDs = new int[categories.length];
+      for (int i = 0; i < categories.length; i++) {
+        categoryIDs[i] = categories[i].getID();
+      }
+      teams.add(new JsonTeam(team.getID(), team.getTeamName(), categoryIDs));
+    }
+
+    return Response.ok(teams).build();*/
+  }
+
+  @GET
   @Path("timesheetID/fromUser/{userName}")
   public Response getTimesheetIDForUser(@Context HttpServletRequest request,
                                         @PathParam("userName") String userName) {
@@ -569,9 +609,14 @@ public class TimesheetRest {
 
     mailBody = mailBody.replaceAll("\\{\\{name\\}\\}", user.getFullName());
     mailBody = mailBody.replaceAll("\\{\\{time\\}\\}", Integer.toString(sheet.getTargetHoursTheory()));
-    mailBody = mailBody.replaceAll("\\{\\{date\\}\\}", sheet.getEntries()[0].getBeginDate().toString());
+
+    if(sheet.getEntries().length > 0) {
+      mailBody = mailBody.replaceAll("\\{\\{date\\}\\}", sheet.getEntries()[0].getBeginDate().toString());
+    }
+
     mailBody = mailBody.replaceAll("\\{\\{original\\}\\}", "OLD ENTRY");
     mailBody = mailBody.replaceAll("\\{\\{actual\\}\\}", "NEW ENTRY");
+
 
     MailQueueItem item = new ConfluenceMailQueueItem(emailTo, mailSubject, mailBody, MIME_TYPE_TEXT);
     mailService.sendEmail(item);

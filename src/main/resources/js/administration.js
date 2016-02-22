@@ -81,12 +81,12 @@ AJS.toInit(function () {
                     AJS.$("#mail-subject-entry-change").val(config.mailSubject);
 
 
-                if (config.mailBody)
-                    AJS.$("#mail-body-out-of-time").val(config.mailBody);
-                if (config.mailBody)
-                    AJS.$("#mail-body-inactive").val(config.mailBody);
-                if (config.mailBody)
-                    AJS.$("#mail-body-entry-change").val(config.mailBody);
+                if (config.mailBodyTime)
+                    AJS.$("#mail-body-out-of-time").val(config.mailBodyTime);
+                if (config.mailBodyInactive)
+                    AJS.$("#mail-body-inactive").val(config.mailBodyInactive);
+                if (config.mailBodyEntry)
+                    AJS.$("#mail-body-entry-change").val(config.mailBodyEntry);
 
                 teams = [];
                 AJS.$("#teams").empty();
@@ -257,9 +257,9 @@ AJS.toInit(function () {
         config.mailSubject = AJS.$("#mail-subject-inactive").val();
         config.mailSubject = AJS.$("mail-subject-entry-change").val();
 
-        config.mailBody = AJS.$("#mail-body-out-of-time").val();
-        config.mailBody = AJS.$("#mail-body-inactive").val();
-        config.mailBody = AJS.$("#mail-body-entry-change").val();
+        config.mailBodyTime = AJS.$("#mail-body-out-of-time").val();
+        config.mailBodyInactive = AJS.$("#mail-body-inactive").val();
+        config.mailBodyEntry = AJS.$("#mail-body-entry-change").val();
 
         var usersAndGroups = AJS.$("#plugin-permission").auiSelect2("val");
         var approvedUsers = [];

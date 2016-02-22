@@ -1,5 +1,6 @@
 package ut.org.catrobat.confluence.rest;
 
+import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import junit.framework.Assert;
@@ -42,6 +43,7 @@ public class TimesheetRestTest {
   private DBFillerService dbFillerService;
   private ConfigService configService;
   private MailService mailService;
+  private UserAccessor userAccessor;
 
   private SimpleDateFormat sdf;
 
@@ -63,8 +65,9 @@ public class TimesheetRestTest {
     dbFillerService = Mockito.mock(DBFillerServiceImpl.class);
     configService = Mockito.mock(ConfigService.class);
     mailService = Mockito.mock(MailService.class);
+    userAccessor = Mockito.mock(UserAccessor.class);
 
-    timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller, configService, mailService);
+    timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller, configService, mailService, userAccessor);
     Mockito.when(permissionService.checkIfUserExists(request)).thenReturn(userProfile);
     Mockito.when(userProfile.getUsername()).thenReturn("testUser");
     Mockito.when(permissionService.userCanViewTimesheet(userProfile, timeSheet)).thenReturn(true);

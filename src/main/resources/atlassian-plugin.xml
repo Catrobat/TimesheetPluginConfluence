@@ -112,7 +112,7 @@
         <url-pattern>/timesheet/user/information</url-pattern>
         <url-pattern>/timesheet/user/information/</url-pattern>
     </servlet>
-    <servlet key="download-all-servlet" class="org.catrobat.confluence.servlet.ExportAllToCsvServlet">
+    <servlet key="download-all-servlet" class="org.catrobat.confluence.servlet.ExportAllAsCSVServlet">
         <url-pattern>/timesheet/administration/download/all</url-pattern>
         <url-pattern>/timesheet/administration/download/all/</url-pattern>
     </servlet>

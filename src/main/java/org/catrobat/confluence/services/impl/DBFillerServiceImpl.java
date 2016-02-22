@@ -52,6 +52,7 @@ public class DBFillerServiceImpl implements DBFillerService {
 
   @Override
   public void insertDefaultData() {
+    /*
     Category c1 = cs.add("Theory (MT)");
     Category c2 = cs.add("Meeting");
     Category c3 = cs.add("Pair Programming");
@@ -138,15 +139,17 @@ public class DBFillerServiceImpl implements DBFillerService {
     c2t15.setTeam(t4);
     c2t15.setCategory(c4);
     c2t15.save();
+    */
 
     UserKey key = um.getRemoteUserKey();
     if (key != null) {
       String userKey = key.getStringValue();
-      Timesheet sheet = tss.add(userKey, 150, 0, "Project Softwareentwicklung");
+      Timesheet sheet = tss.add(userKey, 150, 0, "Confluence Timesheet");
       System.out.println("user key was " + userKey);
       System.out.println("created timesheet: " + sheet.getID());
     }
   }
+
 
   @Override
   public void printDBStatus() {

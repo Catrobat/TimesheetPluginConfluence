@@ -30,12 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class ExportAllToCsvServlet extends HelperServlet {
+public class ExportAllAsCSVServlet extends HelperServlet {
 
   private final TimesheetService timesheetService;
   private final UserManager userManager;
 
-  public ExportAllToCsvServlet(UserManager userManager, LoginUriProvider loginUriProvider, WebSudoManager webSudoManager,
+  public ExportAllAsCSVServlet(UserManager userManager, LoginUriProvider loginUriProvider, WebSudoManager webSudoManager,
                                GroupManager groupManager, ConfigService configurationService,
                                TimesheetService timesheetService) {
     super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);

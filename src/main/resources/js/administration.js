@@ -68,17 +68,20 @@ AJS.toInit(function () {
             url: restBaseUrl + 'config/getConfig',
             dataType: "json",
             success: function (config) {
+
+            console.log(config);
+
                 if (config.mailFromName)
                     AJS.$("#mail-from-name").val(config.mailFromName);
                 if (config.mailFrom)
                     AJS.$("#mail-from").val(config.mailFrom);
 
-                if (config.mailSubject)
-                    AJS.$("#mail-subject-out-of-time").val(config.mailSubject);
-                if (config.mailSubject)
-                    AJS.$("#mail-subject-inactive").val(config.mailSubject);
-                if (config.mailSubject)
-                    AJS.$("#mail-subject-entry-change").val(config.mailSubject);
+                if (config.mailSubjectTime)
+                    AJS.$("#mail-subject-out-of-time").val(config.mailSubjectTime);
+                if (config.mailSubjectInactive)
+                    AJS.$("#mail-subject-inactive").val(config.mailSubjectInactive);
+                if (config.mailSubjectEntry)
+                    AJS.$("#mail-subject-entry-change").val(config.mailSubjectEntry);
 
 
                 if (config.mailBodyTime)
@@ -253,9 +256,9 @@ AJS.toInit(function () {
         config.mailFromName = AJS.$("#mail-from-name").val();
         config.mailFrom = AJS.$("#mail-from").val();
 
-        config.mailSubject = AJS.$("#mail-subject-out-of-time").val();
-        config.mailSubject = AJS.$("#mail-subject-inactive").val();
-        config.mailSubject = AJS.$("mail-subject-entry-change").val();
+        config.mailSubjectTime = AJS.$("#mail-subject-out-of-time").val();
+        config.mailSubjectInactive = AJS.$("#mail-subject-inactive").val();
+        config.mailSubjectEntry = AJS.$("#mail-subject-entry-change").val();
 
         config.mailBodyTime = AJS.$("#mail-body-out-of-time").val();
         config.mailBodyInactive = AJS.$("#mail-body-inactive").val();
@@ -303,6 +306,8 @@ AJS.toInit(function () {
             }
             config.teams.push(tempTeam);
         }
+
+        console.log(config);
 
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
@@ -377,33 +382,6 @@ AJS.toInit(function () {
             }
         });
     }
-
-    /*
-    function addTeam() {
-        AJS.$(".loadingDiv").show();
-        AJS.$.ajax({
-            url: restBaseUrl + 'config/addTeam',
-            type: "PUT",
-            contentType: "application/json",
-            data: AJS.$("#team-name").attr("value"),
-            processData: false,
-            success: function () {
-                AJS.messages.success({
-                    title: "Success!",
-                    body: "Team added!"
-                });
-                AJS.$(".loadingDiv").hide();
-            },
-            error: function (error) {
-                AJS.messages.error({
-                    title: "Error!",
-                    body: "Something went wrong!<br />" + error.responseText
-                });
-                AJS.$(".loadingDiv").hide();
-            }
-        });
-    }
-    */
 
     function editTeam(teamName) {
         // may be in background and therefore needs to be removed
@@ -521,33 +499,6 @@ AJS.toInit(function () {
             }
         });
     }
-
-    /*
-    function removeTeam() {
-        AJS.$(".loadingDiv").show();
-        AJS.$.ajax({
-            url: restBaseUrl + 'config/removeTeam',
-            type: "PUT",
-            contentType: "application/json",
-            data: AJS.$("#team-name").attr("value"),
-            processData: false,
-            success: function () {
-                AJS.messages.success({
-                    title: "Success!",
-                    body: "Team removed!"
-                });
-                AJS.$(".loadingDiv").hide();
-            },
-            error: function () {
-                AJS.messages.error({
-                    title: "Error!",
-                    body: "Something went wrong!"
-                });
-                AJS.$(".loadingDiv").hide();
-            }
-        });
-    }
-    */
 
     fetchData();
 

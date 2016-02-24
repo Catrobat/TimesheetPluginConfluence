@@ -75,7 +75,7 @@
             <h2>E-Mail Notifications</h2>
             <fieldset>
                 <div class="field-group">
-                    <label for="mail-">From Name</label>
+                    <label for="mail-from-name">From Name</label>
                     <input class="text" type="text" id="mail-from-name" name="mail-from-name"
                            title="mail-from-name">
                     <div class="description">

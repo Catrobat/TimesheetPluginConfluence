@@ -60,6 +60,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     if (found.length > 1) {
       throw new NotAuthorizedException("Multiple Categories with the same Name");
+    } else if (found.length == 0) {
+      throw new NotAuthorizedException("No Category with this Name");
     }
 
     ao.delete(found);

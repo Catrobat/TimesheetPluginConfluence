@@ -43,104 +43,21 @@ public class DBFillerServiceImpl implements DBFillerService {
 
   @Override
   public void cleanDB() {
-    ao.deleteWithSQL(TimesheetEntry.class, "1=?", "1");
-    ao.deleteWithSQL(Timesheet.class, "1=?", "1");
-    ao.deleteWithSQL(CategoryToTeam.class, "1=?", "1");
-    ao.deleteWithSQL(Team.class, "1=?", "1");
+    ao.deleteWithSQL(ApprovedGroup.class, "1=?", "1");
+    ao.deleteWithSQL(ApprovedUser.class, "1=?", "1");
     ao.deleteWithSQL(Category.class, "1=?", "1");
+    ao.deleteWithSQL(CategoryToTeam.class, "1=?", "1");
+    ao.deleteWithSQL(Config.class, "1=?", "1");
+    ao.deleteWithSQL(Group.class, "1=?", "1");
+    ao.deleteWithSQL(Team.class, "1=?", "1");
+    ao.deleteWithSQL(TeamToGroup.class, "1=?", "1");
+    ao.deleteWithSQL(Timesheet.class, "1=?", "1");
+    ao.deleteWithSQL(TimesheetEntry.class, "1=?", "1");
   }
 
   @Override
   public void insertDefaultData() {
     /*
-    Category c1 = cs.add("Theory (MT)");
-    Category c2 = cs.add("Meeting");
-    Category c3 = cs.add("Pair Programming");
-    Category c4 = cs.add("Programming");
-    Category c5 = cs.add("Research");
-    Category c6 = cs.add("Other");
-    Category c7 = cs.add("Planning Game");
-    Category c8 = cs.add("Refactoring");
-
-    Team t1 = ts.add("Catroid");
-    Team t2 = ts.add("HTML5Scratch");
-    Team t3 = ts.add("IRC");
-    Team t4 = ts.add("Arduino");
-
-    //categories of team1
-    CategoryToTeam c2t1 = ao.create(CategoryToTeam.class);
-    c2t1.setTeam(t1);
-    c2t1.setCategory(c1);
-    c2t1.save();
-
-    CategoryToTeam c2t2 = ao.create(CategoryToTeam.class);
-    c2t2.setTeam(t1);
-    c2t2.setCategory(c2);
-    c2t2.save();
-
-    CategoryToTeam c2t3 = ao.create(CategoryToTeam.class);
-    c2t3.setTeam(t1);
-    c2t3.setCategory(c3);
-    c2t3.save();
-
-    CategoryToTeam c2t4 = ao.create(CategoryToTeam.class);
-    c2t4.setTeam(t1);
-    c2t4.setCategory(c4);
-    c2t4.save();
-
-    CategoryToTeam c2t5 = ao.create(CategoryToTeam.class);
-    c2t5.setTeam(t1);
-    c2t5.setCategory(c5);
-    c2t5.save();
-
-    //categories of team2
-    CategoryToTeam c2t6 = ao.create(CategoryToTeam.class);
-    c2t6.setTeam(t2);
-    c2t6.setCategory(c5);
-    c2t6.save();
-    CategoryToTeam c2t7 = ao.create(CategoryToTeam.class);
-    c2t7.setTeam(t2);
-    c2t7.setCategory(c6);
-    c2t7.save();
-    CategoryToTeam c2t8 = ao.create(CategoryToTeam.class);
-    c2t8.setTeam(t2);
-    c2t8.setCategory(c7);
-    c2t8.save();
-    CategoryToTeam c2t9 = ao.create(CategoryToTeam.class);
-    c2t9.setTeam(t2);
-    c2t9.setCategory(c8);
-    c2t9.save();
-
-    //team3
-    CategoryToTeam c2t10 = ao.create(CategoryToTeam.class);
-    c2t10.setTeam(t3);
-    c2t10.setCategory(c6);
-    c2t10.save();
-
-    CategoryToTeam c2t11 = ao.create(CategoryToTeam.class);
-    c2t11.setTeam(t3);
-    c2t11.setCategory(c7);
-    c2t11.save();
-
-    //team arduino
-    CategoryToTeam c2t12 = ao.create(CategoryToTeam.class);
-    c2t12.setTeam(t4);
-    c2t12.setCategory(c1);
-    c2t12.save();
-    CategoryToTeam c2t13 = ao.create(CategoryToTeam.class);
-    c2t13.setTeam(t4);
-    c2t13.setCategory(c2);
-    c2t13.save();
-    CategoryToTeam c2t14 = ao.create(CategoryToTeam.class);
-    c2t14.setTeam(t4);
-    c2t14.setCategory(c3);
-    c2t14.save();
-    CategoryToTeam c2t15 = ao.create(CategoryToTeam.class);
-    c2t15.setTeam(t4);
-    c2t15.setCategory(c4);
-    c2t15.save();
-    */
-
     UserKey key = um.getRemoteUserKey();
     if (key != null) {
       String userKey = key.getStringValue();
@@ -148,15 +65,21 @@ public class DBFillerServiceImpl implements DBFillerService {
       System.out.println("user key was " + userKey);
       System.out.println("created timesheet: " + sheet.getID());
     }
+    */
   }
 
 
   @Override
   public void printDBStatus() {
-    System.out.println("  Timesheet:      " + ao.find(Timesheet.class).length);
-    System.out.println("  TimesheetEntry: " + ao.find(TimesheetEntry.class).length);
-    System.out.println("  Team:           " + ao.find(Team.class).length);
+    System.out.println("  ApprovedGroup:  " + ao.find(ApprovedGroup.class).length);
+    System.out.println("  ApprovedUser:   " + ao.find(ApprovedUser.class).length);
     System.out.println("  Category:       " + ao.find(Category.class).length);
     System.out.println("  CategoryToTeam: " + ao.find(CategoryToTeam.class).length);
+    System.out.println("  Config:         " + ao.find(Config.class).length);
+    System.out.println("  Group:          " + ao.find(Group.class).length);
+    System.out.println("  Team:           " + ao.find(Team.class).length);
+    System.out.println("  TeamToGroup:    " + ao.find(TeamToGroup.class).length);
+    System.out.println("  Timesheet:      " + ao.find(Timesheet.class).length);
+    System.out.println("  TimesheetEntry: " + ao.find(TimesheetEntry.class).length);
   }
 }

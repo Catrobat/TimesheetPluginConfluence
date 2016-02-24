@@ -35,22 +35,12 @@ public class TeamServiceImplTest {
   private ActiveObjects ao;
   private UserAccessor ua;
   private ConfigService cs;
-  private List<String> groups;
   private static Team catroid, html5, drone;
 
   @Rule public org.mockito.junit.MockitoRule mockitoRule = MockitoJUnit.rule();
   @Before
   public void setUp() throws Exception
   {
-    groups = new ArrayList<String>();
-    groups.add("Administrators");
-    groups.add("Catroid");
-    groups.add("catroid");
-    groups.add("Confluence-Administrators");
-    groups.add("Confluence");
-    groups.add("HTML5-Coordinators");
-    groups.add("Catroid-HTML5");
-
     ua = Mockito.mock(UserAccessor.class);
     assertNotNull(entityManager);
     ao = new TestActiveObjects(entityManager);
@@ -98,7 +88,7 @@ public class TeamServiceImplTest {
   {
     //arrange
     String userName = "user_x";
-    Mockito.when(ua.getGroupNamesForUserName(userName)).thenReturn(groups);
+    Mockito.when(service.getCoordinatorTeamsOfUser(userName)).thenReturn();
     Set<Team> expectedTeams = new HashSet<Team>(1);
     expectedTeams.add(html5);
 
@@ -109,7 +99,7 @@ public class TeamServiceImplTest {
     Assert.assertEquals(expectedTeams, teams);
   }
   */
-
+  
   @Test
   public void testAddAndGetTeamByID() throws Exception
   {

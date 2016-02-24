@@ -28,7 +28,10 @@ public interface ConfigService {
   Team addTeam(String teamName, List<String> coordinatorGroups,
                List<String> seniorGroups, List<String> developerGroups, List<String> teamCategoryNames);
 
-  Config editTeam(String oldTeamName, String newTeamName);
+  Config editTeamName(String oldTeamName, String newTeamName);
+
+  Team editTeam(String teamName, List<String> coordinatorGroups,
+               List<String> seniorGroups, List<String> developerGroups, List<String> teamCategoryNames);
 
   Config removeTeam(String teamName);
 

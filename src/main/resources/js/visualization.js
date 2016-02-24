@@ -78,6 +78,7 @@ function populateTable(timesheetDataReply) {
 	));
 
 	appendEntriesToTable(timesheetData);
+	assignCategoryDiagramData(timesheetData);
 }
 
 Array.prototype.contains = function(k) {
@@ -85,8 +86,7 @@ Array.prototype.contains = function(k) {
     if (this[p] === k)
       return true;
   return false;
-};
-
+}
 
 function appendEntriesToTable(timesheetData) {
 
@@ -153,7 +153,7 @@ function appendEntriesToTable(timesheetData) {
           dataPoints.push(dataY);
 
           //if not theory
-          if(availableEntries[i].categoryID != 1) {
+          if(timesheetData.categories[availableEntries[i].categoryID].categoryName == "Theory") {
             piChartDataPractice = piChartDataPractice + totalHours*60 + totalMinutes;
           }
 
@@ -236,6 +236,183 @@ function appendEntriesToTable(timesheetData) {
     //draw graphs
     diagram(dataPoints);
     drawPiChartDiagram(piChartDataPoints);
+}
+
+//reverse order of the table from bottom to top
+function assignCategoryDiagramData(timesheetData) {
+
+  var visualizationTable = AJS.$("#visualization-table");
+  var availableEntries = timesheetData.entries;
+
+  var pos = availableEntries.length - 1;
+  var i = availableEntries.length - 1;
+  //variables for the time calculation
+  var totalHours = 0;
+  var totalMinutes = 0;
+  var totalTimeHours = 0;
+  var totalTimeMinutes = 0;
+  //save data in an additional array
+  var index = 0;
+  var dataPoints = [];
+
+  while(i >= 0 ) {
+    var referenceEntryDate = new Date(availableEntries[pos].beginDate);
+    var compareToDate = new Date(availableEntries[i].beginDate);
+    var oldPos = pos;
+
+    if((referenceEntryDate.getFullYear() == compareToDate.getFullYear()) &&
+       (referenceEntryDate.getMonth() == compareToDate.getMonth())) {
+         totalHours = 0;
+         totalMinutes = 0;
+         //add all times for the same year-month pairs
+         var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+         availableEntries[i].pauseMinutes).getHours();
+         var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+         availableEntries[i].pauseMinutes).getMinutes();
+         var pause = availableEntries[i].pauseMinutes;
+         var calculatedTime = hours * 60 + minutes - pause;
+
+         totalMinutes = totalMinutes + calculatedTime;
+
+         if(totalMinutes >= 60) {
+            var minutesToFullHours = Math.floor(totalMinutes / 60) ; //get only full hours
+            totalHours = totalHours + minutesToFullHours;
+            totalMinutes = totalMinutes - minutesToFullHours * 60;
+         }
+
+         //add points
+         var dataX = referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1);
+         var dataY = totalHours + totalMinutes / 60;
+         dataPoints.push(dataX);
+         dataPoints.push(dataY);
+         dataPoints.push(timesheetData.categories[availableEntries[i].categoryID].categoryName);
+      } else {
+          pos = i;
+          i = i + 1;
+        }
+
+        if(oldPos != pos || i == 0) {
+           if(totalTimeMinutes >= 60) {
+              var minutesToFullHours = Math.floor(totalTimeMinutes / 60) ; //get only full hours
+              totalTimeHours = totalTimeHours + minutesToFullHours;
+              totalTimeMinutes = totalTimeMinutes - minutesToFullHours * 60;
+           }
+         }
+
+        i = i - 1;
+    }
+
+    //console.log(dataPoints);
+
+    var categories = [];
+    //filter all category names
+    for(var i = 0; i < dataPoints.length; i++) {
+      //read category name at position 3
+      if(i % 3 == 2){
+        //http://stackoverflow.com/questions/12623272/how-to-check-if-a-string-array-contains-one-string-in-javascript
+        if (categories.indexOf(dataPoints[i]) > -1) {
+            //In the array!
+        } else {
+            //Not in the array
+          categories.push(dataPoints[i]);
+        }
+      }
+    }
+
+    var sortedDataArray = [];
+    var tempArray = [];
+
+
+    for(var k = 0; k < categories.length; k++) {
+      for(var i = 0; i < dataPoints.length; i++) {
+        //fill in category name at first pos of subarray
+        if(i == 0){
+          tempArray.push(categories[k]);
+        }
+
+        //read category name at position 3
+        if((i % 3 == 2) && (dataPoints[i] == categories[k]) ){
+          tempArray.push(dataPoints[i-2]);
+          tempArray.push(dataPoints[i-1]);
+        }
+
+        //add subarray to array and pick next category
+        if(i == dataPoints.length - 1){
+          sortedDataArray.push(tempArray);
+          tempArray = [];
+        }
+      }
+    }
+
+    categoryDiagram(sortedDataArray, categories.length)
+}
+
+function categoryDiagram(sortedDataArray, numberOfCategories) {
+
+   var data = {};
+   var ykeyValues = [];
+
+   for(var i = 0; i < sortedDataArray.length; i++) {
+    ykeyValues.push(sortedDataArray[i][0]);
+   }
+
+   //create data json array dynamically
+   data['label'] = [];
+
+   //console.log(sortedDataArray);
+
+   data['year'] = [];
+   for(var i = 0; i < numberOfCategories ; i++) {
+      data['category'+i] = [];
+      for(var j = 2; j < sortedDataArray[i].length; j = j + 2) {
+        //console.log(sortedDataArray[i]);
+
+        //filter double names
+        if (data['label'].indexOf(sortedDataArray[i][0]) > -1) {
+            //In the array!
+        } else {
+            //Not in the array
+           data['label'].push(sortedDataArray[i][0]);
+        }
+
+        //filter double years
+        if ((data['year'].indexOf(sortedDataArray[i][j-1]) > -1) &&
+            (data['label'].indexOf(sortedDataArray[i][j-1]) > -1)) {
+            //In the array!
+            //all objects should have the same length
+            data['category'+i].push(0);
+        } else {
+            //Not in the array
+           data['year'].push(sortedDataArray[i][j-1]);
+           //append values
+           data['category'+i].push(sortedDataArray[i][j]);
+        }
+      }
+   }
+
+   var dataJSON = [];
+   var tempData = [];
+   //build data JSON object
+   for(var i = 0; i < data['label'].length - 1; i++) {
+     for (var key in data) {
+        var obj = data[key];
+        tempData.push(obj[i]);
+     }
+
+     //console.log(tempData);
+     //fill JSON array
+     dataJSON.push({
+        year : tempData[1],
+        cat1 : tempData[2],
+        cat2 : tempData[3],
+        cat3 : tempData[4]
+     });
+
+     tempData = [];
+   }
+
+   //console.log(dataJSON);
+   drawCategoryDiagram(dataJSON);
 }
 
 function diagram(dataPoints) {

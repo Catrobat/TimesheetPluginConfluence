@@ -66,8 +66,8 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   @Override
-  public Team addTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups
-          , List<String> teamCategoryNames) {
+  public Team addTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups,
+                      List<String> developerGroups, List<String> teamCategoryNames) {
     if (teamName == null || teamName.trim().length() == 0) {
       return null;
     }
@@ -131,6 +131,21 @@ public class ConfigServiceImpl implements ConfigService {
     }
   }
 
+  private void updateCategory(Team team, CategoryToTeam mapper, List<String> categoryList) {
+    if (categoryList == null) {
+      return;
+    }
+
+    for (String categoryName : categoryList) {
+      Category[] categoryArray = ao.find(Category.class, Query.select().where("upper(\"NAME\") = upper(?)", categoryName));
+      Category category = categoryArray[0];
+
+      mapper.setTeam(team);
+      mapper.setCategory(category);
+      mapper.save();
+    }
+  }
+
   private void fillTeam(Team team, TeamToGroup.Role role, List<String> teamList) {
     if (teamList == null) {
       return;
@@ -156,6 +171,25 @@ public class ConfigServiceImpl implements ConfigService {
     }
   }
 
+  private void updateTeam(Team team, TeamToGroup mapper, TeamToGroup.Role role, List<String> teamList) {
+    if (teamList == null) {
+      return;
+    }
+
+    for (String groupName : teamList) {
+      Group[] groupArray = ao.find(Group.class, Query.select().where("upper(\"GROUP_NAME\") = upper(?)", groupName));
+      Group group = groupArray[0];
+
+      group.setGroupName(groupName);
+      group.save();
+
+      mapper.setGroup(group);
+      mapper.setTeam(team);
+      mapper.setRole(role);
+      mapper.save();
+    }
+  }
+
   @Override
   public void clearApprovedGroups() {
     for (ApprovedGroup approvedGroup : ao.find(ApprovedGroup.class)) {
@@ -171,7 +205,7 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   @Override
-  public Config editTeam(String oldTeamName, String newTeamName) {
+  public Config editTeamName(String oldTeamName, String newTeamName) {
     if (oldTeamName == null || newTeamName == null) {
       return null;
     }
@@ -191,6 +225,43 @@ public class ConfigServiceImpl implements ConfigService {
     team.save();
 
     return getConfiguration();
+  }
+
+  @Override
+  public Team editTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups
+          , List<String> teamCategoryNames) {
+    if (teamName == null || teamName.trim().length() == 0) {
+      return null;
+    }
+    teamName = teamName.trim();
+
+    Team[] teamArray = ao.find(Team.class, Query.select().where("upper(\"TEAM_NAME\") = upper(?)", teamName));
+    if (teamArray.length == 0) {
+      return null;
+    }
+
+    Team team = teamArray[0];
+
+    team.setTeamName(teamName);
+    /*
+    Config configuration = getConfiguration();
+    team.setConfiguration(configuration);*/
+
+    TeamToGroup[] teamToGroupArray = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
+    for (TeamToGroup teamToGroup : teamToGroupArray) {
+      updateTeam(team, teamToGroup, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
+      updateTeam(team, teamToGroup, TeamToGroup.Role.SENIOR, seniorGroups);
+      updateTeam(team, teamToGroup, TeamToGroup.Role.DEVELOPER, developerGroups);
+    }
+
+    CategoryToTeam[] categoryToTeamArray = ao.find(CategoryToTeam.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
+    for (CategoryToTeam categoryToTeam : categoryToTeamArray) {
+      updateCategory(team, categoryToTeam, teamCategoryNames);
+    }
+
+    team.save();
+
+    return team;
   }
 
   @Override

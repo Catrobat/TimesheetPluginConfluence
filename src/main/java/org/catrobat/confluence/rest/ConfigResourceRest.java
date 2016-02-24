@@ -192,9 +192,17 @@ public class ConfigResourceRest {
 
     if (jsonConfig.getTeams() != null) {
       for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
+
+        boolean successful = configService.editTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
+                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames()) != null;
+
+        if (!successful)
+          return Response.serverError().build();
+         /*
         configService.removeTeam(jsonTeam.getTeamName());
         configService.addTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
                 jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
+        */
       }
     }
 
@@ -235,7 +243,7 @@ public class ConfigResourceRest {
       return Response.serverError().entity("New Team name must be different").build();
     }
 
-    boolean successful = configService.editTeam(teams[0], teams[1]) != null;
+    boolean successful = configService.editTeamName(teams[0], teams[1]) != null;
 
     if (successful)
       return Response.noContent().build();
@@ -293,40 +301,4 @@ public class ConfigResourceRest {
 
     return Response.serverError().build();
   }
-
-  /*
-  @PUT
-  @Path("/addTeam")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response addTeam(final String modifyTeam, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
-    }
-
-    boolean successful = teamService.add(modifyTeam) != null;
-
-    if (successful)
-      return Response.noContent().build();
-
-    return Response.serverError().build();
-  }
-
-  @PUT
-  @Path("/removeTeam")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response removeTeam(final String modifyTeam, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
-    }
-
-    boolean successful = teamService.removeTeam(modifyTeam);
-
-    if (successful)
-      return Response.noContent().build();
-
-    return Response.serverError().build();
-  }
-  */
 }

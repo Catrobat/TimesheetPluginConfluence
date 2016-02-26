@@ -22,7 +22,9 @@ import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.services.CategoryService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ConfigServiceImpl implements ConfigService {
 
@@ -115,7 +117,6 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     for (String categoryName : categoryList) {
-      //Category[] categoryArray = ao.find(Category.class, "NAME = ?", categoryName);
       Category[] categoryArray = ao.find(Category.class, Query.select().where("upper(\"NAME\") = upper(?)", categoryName));
       Category category;
       if (categoryArray.length == 0) {
@@ -131,18 +132,51 @@ public class ConfigServiceImpl implements ConfigService {
     }
   }
 
-  private void updateCategory(Team team, CategoryToTeam mapper, List<String> categoryList) {
+  private void updateTeamCategory(Team team, List<String> categoryList) {
     if (categoryList == null) {
       return;
     }
 
+    Set<CategoryToTeam> addedRelations = new HashSet<CategoryToTeam>();
+
     for (String categoryName : categoryList) {
       Category[] categoryArray = ao.find(Category.class, Query.select().where("upper(\"NAME\") = upper(?)", categoryName));
-      Category category = categoryArray[0];
 
-      mapper.setTeam(team);
-      mapper.setCategory(category);
-      mapper.save();
+      Category category;
+      if (categoryArray.length == 0) {
+        category = ao.create(Category.class);
+      } else {
+        category = categoryArray[0];
+      }
+      category.setName(categoryName);
+      category.save();
+
+      //category to team for one category
+      CategoryToTeam[] categoryToTeamArray = ao.find(CategoryToTeam.class, Query.select().where("\"CATEGORY_ID\" = ?", category.getID()));
+
+      //update relation
+      CategoryToTeam categoryToTeam;
+      if (categoryToTeamArray.length == 0) {
+        categoryToTeam = ao.create(CategoryToTeam.class);
+      } else {
+        categoryToTeam = categoryToTeamArray[0];
+      }
+
+      categoryToTeam.setTeam(team);
+      categoryToTeam.setCategory(category);
+      categoryToTeam.save();
+
+      addedRelations.add(categoryToTeam);
+    }
+
+    //update all existing categoryToTeam relations of a team
+    CategoryToTeam[] allCategoryToTeam = ao.find(CategoryToTeam.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
+    for (CategoryToTeam oldTeamRelation : allCategoryToTeam) {
+      if (!addedRelations.contains(oldTeamRelation)) {
+        oldTeamRelation.setCategory(null);
+        oldTeamRelation.setTeam(null);
+        oldTeamRelation.save();
+      }
     }
   }
 
@@ -153,13 +187,13 @@ public class ConfigServiceImpl implements ConfigService {
 
     for (String groupName : teamList) {
       Group[] groupArray = ao.find(Group.class, Query.select().where("upper(\"GROUP_NAME\") = upper(?)", groupName));
+
       Group group;
       if (groupArray.length == 0) {
         group = ao.create(Group.class);
       } else {
         group = groupArray[0];
       }
-
       group.setGroupName(groupName);
       group.save();
 
@@ -171,22 +205,82 @@ public class ConfigServiceImpl implements ConfigService {
     }
   }
 
-  private void updateTeam(Team team, TeamToGroup mapper, TeamToGroup.Role role, List<String> teamList) {
-    if (teamList == null) {
+  private void updateTeamMember(Team team, TeamToGroup.Role role, List<String> userList) {
+    if (userList == null) {
       return;
     }
 
-    for (String groupName : teamList) {
-      Group[] groupArray = ao.find(Group.class, Query.select().where("upper(\"GROUP_NAME\") = upper(?)", groupName));
-      Group group = groupArray[0];
+    //comparison list of TeamToGroups
+    Set<TeamToGroup> addedRelations = new HashSet<TeamToGroup>();
 
-      group.setGroupName(groupName);
+    for (String userName : userList) {
+      Group[] groups = ao.find(Group.class, Query.select().where("upper(\"GROUP_NAME\") = upper(?)", userName));
+
+      Group group;
+      if (groups.length == 0) {
+        group = ao.create(Group.class);
+      } else {
+        group = groups[0];
+      }
+      group.setGroupName(userName);
       group.save();
 
-      mapper.setGroup(group);
-      mapper.setTeam(team);
-      mapper.setRole(role);
-      mapper.save();
+      //teamToGroup for one group
+      TeamToGroup[] teamToGroups = ao.find(TeamToGroup.class, Query.select().where("\"GROUP_ID\" = ?", group.getID()));
+
+      //update relation
+      TeamToGroup teamToGroup;
+      if ((teamToGroups.length == 0) || (teamToGroups[0].getRole() != role)) {
+        teamToGroup = ao.create(TeamToGroup.class);
+      } else {
+        teamToGroup = teamToGroups[0];
+      }
+
+      teamToGroup.setGroup(group);
+      teamToGroup.setTeam(team);
+      teamToGroup.setRole(role);
+      teamToGroup.save();
+
+      //actually added TeamToGroup relation
+      addedRelations.add(teamToGroup);
+    }
+    
+    //retrieve all existing relations of a team
+
+    TeamToGroup[] allTeamToGroups = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ? AND \"ROLE\" = ?", team.getID(), role));
+    //update all existing categoryToTeam relations of a team
+    for (TeamToGroup oldTeamRelation : allTeamToGroups) {
+
+      /*
+      System.out.println("- - - - - - - ");
+      System.out.println("\n");
+      System.out.println("AVAILABLE\n");
+      System.out.println("username: " + oldTeamRelation.getGroup().getGroupName() + "\n");
+      System.out.println("role: " + oldTeamRelation.getRole().toString() + "\n");
+      System.out.println("\n");
+      */
+
+      if (!addedRelations.contains(oldTeamRelation)) {
+        /*
+        System.out.println("DELETE\n");
+        System.out.println("username: " + oldTeamRelation.getGroup().getGroupName() + "\n");
+        System.out.println("role: " + oldTeamRelation.getRole().toString() + "\n");
+        System.out.println("- - - - - - - ");
+        System.out.println("\n");
+        */
+
+        oldTeamRelation.setGroup(null);
+        oldTeamRelation.setRole(null);
+        oldTeamRelation.setTeam(null);
+        oldTeamRelation.save();
+      }
+      /*else {
+        System.out.println("UPDATE\n");
+        System.out.println("username: " + oldTeamRelation.getGroup().getGroupName() + "\n");
+        System.out.println("role: " + oldTeamRelation.getRole().toString() + "\n");
+        System.out.println("- - - - - - - ");
+        System.out.println("\n");
+      }*/
     }
   }
 
@@ -227,37 +321,25 @@ public class ConfigServiceImpl implements ConfigService {
     return getConfiguration();
   }
 
+
   @Override
-  public Team editTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups, List<String> developerGroups
-          , List<String> teamCategoryNames) {
-    if (teamName == null || teamName.trim().length() == 0) {
-      return null;
-    }
+  public Team editTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups,
+                       List<String> developerGroups, List<String> teamCategoryNames) {
+
     teamName = teamName.trim();
 
     Team[] teamArray = ao.find(Team.class, Query.select().where("upper(\"TEAM_NAME\") = upper(?)", teamName));
-    if (teamArray.length == 0) {
-      return null;
+    if (teamArray[0].getGroups() == null) {
+      Team team = addTeam(teamName, coordinatorGroups, seniorGroups, developerGroups, teamCategoryNames);
+      return team;
     }
-
     Team team = teamArray[0];
 
-    team.setTeamName(teamName);
-    /*
-    Config configuration = getConfiguration();
-    team.setConfiguration(configuration);*/
+    updateTeamMember(team, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
+    updateTeamMember(team, TeamToGroup.Role.SENIOR, seniorGroups);
+    updateTeamMember(team, TeamToGroup.Role.DEVELOPER, developerGroups);
 
-    TeamToGroup[] teamToGroupArray = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
-    for (TeamToGroup teamToGroup : teamToGroupArray) {
-      updateTeam(team, teamToGroup, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
-      updateTeam(team, teamToGroup, TeamToGroup.Role.SENIOR, seniorGroups);
-      updateTeam(team, teamToGroup, TeamToGroup.Role.DEVELOPER, developerGroups);
-    }
-
-    CategoryToTeam[] categoryToTeamArray = ao.find(CategoryToTeam.class, Query.select().where("\"TEAM_ID\" = ?", team.getID()));
-    for (CategoryToTeam categoryToTeam : categoryToTeamArray) {
-      updateCategory(team, categoryToTeam, teamCategoryNames);
-    }
+    updateTeamCategory(team, teamCategoryNames);
 
     team.save();
 

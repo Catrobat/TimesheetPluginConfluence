@@ -193,16 +193,13 @@ public class ConfigResourceRest {
     if (jsonConfig.getTeams() != null) {
       for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
 
-        boolean successful = configService.editTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
-                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames()) != null;
-
-        if (!successful)
-          return Response.serverError().build();
-         /*
+        configService.editTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
+                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
+        /*
         configService.removeTeam(jsonTeam.getTeamName());
         configService.addTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
                 jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
-        */
+      */
       }
     }
 

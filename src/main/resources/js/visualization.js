@@ -398,7 +398,6 @@ function categoryDiagram(sortedDataArray, numberOfCategories) {
         var obj = data[key];
         tempData.push(obj[i]);
      }
-
      //console.log(tempData);
      //fill JSON array
      dataJSON.push({

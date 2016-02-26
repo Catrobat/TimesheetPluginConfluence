@@ -35,6 +35,6 @@ public interface TeamToGroup extends Entity {
   void setRole(Role role);
 
   public enum Role {
-    COORDINATOR, SENIOR, DEVELOPER
+    COORDINATOR, DEVELOPER
   }
 }

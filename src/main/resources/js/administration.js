@@ -102,7 +102,6 @@ AJS.toInit(function () {
                     "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
                     "<span class=\"aui-icon aui-icon-small aui-iconfont-edit\">Editing</span> Edit</button></h3><fieldset>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-coordinator\">Coordinator</label><input class=\"text coordinator\" type=\"text\" id=\"" + tempTeamName + "-coordinator\" value=\"" + team['coordinatorGroups'] + "\"></div>");
-                    AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-senior\">Senior</label><input class=\"text senior\" type=\"text\" id=\"" + tempTeamName + "-senior\" value=\"" + team['seniorGroups'] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-developer\">User</label><input class=\"text user\" type=\"text\" id=\"" + tempTeamName + "-developer\" value=\"" + team['developerGroups'] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-category\">Category</label><input class=\"text category\" type=\"text\" id=\"" + tempTeamName + "-category\" value=\"" + team['teamCategoryNames'] + "\"></div>");
                     AJS.$("#teams").append("</fieldset>");
@@ -120,11 +119,6 @@ AJS.toInit(function () {
 
                 if (config.approvedUsers) {
                     AJS.$(".coordinator").auiSelect2({
-                        placeholder: "Search for user",
-                        tags: userNameList.sort(),
-                        tokenSeparators: [",", " "]
-                    });
-                    AJS.$(".senior").auiSelect2({
                         placeholder: "Search for user",
                         tags: userNameList.sort(),
                         tokenSeparators: [",", " "]
@@ -288,11 +282,6 @@ AJS.toInit(function () {
             tempTeam.coordinatorGroups = AJS.$("#" + tempTeamName + "-coordinator").auiSelect2("val");
             for (var j = 0; j < tempTeam.coordinatorGroups.length; j++) {
                 tempTeam.coordinatorGroups[j] = tempTeam.coordinatorGroups[j].replace(/^groups-/i, "");
-            }
-
-            tempTeam.seniorGroups = AJS.$("#" + tempTeamName + "-senior").auiSelect2("val");
-            for (var j = 0; j < tempTeam.seniorGroups.length; j++) {
-                tempTeam.seniorGroups[j] = tempTeam.seniorGroups[j].replace(/^groups-/i, "");
             }
 
             tempTeam.developerGroups = AJS.$("#" + tempTeamName + "-developer").auiSelect2("val");

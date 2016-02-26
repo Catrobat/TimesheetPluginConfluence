@@ -44,8 +44,6 @@ public class JsonTeam {
   @XmlElement
   private List<String> coordinatorGroups;
   @XmlElement
-  private List<String> seniorGroups;
-  @XmlElement
   private List<String> developerGroups;
 
   public JsonTeam() {
@@ -61,14 +59,12 @@ public class JsonTeam {
   public JsonTeam(String name) {
     this.teamName = name;
     coordinatorGroups = new ArrayList<String>();
-    seniorGroups = new ArrayList<String>();
     developerGroups = new ArrayList<String>();
   }
 
   public JsonTeam(Team toCopy, ConfigService configService) {
     this.teamName = toCopy.getTeamName();
     this.coordinatorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.COORDINATOR);
-    this.seniorGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.SENIOR);
     this.developerGroups = configService.getGroupsForRole(this.teamName, TeamToGroup.Role.DEVELOPER);
     this.teamCategoryNames = configService.getCategoryNamesForTeam(this.teamName);
   }
@@ -103,14 +99,6 @@ public class JsonTeam {
 
   public void setCoordinatorGroups(List<String> coordinatorGroups) {
     this.coordinatorGroups = coordinatorGroups;
-  }
-
-  public List<String> getSeniorGroups() {
-    return seniorGroups;
-  }
-
-  public void setSeniorGroups(List<String> seniorGroups) {
-    this.seniorGroups = seniorGroups;
   }
 
   public List<String> getDeveloperGroups() {
@@ -153,6 +141,8 @@ public class JsonTeam {
     return "JsonTeam{" +
             "teamID=" + teamID +
             ", teamName='" + teamName + '\'' +
+            ", coordinatorGroups ='" + coordinatorGroups + '\'' +
+            ", developerGroups ='" + developerGroups + '\'' +
             ", teamCategories=" + Arrays.toString(teamCategories) +
             '}';
   }

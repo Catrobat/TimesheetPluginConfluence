@@ -68,8 +68,8 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   @Override
-  public Team addTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups,
-                      List<String> developerGroups, List<String> teamCategoryNames) {
+  public Team addTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups,
+                      List<String> teamCategoryNames) {
     if (teamName == null || teamName.trim().length() == 0) {
       return null;
     }
@@ -86,7 +86,6 @@ public class ConfigServiceImpl implements ConfigService {
     team.setTeamName(teamName);
 
     fillTeam(team, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
-    fillTeam(team, TeamToGroup.Role.SENIOR, seniorGroups);
     fillTeam(team, TeamToGroup.Role.DEVELOPER, developerGroups);
 
     fillCategory(team, teamCategoryNames);
@@ -244,7 +243,7 @@ public class ConfigServiceImpl implements ConfigService {
       //actually added TeamToGroup relation
       addedRelations.add(teamToGroup);
     }
-    
+
     //retrieve all existing relations of a team
 
     TeamToGroup[] allTeamToGroups = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ? AND \"ROLE\" = ?", team.getID(), role));
@@ -323,20 +322,19 @@ public class ConfigServiceImpl implements ConfigService {
 
 
   @Override
-  public Team editTeam(String teamName, List<String> coordinatorGroups, List<String> seniorGroups,
-                       List<String> developerGroups, List<String> teamCategoryNames) {
+  public Team editTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups,
+                       List<String> teamCategoryNames) {
 
     teamName = teamName.trim();
 
     Team[] teamArray = ao.find(Team.class, Query.select().where("upper(\"TEAM_NAME\") = upper(?)", teamName));
     if (teamArray[0].getGroups() == null) {
-      Team team = addTeam(teamName, coordinatorGroups, seniorGroups, developerGroups, teamCategoryNames);
+      Team team = addTeam(teamName, coordinatorGroups, developerGroups, teamCategoryNames);
       return team;
     }
     Team team = teamArray[0];
 
     updateTeamMember(team, TeamToGroup.Role.COORDINATOR, coordinatorGroups);
-    updateTeamMember(team, TeamToGroup.Role.SENIOR, seniorGroups);
     updateTeamMember(team, TeamToGroup.Role.DEVELOPER, developerGroups);
 
     updateTeamCategory(team, teamCategoryNames);

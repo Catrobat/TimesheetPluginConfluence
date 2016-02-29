@@ -32,17 +32,6 @@ function populateTeamTable(config, tableId, resourceId) {
         teamName + "\" id=\"" + teamName + "-developer\" value=\"developer\"></td><td headers=\"basic-none\"><input class=\"radio\" type=\"radio\" checked=\"checked\" name=\"" +
         teamName + "\" id=\"" + teamName + "-none\" value=\"none\"></td></tr>");
     }
-    /*
-    AJS.$(resourceId).empty();
-    for (i = 0; i < config.resources.length; i++) {
-        obj = config.resources[i];
-        AJS.$(resourceId).append('<div class="checkbox">' +
-            '<input class="checkbox" type="checkbox" id="' + obj.resourceName.replace(/\W/g, "-") + '">' +
-            '<label for="' + obj.resourceName.replace(/\W/g, "-") + '">' + obj.resourceName + '</label>' +
-            '</div>'
-        );
-    }
-    */
 }
 
 function getTeamList(baseUrl, callme) {

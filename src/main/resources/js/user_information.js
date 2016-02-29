@@ -71,10 +71,8 @@ AJS.toInit(function () {
     }, "#");
 
     function populateTable(allUsers, allStates) {
-        console.log(allStates[0][0]['isActive']);
         var users = allUsers[0];
         var timesheetState = allStates[0];
-
         AJS.$(".loadingDiv").show();
         AJS.$("#user-body").empty();
         for (var i = 0; i < users.length; i++) {

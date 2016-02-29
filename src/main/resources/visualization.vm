@@ -56,7 +56,7 @@
     </script>
 
     <script>
-    function drawCategoryDiagram(data, keys, label) {
+    function drawCategoryDiagram(data) {
       new Morris.Area({
          // ID of the element in which to draw the chart.
          element: 'categoryLineDiagram',
@@ -69,7 +69,7 @@
          ykeys: ['cat1', 'cat2', 'cat3'],
          // Labels for the ykeys -- will be displayed when you hover over the
          // chart.
-         labels: ['cat1', 'cat2', 'cat3']
+         labels: ['a', 'b', 'c']
        });
     }
     </script>

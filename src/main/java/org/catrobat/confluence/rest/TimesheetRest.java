@@ -381,15 +381,16 @@ public class TimesheetRest {
         if (timesheet.getUserKey().equals(userAccessor.
                 getUserByName(user.getName()).getKey().toString())) {
           if(timesheet.getIsActive()) {
-            isActive = timesheet.getIsActive();
+            isActive = true;
           } else {
             isActive = false;
           }
         }
       }
-
-      jsonUser.setActive(isActive);
-      jsonUserList.add(jsonUser);
+      if(user.getFullName().compareTo("admin") != 0) {
+        jsonUser.setActive(isActive);
+        jsonUserList.add(jsonUser);
+      }
     }
 
     return Response.ok(jsonUserList).build();

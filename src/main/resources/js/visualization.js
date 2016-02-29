@@ -306,22 +306,15 @@ function assignCategoryDiagramData(timesheetData) {
 
     var categories = [];
     //filter all category names
-    for(var i = 0; i < dataPoints.length; i++) {
+    for(var i = 0; i < dataPoints.length; i++)
       //read category name at position 3
-      if(i % 3 == 2){
-        //http://stackoverflow.com/questions/12623272/how-to-check-if-a-string-array-contains-one-string-in-javascript
-        if (categories.indexOf(dataPoints[i]) > -1) {
-            //In the array!
-        } else {
-            //Not in the array
-          categories.push(dataPoints[i]);
-        }
-      }
-    }
+      if(i % 3 == 2)
+        if (!categories.contains(dataPoints[i]))
+            categories.push(dataPoints[i]);
+
 
     var sortedDataArray = [];
     var tempArray = [];
-
 
     for(var k = 0; k < categories.length; k++) {
       for(var i = 0; i < dataPoints.length; i++) {
@@ -350,50 +343,36 @@ function assignCategoryDiagramData(timesheetData) {
 function categoryDiagram(sortedDataArray, numberOfCategories) {
 
    var data = {};
-   var ykeyValues = [];
-
-   for(var i = 0; i < sortedDataArray.length; i++) {
-    ykeyValues.push(sortedDataArray[i][0]);
-   }
-
    //create data json array dynamically
    data['label'] = [];
-
-   //console.log(sortedDataArray);
-
    data['year'] = [];
-   for(var i = 0; i < numberOfCategories ; i++) {
+   for(var i = 0; i < numberOfCategories; i++) {
+      //console.log(sortedDataArray[i]);
+      //labels
+      if(!data['label'].contains(sortedDataArray[i][0]))
+          data['label'].push(sortedDataArray[i][0]);
+      //years
+      for(var j = 1; j < sortedDataArray[i].length - 1; j = j + 2)
+        if(!data['year'].contains(sortedDataArray[i][j]))
+            data['year'].push(sortedDataArray[i][j]);
+      //values
       data['category'+i] = [];
-      for(var j = 2; j < sortedDataArray[i].length; j = j + 2) {
-        //console.log(sortedDataArray[i]);
-
-        //filter double names
-        if (data['label'].indexOf(sortedDataArray[i][0]) > -1) {
-            //In the array!
-        } else {
-            //Not in the array
-           data['label'].push(sortedDataArray[i][0]);
+      for(var l = 0; l < data['year'].length; l++) {
+        var sum = 0;
+        for(var k = 1; k < sortedDataArray[i].length; k++) {
+            if(sortedDataArray[i][k] == data['year'][l])
+                sum = sum + sortedDataArray[i][k+1];
         }
-
-        //filter double years
-        if ((data['year'].indexOf(sortedDataArray[i][j-1]) > -1) &&
-            (data['label'].indexOf(sortedDataArray[i][j-1]) > -1)) {
-            //In the array!
-            //all objects should have the same length
-            data['category'+i].push(0);
-        } else {
-            //Not in the array
-           data['year'].push(sortedDataArray[i][j-1]);
-           //append values
-           data['category'+i].push(sortedDataArray[i][j]);
-        }
+        data['category'+i].push(sum);
       }
    }
+
+   //console.log(data);
 
    var dataJSON = [];
    var tempData = [];
    //build data JSON object
-   for(var i = 0; i < data['label'].length - 1; i++) {
+   for(var i = 0; i < data['label'].length; i++) {
      for (var key in data) {
         var obj = data[key];
         tempData.push(obj[i]);

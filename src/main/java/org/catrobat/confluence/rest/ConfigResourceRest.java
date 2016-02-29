@@ -46,71 +46,71 @@ import java.util.List;
 @Path("/config")
 @Produces({MediaType.APPLICATION_JSON})
 public class ConfigResourceRest {
-  private final ConfigService configService;
-  private final DirectoryManager directoryManager;
-  private final UserManager userManager;
-  private final UserAccessor userAccessor;
-  private final TeamService teamService;
-  private final CategoryService categoryService;
-  private final PermissionService permissionService;
-  private final MailService mailService;
+    private final ConfigService configService;
+    private final DirectoryManager directoryManager;
+    private final UserManager userManager;
+    private final UserAccessor userAccessor;
+    private final TeamService teamService;
+    private final CategoryService categoryService;
+    private final PermissionService permissionService;
+    private final MailService mailService;
 
-  public ConfigResourceRest(final UserManager userManager, final ConfigService configService,
-                            final DirectoryManager directoryManager, final TeamService teamService,
-                            final UserAccessor userAccessor, final CategoryService categoryService,
-                            final PermissionService permissionService, final MailService mailService) {
-    this.configService = configService;
-    this.directoryManager = directoryManager;
-    this.teamService = teamService;
-    this.userAccessor = userAccessor;
-    this.userManager = userManager;
-    this.categoryService = categoryService;
-    this.permissionService = permissionService;
-    this.mailService = mailService;
-  }
-
-  @GET
-  @Path("/getCategories")
-  public Response getCategories(@Context HttpServletRequest request) {
-
-    List<JsonCategory> categories = new LinkedList<JsonCategory>();
-
-    for (Category category : categoryService.all()) {
-      categories.add(new JsonCategory(category.getID(), category.getName()));
+    public ConfigResourceRest(final UserManager userManager, final ConfigService configService,
+                              final DirectoryManager directoryManager, final TeamService teamService,
+                              final UserAccessor userAccessor, final CategoryService categoryService,
+                              final PermissionService permissionService, final MailService mailService) {
+        this.configService = configService;
+        this.directoryManager = directoryManager;
+        this.teamService = teamService;
+        this.userAccessor = userAccessor;
+        this.userManager = userManager;
+        this.categoryService = categoryService;
+        this.permissionService = permissionService;
+        this.mailService = mailService;
     }
 
-    return Response.ok(categories).build();
-  }
+    @GET
+    @Path("/getCategories")
+    public Response getCategories(@Context HttpServletRequest request) {
 
-  @GET
-  @Path("/getTeams")
-  public Response getTeams(@Context HttpServletRequest request) {
+        List<JsonCategory> categories = new LinkedList<JsonCategory>();
 
-    List<JsonTeam> teams = new LinkedList<JsonTeam>();
-    UserProfile user;
+        for (Category category : categoryService.all()) {
+            categories.add(new JsonCategory(category.getID(), category.getName()));
+        }
 
-    try {
-      user = permissionService.checkIfUserExists(request);
-    } catch (NotAuthorizedException e) {
-      return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        return Response.ok(categories).build();
     }
 
-    for (Team team : teamService.all()) {
-      Category[] categories = team.getCategories();
-      int[] categoryIDs = new int[categories.length];
-      for (int i = 0; i < categories.length; i++) {
-        categoryIDs[i] = categories[i].getID();
-      }
-      teams.add(new JsonTeam(team.getID(), team.getTeamName(), categoryIDs));
+    @GET
+    @Path("/getTeams")
+    public Response getTeams(@Context HttpServletRequest request) {
+
+        List<JsonTeam> teams = new LinkedList<JsonTeam>();
+        UserProfile user;
+
+        try {
+            user = permissionService.checkIfUserExists(request);
+        } catch (NotAuthorizedException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        }
+
+        for (Team team : teamService.all()) {
+            Category[] categories = team.getCategories();
+            int[] categoryIDs = new int[categories.length];
+            for (int i = 0; i < categories.length; i++) {
+                categoryIDs[i] = categories[i].getID();
+            }
+            teams.add(new JsonTeam(team.getID(), team.getTeamName(), categoryIDs));
+        }
+
+        return Response.ok(teams).build();
     }
 
-    return Response.ok(teams).build();
-  }
-
-  @GET
-  @Path("/getConfig")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response getConfig(@Context HttpServletRequest request) {
+    @GET
+    @Path("/getConfig")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getConfig(@Context HttpServletRequest request) {
 
     /*ToDo: Refactor CheckPermission
     Response unauthorized = checkPermission(request);
@@ -119,183 +119,215 @@ public class ConfigResourceRest {
     }
     */
 
-    return Response.ok(new JsonConfig(configService)).build();
-  }
-
-  @GET
-  @Path("/getDirectories")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response getDirectories(@Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        return Response.ok(new JsonConfig(configService)).build();
     }
 
-    List<Directory> directoryList = directoryManager.findAllDirectories();
-    List<JsonConfig> jsonDirectoryList = new ArrayList<JsonConfig>();
-    for (Directory directory : directoryList) {
-      JsonConfig config = new JsonConfig();
-      config.setUserDirectoryId(directory.getId());
-      jsonDirectoryList.add(config);
-    }
-
-    return Response.ok(jsonDirectoryList).build();
-  }
-
-  @GET
-  @Path("/getTeamList")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response getTeamList(@Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
-    }
-
-    List<String> teamList = new ArrayList<String>();
-    for (Team team : configService.getConfiguration().getTeams()) {
-      teamList.add(team.getTeamName());
-    }
-
-    return Response.ok(teamList).build();
-  }
-
-  @PUT
-  @Path("/saveConfig")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response setConfig(final JsonConfig jsonConfig, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
-    }
-
-    configService.editMail(jsonConfig.getMailFromName(), jsonConfig.getMailFrom(),
-            jsonConfig.getMailSubjectTime(), jsonConfig.getMailSubjectInactive(),
-            jsonConfig.getMailSubjectEntry(), jsonConfig.getMailBodyTime(),
-            jsonConfig.getMailBodyInactive(), jsonConfig.getMailBodyEntry());
-
-    if (jsonConfig.getApprovedGroups() != null) {
-      configService.clearApprovedGroups();
-      for (String approvedGroupName : jsonConfig.getApprovedGroups()) {
-        configService.addApprovedGroup(approvedGroupName);
-      }
-    }
-
-    if (jsonConfig.getApprovedUsers() != null) {
-      configService.clearApprovedUsers();
-      for (String approvedUserName : jsonConfig.getApprovedUsers()) {
-        UserProfile userProfile = userManager.getUserProfile(approvedUserName);
-        if (userProfile != null) {
-          configService.addApprovedUser(userManager.getRemoteUser().getUserKey().toString());
+    @GET
+    @Path("/getDirectories")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDirectories(@Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
         }
-      }
+
+        List<Directory> directoryList = directoryManager.findAllDirectories();
+        List<JsonConfig> jsonDirectoryList = new ArrayList<JsonConfig>();
+        for (Directory directory : directoryList) {
+            JsonConfig config = new JsonConfig();
+            config.setUserDirectoryId(directory.getId());
+            jsonDirectoryList.add(config);
+        }
+
+        return Response.ok(jsonDirectoryList).build();
     }
 
-    if (jsonConfig.getTeams() != null) {
-      for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
+    @GET
+    @Path("/getTeamList")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTeamList(@Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
 
-        configService.editTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
-                 jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
-        /*
-        configService.removeTeam(jsonTeam.getTeamName());
-        configService.addTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
-                jsonTeam.getSeniorGroups(), jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
-      */
-      }
+        List<String> teamList = new ArrayList<String>();
+        for (Team team : configService.getConfiguration().getTeams()) {
+            teamList.add(team.getTeamName());
+        }
+
+        return Response.ok(teamList).build();
     }
 
-    return Response.noContent().build();
-  }
+    @PUT
+    @Path("/saveConfig")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setConfig(final JsonConfig jsonConfig, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
 
-  @PUT
-  @Path("/addTeamPermission")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response addTeamPermission(final String modifyTeam, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        configService.editMail(jsonConfig.getMailFromName(), jsonConfig.getMailFrom(),
+                jsonConfig.getMailSubjectTime(), jsonConfig.getMailSubjectInactive(),
+                jsonConfig.getMailSubjectEntry(), jsonConfig.getMailBodyTime(),
+                jsonConfig.getMailBodyInactive(), jsonConfig.getMailBodyEntry());
+
+        if (jsonConfig.getApprovedGroups() != null) {
+            configService.clearApprovedGroups();
+            for (String approvedGroupName : jsonConfig.getApprovedGroups()) {
+                configService.addApprovedGroup(approvedGroupName);
+            }
+        }
+
+        if (jsonConfig.getApprovedUsers() != null) {
+            configService.clearApprovedUsers();
+            for (String approvedUserName : jsonConfig.getApprovedUsers()) {
+                UserProfile userProfile = userManager.getUserProfile(approvedUserName);
+                if (userProfile != null) {
+                    configService.addApprovedUser(userManager.getRemoteUser().getUserKey().toString());
+                }
+            }
+        }
+
+        if (jsonConfig.getTeams() != null) {
+            for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
+
+                configService.editTeam(jsonTeam.getTeamName(), jsonTeam.getCoordinatorGroups(),
+                        jsonTeam.getDeveloperGroups(), jsonTeam.getTeamCategoryNames());
+            }
+        }
+
+        return Response.noContent().build();
     }
 
-    boolean successful = configService.addTeam(modifyTeam, null, null, null) != null;
+    @PUT
+    @Path("/addTeamPermission")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addTeamPermission(final String teamName, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        } else if(teamName.isEmpty()) {
+            return Response.serverError().entity("Team name must not be empty.").build();
+        }
 
-    if (successful)
-      return Response.noContent().build();
+        Team[] teams = configService.getConfiguration().getTeams();
+        for (Team team : teams) {
+            if (team.getTeamName().compareTo(teamName) == 0)
+                return Response.serverError().entity("Team name already exists.").build();
+        }
 
-    return Response.serverError().build();
-  }
+        boolean successful = configService.addTeam(teamName, null, null, null) != null;
 
-  @PUT
-  @Path("/editTeamPermission")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response editTeamPermission(final String[] teams, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        if (successful)
+            return Response.noContent().build();
+
+        return Response.serverError().build();
     }
 
-    if (teams == null || teams.length != 2) {
-      return Response.serverError().build();
-    } else if (teams[1].trim().length() == 0) {
-      return Response.serverError().entity("Team name must not be empty").build();
-    } else if (teams[1].compareTo(teams[0]) == 0) {
-      return Response.serverError().entity("New Team name must be different").build();
+    @PUT
+    @Path("/editTeamPermission")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response editTeamPermission(final String[] teams, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
+
+        if (teams == null || teams.length != 2) {
+            return Response.serverError().build();
+        } else if (teams[1].trim().isEmpty()) {
+            return Response.serverError().entity("Team name must not be empty.").build();
+        } else if (teams[1].compareTo(teams[0]) == 0) {
+            return Response.serverError().entity("New team name must be different.").build();
+        }
+
+        boolean successful = configService.editTeamName(teams[0], teams[1]) != null;
+
+        if (successful)
+            return Response.noContent().build();
+
+        return Response.serverError().build();
     }
 
-    boolean successful = configService.editTeamName(teams[0], teams[1]) != null;
+    @PUT
+    @Path("/removeTeamPermission")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response removeTeamPermission(final String teamName, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        } else if (teamName.isEmpty()) {
+            return Response.serverError().entity("Team name must not be empty.").build();
+        }
 
-    if (successful)
-      return Response.noContent().build();
+        boolean successful = configService.removeTeam(teamName) != null;
 
-    return Response.serverError().build();
-  }
+        if (successful)
+            return Response.noContent().build();
 
-  @PUT
-  @Path("/removeTeamPermission")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response removeTeamPermission(final String modifyTeam, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        return Response.serverError().build();
     }
 
-    boolean successful = configService.removeTeam(modifyTeam) != null;
+    @PUT
+    @Path("/addCategory")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addCategory(final String categoryName, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        } else if (categoryName.isEmpty()) {
+            return Response.serverError().entity("Category name must not be empty.").build();
+        }
 
-    if (successful)
-      return Response.noContent().build();
+        boolean successful = categoryService.add(categoryName) != null;
 
-    return Response.serverError().build();
-  }
+        if (successful)
+            return Response.noContent().build();
 
-  @PUT
-  @Path("/addCategory")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response addCategory(final String modifyCategory, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        return Response.serverError().build();
     }
 
-    boolean successful = categoryService.add(modifyCategory) != null;
+    @PUT
+    @Path("/editCategoryName")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response editCategoryName(final String[] categories, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
 
-    if (successful)
-      return Response.noContent().build();
+        if (categories == null || categories.length != 2) {
+            return Response.serverError().build();
+        } else if (categories[1].trim().isEmpty()) {
+            return Response.serverError().entity("Category name must not be empty.").build();
+        } else if (categories[1].compareTo(categories[0]) == 0) {
+            return Response.serverError().entity("New category name must be different.").build();
+        }
 
-    return Response.serverError().build();
-  }
+        boolean successful = configService.editCategoryName(categories[0], categories[1]) != null;
 
-  @PUT
-  @Path("/removeCategory")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response removeCategory(final String modifyCategory, @Context HttpServletRequest request) {
-    Response unauthorized = permissionService.checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        if (successful)
+            return Response.noContent().build();
+
+        return Response.serverError().build();
     }
 
-    boolean successful = categoryService.removeCategory(modifyCategory);
+    @PUT
+    @Path("/removeCategory")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response removeCategory(final String modifyCategory, @Context HttpServletRequest request) {
+        Response unauthorized = permissionService.checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
 
-    if (successful)
-      return Response.noContent().build();
+        boolean successful = categoryService.removeCategory(modifyCategory);
 
-    return Response.serverError().build();
-  }
+        if (successful)
+            return Response.noContent().build();
+
+        return Response.serverError().build();
+    }
 }

@@ -43,7 +43,6 @@ AJS.toInit(function () {
     //    AJS.$(".loadingDiv").hide();
     //});
 
-    //var baseUrl = AJS.$("meta[name='application-base-url']").attr("content");
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
     restBaseUrl = baseUrl + "/rest/timesheet/latest/";
 
@@ -92,7 +91,7 @@ AJS.toInit(function () {
         AJS.$("#user-table").trigger("update");
         var userList = new List("modify-user", {
             page: Number.MAX_VALUE,
-            valueNames: ["username", "first-name", "last-name", "email", "github", "action"]
+            valueNames: ["username", "first-name", "last-name", "email", "status", "timesheet"]
         });
 
         userList.on('updated', function () {

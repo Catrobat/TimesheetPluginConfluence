@@ -23,39 +23,41 @@ import java.util.List;
 @Transactional
 public interface ConfigService {
 
-  Config getConfiguration();
+    Config getConfiguration();
 
-  Team addTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups, List<String> teamCategoryNames);
+    Team addTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups, List<String> teamCategoryNames);
 
-  Config editTeamName(String oldTeamName, String newTeamName);
+    Config editTeamName(String oldTeamName, String newTeamName);
 
-  Team editTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups, List<String> teamCategoryNames);
+    Config editCategoryName(String oldCategoryName, String newCategoryName);
 
-  Config removeTeam(String teamName);
+    Team editTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups, List<String> teamCategoryNames);
 
-  Config editMail(String mailFromName, String mailFrom, String mailSubjectTime,
-                  String mailSubjectInactive, String mailSubjectEntry,
-                  String mailBodyTime, String mailBodyInactive, String mailBodyEntry);
+    Config removeTeam(String teamName);
 
-  List<String> getGroupsForRole(String teamName, TeamToGroup.Role role);
+    Config editMail(String mailFromName, String mailFrom, String mailSubjectTime,
+                    String mailSubjectInactive, String mailSubjectEntry,
+                    String mailBodyTime, String mailBodyInactive, String mailBodyEntry);
 
-  List<String> getCategoryNamesForTeam(String teamName);
+    List<String> getGroupsForRole(String teamName, TeamToGroup.Role role);
 
-  int[] getCategoryIDsForTeam(String teamName);
+    List<String> getCategoryNamesForTeam(String teamName);
 
-  boolean isGroupApproved(String groupName);
+    int[] getCategoryIDsForTeam(String teamName);
 
-  boolean isUserApproved(String userKey);
+    boolean isGroupApproved(String groupName);
 
-  ApprovedGroup addApprovedGroup(String approvedGroupName);
+    boolean isUserApproved(String userKey);
 
-  Config removeApprovedGroup(String approvedGroupName);
+    ApprovedGroup addApprovedGroup(String approvedGroupName);
 
-  ApprovedUser addApprovedUser(String approvedUserKey);
+    Config removeApprovedGroup(String approvedGroupName);
 
-  Config removeApprovedUser(String approvedUserKey);
+    ApprovedUser addApprovedUser(String approvedUserKey);
 
-  void clearApprovedGroups();
+    Config removeApprovedUser(String approvedUserKey);
 
-  void clearApprovedUsers();
+    void clearApprovedGroups();
+
+    void clearApprovedUsers();
 }

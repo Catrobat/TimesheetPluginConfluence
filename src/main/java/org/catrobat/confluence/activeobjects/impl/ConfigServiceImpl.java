@@ -320,7 +320,6 @@ public class ConfigServiceImpl implements ConfigService {
     return getConfiguration();
   }
 
-
   @Override
   public Team editTeam(String teamName, List<String> coordinatorGroups, List<String> developerGroups,
                        List<String> teamCategoryNames) {
@@ -370,6 +369,29 @@ public class ConfigServiceImpl implements ConfigService {
       }
 
     ao.delete(team);
+
+    return getConfiguration();
+  }
+
+  @Override
+  public Config editCategoryName(String oldCategoryName, String newCategoryName) {
+    if (oldCategoryName == null || newCategoryName == null) {
+      return null;
+    }
+
+    Category[] tempCategoryArray = ao.find(Category.class, "NAME = ?", oldCategoryName);
+    if (tempCategoryArray.length == 0) {
+      return null;
+    }
+    Category category = tempCategoryArray[0];
+
+    tempCategoryArray = ao.find(Category.class, "NAME = ?", newCategoryName);
+    if (tempCategoryArray.length != 0) {
+      return null;
+    }
+
+    category.setName(newCategoryName);
+    category.save();
 
     return getConfiguration();
   }

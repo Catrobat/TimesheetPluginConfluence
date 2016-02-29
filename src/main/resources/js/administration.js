@@ -30,7 +30,7 @@ AJS.toInit(function () {
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
     restBaseUrl = baseUrl + "/rest/timesheet/latest/";
     var teams = [];
-    var editNameDialog;
+    var editNameDialog, editCategoryNameDialog;
 
     function scrollToAnchor(aid) {
         var aTag = AJS.$("a[name='" + aid + "']");
@@ -46,17 +46,17 @@ AJS.toInit(function () {
         });
 
         var categoriesFetched = AJS.$.ajax({
-             type: 'GET',
-             url: restBaseUrl + 'config/getCategories',
-             contentType: "application/json"
+            type: 'GET',
+            url: restBaseUrl + 'config/getCategories',
+            contentType: "application/json"
         });
 
         AJS.$.when(allUsersFetched, categoriesFetched)
             .done(populateForm)
             .fail(function (error) {
                 AJS.messages.error({
-                  title: 'There was an error while fetching user data.',
-                  body: '<p>Reason: ' + error.responseText + '</p>'
+                    title: 'There was an error while fetching user data.',
+                    body: '<p>Reason: ' + error.responseText + '</p>'
                 });
                 console.log(error);
             });
@@ -68,22 +68,19 @@ AJS.toInit(function () {
             url: restBaseUrl + 'config/getConfig',
             dataType: "json",
             success: function (config) {
-
-            console.log(config);
-
+                //manage mail
                 if (config.mailFromName)
                     AJS.$("#mail-from-name").val(config.mailFromName);
                 if (config.mailFrom)
                     AJS.$("#mail-from").val(config.mailFrom);
-
+                //mange mail subjects
                 if (config.mailSubjectTime)
                     AJS.$("#mail-subject-out-of-time").val(config.mailSubjectTime);
                 if (config.mailSubjectInactive)
                     AJS.$("#mail-subject-inactive").val(config.mailSubjectInactive);
                 if (config.mailSubjectEntry)
                     AJS.$("#mail-subject-entry-change").val(config.mailSubjectEntry);
-
-
+                //mange mail bodies
                 if (config.mailBodyTime)
                     AJS.$("#mail-body-out-of-time").val(config.mailBodyTime);
                 if (config.mailBodyInactive)
@@ -91,6 +88,7 @@ AJS.toInit(function () {
                 if (config.mailBodyEntry)
                     AJS.$("#mail-body-entry-change").val(config.mailBodyEntry);
 
+                //build team list
                 teams = [];
                 AJS.$("#teams").empty();
                 for (var i = 0; i < config.teams.length; i++) {
@@ -99,8 +97,8 @@ AJS.toInit(function () {
 
                     var tempTeamName = team['teamName'].replace(/\W/g, '-');
                     AJS.$("#teams").append("<h3>" + team['teamName'] +
-                    "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
-                    "<span class=\"aui-icon aui-icon-small aui-iconfont-edit\">Editing</span> Edit</button></h3><fieldset>");
+                        "<button class=\"aui-button aui-button-subtle\" value=\"" + team['teamName'] + "\">" +
+                        "<span class=\"aui-icon aui-icon-small aui-iconfont-edit\">Editing</span> Edit Team Name </button></h3><fieldset>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-coordinator\">Coordinator</label><input class=\"text coordinator\" type=\"text\" id=\"" + tempTeamName + "-coordinator\" value=\"" + team['coordinatorGroups'] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-developer\">User</label><input class=\"text user\" type=\"text\" id=\"" + tempTeamName + "-developer\" value=\"" + team['developerGroups'] + "\"></div>");
                     AJS.$("#teams").append("<div class=\"field-group\"><label for=\"" + tempTeamName + "-category\">Category</label><input class=\"text category\" type=\"text\" id=\"" + tempTeamName + "-category\" value=\"" + team['teamCategoryNames'] + "\"></div>");
@@ -115,6 +113,15 @@ AJS.toInit(function () {
                 var categoryList = [];
                 for (var i = 0; i < allCategories[0].length; i++) {
                     categoryList.push(allCategories[0][i]['categoryName']);
+                }
+
+                //build category list
+                AJS.$("#categories").empty();
+                for (var i = 0; i < categoryList.length; i++) {
+                    AJS.$("#categories").append("<h3>" + categoryList[i] +
+                        "<button class=\"aui-button aui-button-subtle\" value=\"C-" + categoryList[i] + "\">" +
+                        "<span class=\"aui-icon aui-icon-small aui-iconfont-edit\">Editing</span> Edit Category Name </button></h3><fieldset>");
+                    AJS.$("#categories").append("</fieldset>");
                 }
 
                 if (config.approvedUsers) {
@@ -135,84 +142,7 @@ AJS.toInit(function () {
                     });
                 }
 
-               AJS.$("#userdirectory").auiSelect2({
-                    placeholder: "Search for directories",
-                    minimumInputLength: 0,
-                    ajax: {
-                        url: restBaseUrl + 'config/getDirectories',
-                        dataType: "json",
-                        data: function (term, page) {
-                            return {query: term};
-                        },
-                        results: function (data, page) {
-                            var select2data = [];
-                            for (var i = 0; i < data.length; i++) {
-                                select2data.push({id: data[i].userDirectoryId, text: data[i].userDirectoryName});
-                            }
-                            return {results: select2data};
-                        }
-                    }
-                });
-                /*)
-                AJS.$(".single-jira-group").auiSelect2({
-                    placeholder: "Search for group",
-                    minimumInputLength: 0,
-                    ajax: {
-                        //url: baseUrl + 'rest/api/2/groups/picker',
-                        url: baseUrl + 'rest/prototype/1/search/user',
-                        dataType: "json",
-                        data: function (term, page) {
-                            return {query: term};
-                        },
-                        results: function (data, page) {
-                            var select2data = [];
-                            for (var i = 0; i < data.groups.length; i++) {
-                                select2data.push({id: data.groups[i].name, text: data.groups[i].name});
-                            }
-                            return {results: select2data};
-                        }
-                    }
-                });
-
-                AJS.$("#plugin-permission").auiSelect2({
-                    placeholder: "Search for users and groups",
-                    minimumInputLength: 0,
-                    tags: true,
-                    tokenSeparators: [",", " "],
-                    ajax: {
-                        url: baseUrl + '/rest/prototype/1/search/user-or-group',
-                        //url: baseUrl + 'rest/prototype/1/search/user',
-                        dataType: "json",
-                        data: function (term, page) {
-                            return {query: term};
-                        },
-                        results: function (data, page) {
-                            var select2data = [];
-                            for (var i = 0; i < data.group.length; i++) {
-                                select2data.push({
-                                    id: "groups-" + data.group[i].name,
-                                    text: data.group[i].name
-                                });
-                            }
-                            for (var i = 0; i < data.result.length; i++) {
-                                select2data.push({
-                                    id: "users-" + data.result[i].name,
-                                    text: data.result[i].name
-                                });
-                            }
-                            return {results: select2data};
-                        }
-                    },
-                    initSelection: function (elements, callback) {
-                        var data = [];
-                        var array = elements.val().split(",");
-                        for (var i = 0; i < array.length; i++) {
-                            data.push({id: array[i], text: array[i].replace(/^users-/i, "").replace(/^groups-/i, "")});
-                        }
-                        callback(data);
-                    }
-                });
-                */
+                /*
                 var approved = [];
                 if (config.approvedGroups) {
                     for (var i = 0; i < config.approvedGroups.length; i++) {
@@ -231,6 +161,7 @@ AJS.toInit(function () {
                     id: config.userDirectoryId,
                     text: config.userDirectoryName
                 });
+                */
 
                 AJS.$(".loadingDiv").hide();
             },
@@ -263,13 +194,13 @@ AJS.toInit(function () {
         var approvedGroups = [];
 
         /*
-        for (var i = 0; i < usersAndGroups.length; i++) {
-            if (usersAndGroups[i].match("^users-")) {
-                approvedUsers.push(usersAndGroups[i].split("users-")[1]);
-            } else if (usersAndGroups[i].match("^groups-")) {
-                approvedGroups.push(usersAndGroups[i].split("groups-")[1]);
-            }
-        }*/
+         for (var i = 0; i < usersAndGroups.length; i++) {
+         if (usersAndGroups[i].match("^users-")) {
+         approvedUsers.push(usersAndGroups[i].split("users-")[1]);
+         } else if (usersAndGroups[i].match("^groups-")) {
+         approvedGroups.push(usersAndGroups[i].split("groups-")[1]);
+         }
+         }*/
 
         config.approvedUsers = approvedUsers;
         config.approvedGroups = approvedGroups;
@@ -295,8 +226,6 @@ AJS.toInit(function () {
             }
             config.teams.push(tempTeam);
         }
-
-        console.log(config);
 
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
@@ -439,6 +368,75 @@ AJS.toInit(function () {
         editNameDialog.show();
     }
 
+    function editCategory(categoryName) {
+        //remove prefix
+        categoryName = categoryName.slice(2);
+        // may be in background and therefore needs to be removed
+        if (editCategoryNameDialog) {
+            try {
+                editCategoryNameDialog.remove();
+            } catch (err) {
+                // may be removed already
+            }
+        }
+
+        editCategoryNameDialog = new AJS.Dialog({
+            width: 600,
+            height: 200,
+            id: "edit-category-name-dialog",
+            closeOnOutsideClick: true
+        });
+
+        var content = "<form class=\"aui\">\n" +
+            "    <fieldset>\n" +
+            "        <div class=\"field-group\">\n" +
+            "            <label for=\"new-category-name\">New Category Name</label>\n" +
+            "            <input class=\"text\" type=\"text\" id=\"new-category-name\" name=\"new-category-name\" title=\"new-category-name\">\n" +
+            "        </div>\n" +
+            "    </fieldset>\n" +
+            " </form> ";
+
+        editCategoryNameDialog.addHeader("New Category Name for " + categoryName);
+        editCategoryNameDialog.addPanel("Panel 2", content, "panel-body");
+
+        editCategoryNameDialog.addButton("Save", function (dialog) {
+            AJS.$(".loadingDiv").show();
+            AJS.$.ajax({
+                url: restBaseUrl + 'config/editCategoryName',
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify([categoryName, AJS.$("#new-category-name").val()]),
+                processData: false,
+                success: function () {
+                    AJS.messages.success({
+                        title: "Success!",
+                        body: "Category edited!"
+                    });
+                    fetchData();
+                    scrollToAnchor('top');
+                    AJS.$(".loadingDiv").hide();
+                },
+                error: function (error) {
+                    AJS.messages.error({
+                        title: "Error!",
+                        body: "Something went wrong!<br />" + error.responseText
+                    });
+                    scrollToAnchor('top');
+                    AJS.$(".loadingDiv").hide();
+                }
+            });
+
+            dialog.remove();
+        });
+        editCategoryNameDialog.addLink("Cancel", function (dialog) {
+            dialog.remove();
+        }, "#");
+
+        editCategoryNameDialog.gotoPage(0);
+        editCategoryNameDialog.gotoPanel(0);
+        editCategoryNameDialog.show();
+    }
+
     function removeTeam() {
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
@@ -496,6 +494,9 @@ AJS.toInit(function () {
         if (AJS.$(document.activeElement).val() === 'Save') {
             updateConfig();
             scrollToAnchor('top');
+        } else if ((AJS.$(document.activeElement).val()[0] === "C") &&
+            (AJS.$(document.activeElement).val()[1] === "-")) {
+            editCategory(AJS.$(document.activeElement).val());
         } else {
             editTeam(AJS.$(document.activeElement).val());
         }
@@ -531,7 +532,7 @@ AJS.toInit(function () {
     });
 
     function unescapeHtml(safe) {
-        if(safe) {
+        if (safe) {
             return AJS.$('<div />').html(safe).text();
         } else {
             return '';

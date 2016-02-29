@@ -52,8 +52,11 @@
                     <div class="description">
                         <ul>
                             <li>If nothing is given, every Confluence Administrator may read/write</li>
-                            <li>If a group is given, every Confluence Administrator within this group may read/write</li>
-                            <li>If a single user is given and this user is a Confluence Administrator this user may read/write</li>
+                            <li>If a group is given, every Confluence Administrator within this group may read/write
+                            </li>
+                            <li>If a single user is given and this user is a Confluence Administrator this user may
+                                read/write
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -119,66 +122,73 @@
                 </div>
             </fieldset>
 
-           <h3>Inactive</h3>
-           <fieldset>
-               <div class="field-group">
-                   <label for="mail-subject-inactive">Subject</label>
-                   <input class="text" type="text" id="mail-subject-inactive" name="mail-subject-inactive"
-                          title="mail-subject-inactive">
-                   <div class="description">
-                       The subject of the mail, if a student was not active since two weeks.
-                   </div>
-               </div>
-           </fieldset>
-           <fieldset>
-               <div class="field-group">
-                   <label for="mail-body-inactive">Body</label>
-                   <textarea name="mail-body-inactive" id="mail-body-inactive"></textarea>
-                   <div class="description">
-                       The text of the mail. Following strings will be replaced by Confluence automatically:
-                       <ul>
-                           <li><span class="mono">{{name}}</span>: The name of the user</li>
-                           <li><span class="mono">{{date}}</span>: The date of the users last entry</li>
-                       </ul>
-                   </div>
-               </div>
-           </fieldset>
+            <h3>Inactive</h3>
+            <fieldset>
+                <div class="field-group">
+                    <label for="mail-subject-inactive">Subject</label>
+                    <input class="text" type="text" id="mail-subject-inactive" name="mail-subject-inactive"
+                           title="mail-subject-inactive">
+                    <div class="description">
+                        The subject of the mail, if a student was not active since two weeks.
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="field-group">
+                    <label for="mail-body-inactive">Body</label>
+                    <textarea name="mail-body-inactive" id="mail-body-inactive"></textarea>
+                    <div class="description">
+                        The text of the mail. Following strings will be replaced by Confluence automatically:
+                        <ul>
+                            <li><span class="mono">{{name}}</span>: The name of the user</li>
+                            <li><span class="mono">{{date}}</span>: The date of the users last entry</li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
 
-           <h3>Administrator Changed Timesheet Entry</h3>
-           <fieldset>
-               <div class="field-group">
-                   <label for="mail-subject-entry-change">Subject</label>
-                       <input class="text" type="text" id="mail-subject-entry-change" name="mail-subject-entry-change"
-                              title="mail-subject-entry-change">
-                   <div class="description">
-                       The subject of the mail, if an administrator changed an user timesheet entry.
-                   </div>
-               </div>
-           </fieldset>
-           <fieldset>
-               <div class="field-group">
-                   <label for="mail-body-entry-change">Body</label>
-                   <textarea name="mail-body-entry-change" id="mail-body-entry-change"></textarea>
-                   <div class="description">
-                       The text of the mail. Following strings will be replaced by Confluence automatically:
-                       <ul>
-                           <li><span class="mono">{{name}}</span>: The name of the user</li>
-                           <li><span class="mono">{{original}}</span>: The original user entry</li>
-                           <li><span class="mono">{{actual}}</span>: The actual user entry (changed by the Administrator)</li>
-                       </ul>
-                   </div>
-               </div>
-           </fieldset>
+            <h3>Administrator Changed Timesheet Entry</h3>
+            <fieldset>
+                <div class="field-group">
+                    <label for="mail-subject-entry-change">Subject</label>
+                    <input class="text" type="text" id="mail-subject-entry-change" name="mail-subject-entry-change"
+                           title="mail-subject-entry-change">
+                    <div class="description">
+                        The subject of the mail, if an administrator changed an user timesheet entry.
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="field-group">
+                    <label for="mail-body-entry-change">Body</label>
+                    <textarea name="mail-body-entry-change" id="mail-body-entry-change"></textarea>
+                    <div class="description">
+                        The text of the mail. Following strings will be replaced by Confluence automatically:
+                        <ul>
+                            <li><span class="mono">{{name}}</span>: The name of the user</li>
+                            <li><span class="mono">{{original}}</span>: The original user entry</li>
+                            <li><span class="mono">{{actual}}</span>: The actual user entry (changed by the
+                                Administrator)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
 
-           <h2>Export</h2>
-           <p>Download all user timesheets as <a href="download/all">CSV</a>.</p>
+            <h2>Export</h2>
+            <p>Download all user timesheets as <a href="download/all">CSV</a>.</p>
 
-           <h2>Team Configuration</h2>
+            <h2>Team Configuration</h2>
 
-           <div id="teams"></div>
-           <div class="field-group">
-               <input type="submit" value="Save" class="aui-button aui-button-primary">
-           </div>
+            <div id="teams"></div>
+
+            <h2>Category Management</h2>
+
+            <div id="categories"></div>
+
+            <div class="field-group">
+                <input type="submit" value="Save" class="aui-button aui-button-primary">
+            </div>
         </form>
     </div>
     <div class="tabs-pane" id="tabs-teams">
@@ -207,7 +217,8 @@
         <form id="modify-categoryList" class="aui">
             <fieldset>
                 <div class="field-group">
-                    <label for="category-name">Category name<span class="aui-icon icon-required"> required</span></label>
+                    <label for="category-name">Category name<span
+                            class="aui-icon icon-required"> required</span></label>
                     <input class="text" type="text" id="category-name" name="category-name" title="category-name">
                 </div>
                 <div class="field-group">

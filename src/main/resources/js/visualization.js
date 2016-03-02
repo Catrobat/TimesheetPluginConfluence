@@ -88,6 +88,19 @@ Array.prototype.contains = function (k) {
     return false;
 }
 
+function appendTimeToPiChart(theoryTime, practicalTime, totalTime) {
+    var piChartDataPoints = [];
+
+    //practice hours
+    piChartDataPoints.push("Practice Hours Percentage");
+    piChartDataPoints.push(((practicalTime * 100) / totalTime).toString().slice(0,5));
+    //theory hours
+    piChartDataPoints.push("Theory Hours Percentage");
+    piChartDataPoints.push(((theoryTime * 100) / totalTime).toString().slice(0,5));
+
+    drawPiChartDiagram(piChartDataPoints);
+}
+
 function appendEntriesToTable(timesheetData) {
 
     var visualizationTable = AJS.$("#visualization-table");
@@ -104,8 +117,8 @@ function appendEntriesToTable(timesheetData) {
     var index = 0;
     var dataArray = [];
     var dataPoints = [];
-    var piChartDataPoints = [];
-    var piChartDataPractice = 0;
+    //pi chart variables
+    var theoryHours = 0;
 
     while (i < availableEntries.length) {
         var referenceEntryDate = new Date(availableEntries[pos].beginDate);
@@ -129,6 +142,11 @@ function appendEntriesToTable(timesheetData) {
                 totalHours = totalHours + minutesToFullHours;
                 totalMinutes = totalMinutes - minutesToFullHours * 60;
             }
+
+            //calculate theory time in minutes
+            if (timesheetData.categories[availableEntries[i].categoryID].categoryName === "Theory")
+                theoryHours = theoryHours + calculatedTime;
+
         } else {
             pos = i;
             i = i - 1;
@@ -142,18 +160,13 @@ function appendEntriesToTable(timesheetData) {
                 begin: totalHours + "h" + totalMinutes + "min",
             };
 
-            //add points
+            //add points to line diagram
             var dataX = referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1);
             var dataY = totalHours + totalMinutes / 60;
             dataPoints.push(dataX);
             dataPoints.push(dataY);
 
-            //if not theory
-            if (timesheetData.categories[availableEntries[i].categoryID].categoryName !== "Theory") {
-                //piChartDataPractice = piChartDataPractice + totalHours * 60 + totalMinutes;
-                console.log(totalHours + totalMinutes / 60);
-            }
-
+            //add entry to table
             dataArray.push(newVisualizationEntry);
             index = index + 1;
 
@@ -178,13 +191,6 @@ function appendEntriesToTable(timesheetData) {
     }
 
     var totalTime = totalTimeHours * 60 + totalTimeMinutes;
-
-    //practice hours
-    piChartDataPoints.push("Practice Hours Percentage");
-    piChartDataPoints.push((piChartDataPractice * 100) / totalTime);
-    //theory hours
-    piChartDataPoints.push("Theory Hours Percentage");
-    piChartDataPoints.push(100 - (piChartDataPractice * 100) / totalTime);
 
     //entry for whole time
     var newVisualizationEntry = {
@@ -222,9 +228,10 @@ function appendEntriesToTable(timesheetData) {
         {entry: newVisualizationEntry, teams: timesheetData.teams}));
     visualizationTable.append(viewRow);
 
-    //draw graphs
+    //draw line graph
     diagram(dataPoints);
-    drawPiChartDiagram(piChartDataPoints);
+    console.log(theoryHours);
+    appendTimeToPiChart(theoryHours, totalTime - theoryHours, totalTime);
 }
 
 //reverse order of the table from bottom to top

@@ -105,11 +105,14 @@
                 </div>
             </footer>
         </section>
-
-        <div id="timesheet-table" class="aui aui-table-interactive table">
+        
+        <div id="timesheet-table" class="aui aui-table-interactive aui-table-sortable table">
             <div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
         </div>
     </div>
 </div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.1.1/list.min.js"></script>
+
 </body>
 </html>

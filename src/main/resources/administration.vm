@@ -62,18 +62,7 @@
                 </div>
             </fieldset>
 
-            <h2>General</h2>
-            <fieldset>
-                <div class="field-group">
-                    <label for="userdirectory">Userdirectory</label>
-                    <input class="text" type="text" id="userdirectory" name="userdirectory"
-                           title="userdirectory">
-
-                    <div class="description">
-                        Adds user to given user directory.
-                    </div>
-                </div>
-            </fieldset>
+            <h2>Read Access To All Timesheets</h2>
 
             <h2>E-Mail Notifications</h2>
             <fieldset>
@@ -179,10 +168,18 @@
             <p>Download all user timesheets as <a href="download/all">CSV</a>.</p>
 
             <h2>Team Configuration</h2>
+            <p>
+                Provides: change Team name; assign users and/or categories to a team.
+            </p>
+            <p></p>
 
             <div id="teams"></div>
 
             <h2>Category Management</h2>
+            <p>
+                Provides: change Category name.
+            </p>
+            <p></p>
 
             <div id="categories"></div>
 

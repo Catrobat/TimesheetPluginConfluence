@@ -81,17 +81,19 @@ AJS.toInit(function () {
             var tsState = timesheetState[i]['active'] ? "active" : "inactive";
 
             AJS.$("#user-body").append("<tr><td headers=\"basic-username\" class=\"username\">" + username + "</td>" +
-            "<td headers=\"basic-first-name\" class=\"first-name\">" + obj['firstName'] + "</td>" +
-            "<td headers=\"basic-last-name\" class=\"last-name\">" + obj['lastName'] + "</td>" +
-            "<td headers=\"basic-email\" class=\"email\">" + obj['email'] + "</td>" +
-            "<td headers=\"basic-state\" class=\"status\">" + state + "</td>" +
-            "<td headers=\"basic-timesheet-state\" class=\"timesheet\">" + tsState + "</td></tr>");
+                "<td headers=\"basic-email\" class=\"email\">" + obj['email'] + "</td>" +
+                "<td headers=\"basic-state\" class=\"status\">" + state + "</td>" +
+                "<td headers=\"basic-timesheet-state\" class=\"timesheet\">" + tsState + "</td>" +
+                "<td headers=\"basic-timesheet-disable\" class=\"timsheet\"><input class=\"checkbox\" type=\"checkbox\" name=\"checkBoxOne\" id=\"checkBoxOne\"></td></tr>");
         }
+
+        //enable checkbox
+        //AJS.$("#checkBoxOne")[0].checked = true
 
         AJS.$("#user-table").trigger("update");
         var userList = new List("modify-user", {
             page: Number.MAX_VALUE,
-            valueNames: ["username", "first-name", "last-name", "email", "status", "timesheet"]
+            valueNames: ["username", "email", "status", "timesheet"]
         });
 
         userList.on('updated', function () {
@@ -102,27 +104,27 @@ AJS.toInit(function () {
 
     function fetchData() {
 
-      var allUserFetched = AJS.$.ajax({
-          type: 'GET',
-          url: restBaseUrl + 'user/getUsers',
-          contentType: "application/json"
-      });
-
-      var allStatesFetched = AJS.$.ajax({
-          type: 'GET',
-          url: restBaseUrl + 'timesheets/getStates',
-          contentType: "application/json"
-      });
-
-      AJS.$.when(allUserFetched, allStatesFetched)
-        .done(populateTable)
-        .fail(function (error) {
-            AJS.messages.error({
-              title: 'There was an error while fetching the required data.',
-              body: '<p>Reason: ' + error.responseText + '</p>'
-            });
-            console.log(error);
+        var allUserFetched = AJS.$.ajax({
+            type: 'GET',
+            url: restBaseUrl + 'user/getUsers',
+            contentType: "application/json"
         });
+
+        var allStatesFetched = AJS.$.ajax({
+            type: 'GET',
+            url: restBaseUrl + 'timesheets/getStates',
+            contentType: "application/json"
+        });
+
+        AJS.$.when(allUserFetched, allStatesFetched)
+            .done(populateTable)
+            .fail(function (error) {
+                AJS.messages.error({
+                    title: 'There was an error while fetching the required data.',
+                    body: '<p>Reason: ' + error.responseText + '</p>'
+                });
+                console.log(error);
+            });
     }
 
     fetchData();

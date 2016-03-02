@@ -7,32 +7,31 @@ var restBaseUrl;
 var listOfUsers = [];
 
 AJS.toInit(function () {
-	var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
-	restBaseUrl = baseUrl + "/rest/timesheet/latest/";
+    var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
+    restBaseUrl = baseUrl + "/rest/timesheet/latest/";
 
-	initSaveButton();
-
-	fetchUsers();
-	fetchData();
+    initSaveButton();
+    fetchUsers();
+    fetchData();
 });
 
 function initSaveButton() {
-  AJS.$("#timesheet-information").submit(function (e) {
-      e.preventDefault();
-      if (AJS.$(document.activeElement).val() === 'Save') {
-          getExistingTimesheetHours();
-      }
-  });
+    AJS.$("#timesheet-information").submit(function (e) {
+        e.preventDefault();
+        if (AJS.$(document.activeElement).val() === 'Save') {
+            getExistingTimesheetHours();
+        }
+    });
 }
 
-function initSelectTimesheetButton(){
-  AJS.$("#timesheet-settings").submit(function (e) {
-      e.preventDefault();
-      if (AJS.$(document.activeElement).val() === 'Show') {
-          var selectedUser = AJS.$("#user-select2-field").val().split(',');
-          getTimesheetOfUser(selectedUser);
-      }
-  });
+function initSelectTimesheetButton() {
+    AJS.$("#timesheet-settings").submit(function (e) {
+        e.preventDefault();
+        if (AJS.$(document.activeElement).val() === 'Show') {
+            var selectedUser = AJS.$("#user-select2-field").val().split(',');
+            getTimesheetOfUser(selectedUser);
+        }
+    });
 }
 
 function initUserSelect(jsonConfig, jsonUser) {
@@ -47,14 +46,14 @@ function initUserSelect(jsonConfig, jsonUser) {
         var team = config.teams[i];
         //check if user is coordinator of a team
         for (var j = 0; j < team['coordinatorGroups'].length; j++) {
-            if(team['coordinatorGroups'][j].localeCompare(userName) == 0) {
+            if (team['coordinatorGroups'][j].localeCompare(userName) == 0) {
                 isTeamCoordinator = true;
             } else {
                 isTeamCoordinator = false;
             }
         }
         //add member of his team to the select2 box
-        if(isTeamCoordinator) {
+        if (isTeamCoordinator) {
             for (var j = 0; j < team['developerGroups'].length; j++) {
                 listOfUsers.push(team['developerGroups'][j]);
             }
@@ -66,7 +65,7 @@ function initUserSelect(jsonConfig, jsonUser) {
         tokenSeparators: [",", " "]
     });
 
-    if(isTeamCoordinator){
+    if (isTeamCoordinator) {
         initSelectTimesheetButton();
         AJS.$("#selectTimesheetOfUser").show();
     } else {
@@ -75,351 +74,354 @@ function initUserSelect(jsonConfig, jsonUser) {
 
     //Dropdown List
     /*
-    AJS.$("#selectTimesheetOfUser").append("<fieldset>");
-    AJS.$("#selectTimesheetOfUser").append("<p>");
-    AJS.$("#selectTimesheetOfUser").append("<a href=\"#dwarfers\" aria-owns=\"dwarfers\" aria-haspopup=\"true\" class=\"aui-button aui-dropdown2-trigger aui-style-default\">Shipmates</a>");
-    AJS.$("#selectTimesheetOfUser").append("</p>");
-    AJS.$("#selectTimesheetOfUser").append("<div id=\"dwarfers\" class=\"aui-dropdown2 aui-style-default\">");
-    AJS.$("#selectTimesheetOfUser").append("<ul class=\"aui-list-truncate\">");
-    AJS.$("#selectTimesheetOfUser").append("<li><a href=\"http://example.com/\">Lister</a></li>");
-    /*
-    for(var k = 0; k < listOfUsers.length; k++) {
-        AJS.$("#selectTimesheetOfUser").append("<li><a href=\"#\">Menu item</a></li>");
-    }
-    AJS.$("#selectTimesheetOfUser").append("</ul>");
-    AJS.$("#selectTimesheetOfUser").append("</div>");
-    AJS.$("#selectTimesheetOfUser").append("</fieldset>");
-    */
+     AJS.$("#selectTimesheetOfUser").append("<fieldset>");
+     AJS.$("#selectTimesheetOfUser").append("<p>");
+     AJS.$("#selectTimesheetOfUser").append("<a href=\"#dwarfers\" aria-owns=\"dwarfers\" aria-haspopup=\"true\" class=\"aui-button aui-dropdown2-trigger aui-style-default\">Shipmates</a>");
+     AJS.$("#selectTimesheetOfUser").append("</p>");
+     AJS.$("#selectTimesheetOfUser").append("<div id=\"dwarfers\" class=\"aui-dropdown2 aui-style-default\">");
+     AJS.$("#selectTimesheetOfUser").append("<ul class=\"aui-list-truncate\">");
+     AJS.$("#selectTimesheetOfUser").append("<li><a href=\"http://example.com/\">Lister</a></li>");
+     /*
+     for(var k = 0; k < listOfUsers.length; k++) {
+     AJS.$("#selectTimesheetOfUser").append("<li><a href=\"#\">Menu item</a></li>");
+     }
+     AJS.$("#selectTimesheetOfUser").append("</ul>");
+     AJS.$("#selectTimesheetOfUser").append("</div>");
+     AJS.$("#selectTimesheetOfUser").append("</fieldset>");
+     */
 }
 
 function fetchDataCoordinator(selectedUserTimesheetID) {
 
-	var timesheetFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'coordinator/' + selectedUserTimesheetID,
-		contentType: "application/json"
-	});
+    var timesheetFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'coordinator/' + selectedUserTimesheetID,
+        contentType: "application/json"
+    });
 
-	var entriesFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'coordinator/' + selectedUserTimesheetID + '/entries',
-		contentType: "application/json"
-	});
+    var entriesFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'coordinator/' + selectedUserTimesheetID + '/entries',
+        contentType: "application/json"
+    });
 
-	var categoriesFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'categories',
-		contentType: "application/json"
-	});
+    var categoriesFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'categories',
+        contentType: "application/json"
+    });
 
-	var teamsFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'teams',
-		contentType: "application/json"
-	});
+    var teamsFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'teams',
+        contentType: "application/json"
+    });
 
-	AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched)
-		.done(assembleTimesheetData)
-		.done(populateTable, prepareImportDialog)
-		.fail(function (error) {
-			AJS.messages.error({
-				title: 'There was an error while fetching data.',
-				body: '<p>Reason: ' + error.responseText + '</p>'
-			});
-			console.log(error);
-		});
+    AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched)
+        .done(assembleTimesheetData)
+        .done(populateTable, prepareImportDialog)
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error while fetching data.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+            console.log(error);
+        });
 }
 
 //ToDo: Only the first one will be taken
 function getTimesheetOfUser(selectedUser) {
-  var timesheetFetched = AJS.$.ajax({
-    type: 'GET',
-    url: restBaseUrl + 'timesheetID/fromUser/' + selectedUser[0],
-    contentType: "application/json"
-  });
-
-  AJS.$.when(timesheetFetched)
-  .done(fetchDataCoordinator)
-  .fail(function (error) {
-    AJS.messages.error({
-      title: 'There was an error while fetching data.',
-      body: '<p>Reason: ' + error.responseText + '</p>'
+    var timesheetFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'timesheetID/fromUser/' + selectedUser[0],
+        contentType: "application/json"
     });
-    console.log(error);
-  });
+
+    AJS.$.when(timesheetFetched)
+        .done(fetchDataCoordinator)
+        .done(location.reload())
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error while fetching data.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+            console.log(error);
+        });
 }
 
 function getExistingTimesheetHours() {
-  var timesheetFetched = AJS.$.ajax({
-    type: 'GET',
-    url: restBaseUrl + 'timesheets/' + timesheetID,
-    contentType: "applicatPion/json"
-  });
-  AJS.$.when(timesheetFetched)
-  .done(updateTimesheetHours)
-  .fail(function (error) {
-    AJS.messages.error({
-      title: 'There was an error while fetching data.',
-      body: '<p>Reason: ' + error.responseText + '</p>'
+    var timesheetFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'timesheets/' + timesheetID,
+        contentType: "applicatPion/json"
     });
-    console.log(error);
-  });
+    AJS.$.when(timesheetFetched)
+        .done(updateTimesheetHours)
+        .done(location.reload())
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error while fetching data.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+            console.log(error);
+        });
 }
 
 function updateTimesheetHours(existingTimesheetData) {
-	var timesheetUpdateData = {
-      timesheetID: existingTimesheetData.timesheetID,
-      lectures: existingTimesheetData.lectures,
-      targetHourPractice: AJS.$("#timesheet-hours-text").val(),
-      targetHourTheory: existingTimesheetData.targetHourTheory,
-      isActive: existingTimesheetData.isActive,
-	};
-  AJS.$.ajax({
-  		type: "post",
-      url : restBaseUrl + 'timesheets/' + timesheetID + '/changeHours',
-  		contentType: "application/json",
-  		data: JSON.stringify(timesheetUpdateData)
-  	})
-  	.fail(function (error) {
-  		AJS.messages.error({
-  			title: 'There was an error during your Google Timesheet import.',
-  			body: '<p>Reason: ' + error.responseText + '</p>'
-  		});
-  	});
+    var timesheetUpdateData = {
+        timesheetID: existingTimesheetData.timesheetID,
+        lectures: existingTimesheetData.lectures,
+        targetHourPractice: AJS.$("#timesheet-hours-text").val(),
+        targetHourTheory: existingTimesheetData.targetHourTheory,
+        isActive: existingTimesheetData.isActive,
+    };
+    AJS.$.ajax({
+            type: "post",
+            url: restBaseUrl + 'timesheets/' + timesheetID + '/changeHours',
+            contentType: "application/json",
+            data: JSON.stringify(timesheetUpdateData)
+        })
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error during your Google Timesheet import.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+        });
 }
 
 function fetchUsers() {
     var config = AJS.$.ajax({
-           type: 'GET',
-           url: restBaseUrl + 'config/getConfig',
-           contentType: "application/json"
-       });
+        type: 'GET',
+        url: restBaseUrl + 'config/getConfig',
+        contentType: "application/json"
+    });
 
     var jsonUser = AJS.$.ajax({
-          type: 'GET',
-          url: restBaseUrl + 'timesheets/owner/' + timesheetID,
-          contentType: "application/json"
-      });
+        type: 'GET',
+        url: restBaseUrl + 'timesheets/owner/' + timesheetID,
+        contentType: "application/json"
+    });
 
     AJS.$.when(config, jsonUser)
         .done(initUserSelect)
         .fail(function (error) {
             AJS.messages.error({
-              title: 'There was an error while fetching data.',
-              body: '<p>Reason: ' + error.responseText + '</p>'
+                title: 'There was an error while fetching data.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
             });
             console.log(error);
         });
 }
 
 function fetchData() {
-	var timesheetFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'timesheets/' + timesheetID,
-		contentType: "application/json"
-	});
+    var timesheetFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'timesheets/' + timesheetID,
+        contentType: "application/json"
+    });
 
-	var entriesFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'timesheets/' + timesheetID + '/entries',
-		contentType: "application/json"
-	});
+    var entriesFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'timesheets/' + timesheetID + '/entries',
+        contentType: "application/json"
+    });
 
-	var categoriesFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'categories',
-		contentType: "application/json"
-	});
+    var categoriesFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'categories',
+        contentType: "application/json"
+    });
 
-	var teamsFetched = AJS.$.ajax({
-		type: 'GET',
-		url: restBaseUrl + 'teams',
-		contentType: "application/json"
-	});
+    var teamsFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'teams',
+        contentType: "application/json"
+    });
 
-	AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched)
-		.done(assembleTimesheetData)
-		.done(populateTable, prepareImportDialog)
-		.fail(function (error) {
-			AJS.messages.error({
-				title: 'There was an error while fetching data.',
-				body: '<p>Reason: ' + error.responseText + '</p>'
-			});
-			console.log(error);
-		});
+    AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched)
+        .done(assembleTimesheetData)
+        .done(populateTable, prepareImportDialog)
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error while fetching data.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+            console.log(error);
+        });
 }
 
 function calculateTotalTime(availableEntries) {
-var totalHours = 0;
-var totalMinutes = 0;
+    var totalHours = 0;
+    var totalMinutes = 0;
 
-for(var i = 0; i < availableEntries.length; i++) {
-    var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
-    availableEntries[i].pauseMinutes).getHours();
-    var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
-    availableEntries[i].pauseMinutes).getMinutes();
-    var pause = availableEntries[i].pauseMinutes;
-    var calculatedTime = hours * 60 + minutes - pause;
+    for (var i = 0; i < availableEntries.length; i++) {
+        var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+            availableEntries[i].pauseMinutes).getHours();
+        var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+            availableEntries[i].pauseMinutes).getMinutes();
+        var pause = availableEntries[i].pauseMinutes;
+        var calculatedTime = hours * 60 + minutes - pause;
 
-    totalMinutes = totalMinutes + calculatedTime;
+        totalMinutes = totalMinutes + calculatedTime;
 
-    if(totalMinutes >= 60) {
-      var minutesToFullHours = Math.floor(totalMinutes / 60) ; //get only full hours
-      totalHours = totalHours + minutesToFullHours;
-      totalMinutes = totalMinutes - minutesToFullHours * 60;
+        if (totalMinutes >= 60) {
+            var minutesToFullHours = Math.floor(totalMinutes / 60); //get only full hours
+            totalHours = totalHours + minutesToFullHours;
+            totalMinutes = totalMinutes - minutesToFullHours * 60;
+        }
     }
-  }
-  return totalHours + totalMinutes / 60;
+    return totalHours + totalMinutes / 60;
 }
 
 function calculateRemainingTimesheetTime(timesheetTime, availableEntries) {
-  return (timesheetTime - calculateTotalTime(availableEntries));
+    return (timesheetTime - calculateTotalTime(availableEntries));
 }
 
 function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
-	var timesheetData = timesheetReply[0];
-  //set timesheet hours text field
-  AJS.$("#timesheet-hours-text").val(timesheetData.targetHourPractice);
+    var timesheetData = timesheetReply[0];
+    //set timesheet hours text field
+    AJS.$("#timesheet-hours-text").val(timesheetData.targetHourPractice);
 
-	timesheetData.entries = entriesReply[0];
-	timesheetData.categories = [];
-	timesheetData.teams = [];
+    timesheetData.entries = entriesReply[0];
+    timesheetData.categories = [];
+    timesheetData.teams = [];
 
-	categoriesReply[0].map(function (category) {
-		timesheetData.categories[category.categoryID] = {
-			categoryName: category.categoryName
-		};
-	});
+    categoriesReply[0].map(function (category) {
+        timesheetData.categories[category.categoryID] = {
+            categoryName: category.categoryName
+        };
+    });
 
-	teamsReply[0].map(function (team) {
-		timesheetData.teams[team.teamID] = {
-			teamName: team.teamName,
-			teamCategories: team.teamCategories
-		};
-	});
+    teamsReply[0].map(function (team) {
+        timesheetData.teams[team.teamID] = {
+            teamName: team.teamName,
+            teamCategories: team.teamCategories
+        };
+    });
 
-	return timesheetData;
+    return timesheetData;
 }
 
 function populateTable(timesheetDataReply, allUsers) {
-	var timesheetData = timesheetDataReply[0];
-	var timesheetTable = AJS.$("#timesheet-table");
-	timesheetTable.empty();
+    var timesheetData = timesheetDataReply[0];
+    var timesheetTable = AJS.$("#timesheet-table");
+    timesheetTable.empty();
 
-	timesheetTable.append(Confluence.Templates.Timesheet.timesheetHeader(
-					{teams: timesheetData.teams}
-	));
+    timesheetTable.append(Confluence.Templates.Timesheet.timesheetHeader(
+        {teams: timesheetData.teams}
+    ));
 
-	var actualDate = new Date();
+    var actualDate = new Date();
 
-	var emptyEntry = {
-		entryID: "new-id",
-		date: "",
-		begin: actualDate.getHours() + ":" + actualDate.getMinutes(),
-		end: (actualDate.getHours() + 1) + ":" + actualDate.getMinutes(),
-		pause: "00:00",
-		description: "",
-		duration: "",
-    isGoogleDocImport: false
-	};
+    var emptyEntry = {
+        entryID: "new-id",
+        date: "",
+        begin: actualDate.getHours() + ":" + actualDate.getMinutes(),
+        end: (actualDate.getHours() + 1) + ":" + actualDate.getMinutes(),
+        pause: "00:00",
+        description: "",
+        duration: "",
+        isGoogleDocImport: false
+    };
 
-	var addNewEntryOptions = {
-		httpMethod : "post",
-		callback   : addNewEntryCallback,
-		ajaxUrl    : restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entry/"
-	};
+    var addNewEntryOptions = {
+        httpMethod: "post",
+        callback: addNewEntryCallback,
+        ajaxUrl: restBaseUrl + "timesheets/" + timesheetData.timesheetID + "/entry/"
+    };
 
-	var emptyForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
-	timesheetTable.append(emptyForm);
+    var emptyForm = renderFormRow(timesheetData, emptyEntry, addNewEntryOptions);
+    timesheetTable.append(emptyForm);
 
-	appendEntriesToTable(timesheetData);
+    appendEntriesToTable(timesheetData);
 }
 
 function appendEntriesToTable(timesheetData) {
-  //calculate remaining timesheet hours
-  AJS.$("#timesheet-hours-remain").val(calculateRemainingTimesheetTime(AJS.$("#timesheet-hours-text").val(), timesheetData.entries));
-  //append timesheet entries to table
-	var timesheetTable = AJS.$("#timesheet-table");
-	
-	timesheetData.entries.map(function (entry) {
-		var viewRow = renderViewRow(timesheetData, entry);
-		timesheetTable.append(viewRow);
-	});
+    //calculate remaining timesheet hours
+    AJS.$("#timesheet-hours-remain").val(calculateRemainingTimesheetTime(AJS.$("#timesheet-hours-text").val(), timesheetData.entries));
+
+    //append timesheet entries to table
+    var timesheetTable = AJS.$("#timesheet-table");
+
+    timesheetData.entries.map(function (entry) {
+        var viewRow = renderViewRow(timesheetData, entry);
+        timesheetTable.append(viewRow);
+    });
 }
 
 function prepareImportDialog(timesheetDataReply) {
-	var timesheetData = timesheetDataReply[0];
-	var showImportDialogButton = AJS.$(".import-google-docs");
-	var importDialog = AJS.$(".import-dialog"); 
-	var importTextarea = importDialog.find(".import-text");
-	var startImportButton = importDialog.find(".start-import");
-	
-	showImportDialogButton.click(function() {
-		AJS.dialog2(importDialog).show();
-	});
-	
-	autosize(importTextarea);
-	
-	startImportButton.click(function() {
-		importGoogleDocsTable(importTextarea.val(), timesheetData, importDialog);
-	});
+    var timesheetData = timesheetDataReply[0];
+    var showImportDialogButton = AJS.$(".import-google-docs");
+    var importDialog = AJS.$(".import-dialog");
+    var importTextarea = importDialog.find(".import-text");
+    var startImportButton = importDialog.find(".start-import");
+
+    showImportDialogButton.click(function () {
+        AJS.dialog2(importDialog).show();
+    });
+
+    autosize(importTextarea);
+
+    startImportButton.click(function () {
+        importGoogleDocsTable(importTextarea.val(), timesheetData, importDialog);
+    });
 }
 
 function importGoogleDocsTable(table, timesheetData, importDialog) {
-	var entries = parseEntriesFromGoogleDocTimesheet(table, timesheetData);
-	var url = restBaseUrl + "timesheets/" + timesheetID + "/entries";
+    var entries = parseEntriesFromGoogleDocTimesheet(table, timesheetData);
+    var url = restBaseUrl + "timesheets/" + timesheetID + "/entries";
 
-	if(entries.length === 0) return;
-	
-	AJS.$.ajax({
-		type: "post",
-		url : url,
-		contentType: "application/json",
-		data: JSON.stringify(entries)
-	})
-	.then(function(response) {
-		showImportMessage(response);
-		AJS.dialog2(importDialog).hide();
-		timesheetData.entries = response.entries;
-		appendEntriesToTable(timesheetData);
-	})
-	.fail(function (error) {
-		AJS.messages.error({
-			title: 'There was an error during your Google Timesheet import.',
-			body: '<p>Reason: ' + error.responseText + '</p>'
-		});
-	});
+    if (entries.length === 0) return;
+
+    AJS.$.ajax({
+            type: "post",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(entries)
+        })
+        .then(function (response) {
+            showImportMessage(response);
+            AJS.dialog2(importDialog).hide();
+            timesheetData.entries = response.entries;
+            appendEntriesToTable(timesheetData);
+        })
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error during your Google Timesheet import.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+        });
 }
 
 function showImportMessage(response) {
-	var successfulEntries = response.entries.length;
-	var errorEntries = response.errorMessages.length ;
-	
-	if(errorEntries > 0) {
-		
-		var begin = (successfulEntries === 0)
-						? "Entries could not be imported"
-						: "Some entries could not be imported";
-		
-		var message = begin + ". Reason: <br /> " 
-						+ "<ul><li>"
-						+ response.errorMessages.join("</li><li>")
-						+ "</li></ul>"
-						+ "Successfully imported entries: " + successfulEntries + "<br />"
-						+ "Failed imports: " + errorEntries + "<br />";
-				
-		if (successfulEntries === 0) 
-			AJS.messages.error({title: 'Import Error',body:  message});
-		else 
-			AJS.messages.warning({title: 'Import Error',body:  message});
-		
-	} else {
-		var message = "Imported " + successfulEntries + " entries.";
-		AJS.messages.success({
-			title: 'Import was successful!',
-			body:  message
-		});
-	}
+    var successfulEntries = response.entries.length;
+    var errorEntries = response.errorMessages.length;
+
+    if (errorEntries > 0) {
+
+        var begin = (successfulEntries === 0)
+            ? "Entries could not be imported"
+            : "Some entries could not be imported";
+
+        var message = begin + ". Reason: <br /> "
+            + "<ul><li>"
+            + response.errorMessages.join("</li><li>")
+            + "</li></ul>"
+            + "Successfully imported entries: " + successfulEntries + "<br />"
+            + "Failed imports: " + errorEntries + "<br />";
+
+        if (successfulEntries === 0)
+            AJS.messages.error({title: 'Import Error', body: message});
+        else
+            AJS.messages.warning({title: 'Import Error', body: message});
+
+    } else {
+        var message = "Imported " + successfulEntries + " entries.";
+        AJS.messages.success({
+            title: 'Import was successful!',
+            body: message
+        });
+    }
 }
 
 /**
@@ -429,14 +431,14 @@ function showImportMessage(response) {
  * @param {jQuery} form
  */
 function addNewEntryCallback(entry, timesheetData, form) {
-	var viewRow = renderViewRow(timesheetData, entry);
-	var beginTime = form.beginTimeField.timepicker('getTime');
-	var endTime = form.endTimeField.timepicker('getTime');
+    var viewRow = renderViewRow(timesheetData, entry);
+    var beginTime = form.beginTimeField.timepicker('getTime');
+    var endTime = form.endTimeField.timepicker('getTime');
 
-	form.row.after(viewRow);
-	form.beginTimeField.timepicker('setTime', endTime);
-	form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
-	form.pauseTimeField.val("00:00").trigger('change');
+    form.row.after(viewRow);
+    form.beginTimeField.timepicker('setTime', endTime);
+    form.endTimeField.timepicker('setTime', new Date(2 * endTime - beginTime));
+    form.pauseTimeField.val("00:00").trigger('change');
 }
 
 /**
@@ -446,22 +448,22 @@ function addNewEntryCallback(entry, timesheetData, form) {
  * @param {jQuery} form
  */
 function editEntryCallback(entry, timesheetData, form) {
-	var newViewRow = prepareViewRow(timesheetData, entry); //todo check if entry is augmented
-	var oldViewRow = form.row.prev();
-	
-	newViewRow.find("button.edit").click(function () {
-	newViewRow.hide();
-	form.row.show();
-	});
+    var newViewRow = prepareViewRow(timesheetData, entry); //todo check if entry is augmented
+    var oldViewRow = form.row.prev();
 
-	newViewRow.find("button.delete").click(function () {
-		deleteEntryClicked(newViewRow, entry.entryID);
-	});
-	
-	oldViewRow.after(newViewRow);
-	oldViewRow.remove();
-	
-	form.row.hide(); 
+    newViewRow.find("button.edit").click(function () {
+        newViewRow.hide();
+        form.row.show();
+    });
+
+    newViewRow.find("button.delete").click(function () {
+        deleteEntryClicked(newViewRow, entry.entryID);
+    });
+
+    oldViewRow.after(newViewRow);
+    oldViewRow.remove();
+
+    form.row.hide();
 }
 
 /**
@@ -475,70 +477,70 @@ function editEntryCallback(entry, timesheetData, form) {
  * @returns {undefined}
  */
 function saveEntryClicked(timesheetData, saveOptions, form, existingEntryID,
-existingIsGoogleDocImportValue) {
-	form.saveButton.prop('disabled', true);
+                          existingIsGoogleDocImportValue) {
+    form.saveButton.prop('disabled', true);
 
-	var date = form.dateField.val();
-  var validDateFormat = new Date(date);
+    var date = form.dateField.val();
+    var validDateFormat = new Date(date);
 
-	if((date == "") || (isValidDate(validDateFormat) === false)) {
-	  date = new Date().toJSON().slice(0,10);
-	}
+    if ((date == "") || (isValidDate(validDateFormat) === false)) {
+        date = new Date().toJSON().slice(0, 10);
+    }
 
-	var beginTime = form.beginTimeField.timepicker('getTime');
+    var beginTime = form.beginTimeField.timepicker('getTime');
 
-	if(beginTime === null) {
-	  beginTime = new Date();
-	}
+    if (beginTime === null) {
+        beginTime = new Date();
+    }
 
-	var endTime   = form.endTimeField.timepicker('getTime');
+    var endTime = form.endTimeField.timepicker('getTime');
 
-	if(endTime === null) {
-	  endTime = new Date();
-  }
+    if (endTime === null) {
+        endTime = new Date();
+    }
 
-	var pauseTime = form.pauseTimeField.timepicker('getTime');
-	var beginDate = new Date(date + " " + toTimeString(beginTime));
-	var endDate   = new Date(date + " " + toTimeString(endTime));
-	var pauseMin  = pauseTime.getHours() * 60 + pauseTime.getMinutes();
+    var pauseTime = form.pauseTimeField.timepicker('getTime');
+    var beginDate = new Date(date + " " + toTimeString(beginTime));
+    var endDate = new Date(date + " " + toTimeString(endTime));
+    var pauseMin = pauseTime.getHours() * 60 + pauseTime.getMinutes();
 
-	var entry = {
-		beginDate: beginDate,
-		endDate: endDate,
-		description: form.descriptionField.val(),
-		pauseMinutes: pauseMin,
-		teamID: form.teamSelect.val(),
-		categoryID: form.categorySelect.val(),
-		isGoogleDocImport: existingIsGoogleDocImportValue
-	};
+    var entry = {
+        beginDate: beginDate,
+        endDate: endDate,
+        description: form.descriptionField.val(),
+        pauseMinutes: pauseMin,
+        teamID: form.teamSelect.val(),
+        categoryID: form.categorySelect.val(),
+        isGoogleDocImport: existingIsGoogleDocImportValue
+    };
 
-	if(existingEntryID !== "new-id") {
-	  entry.entryID = existingEntryID;
-	}
+    if (existingEntryID !== "new-id") {
+        entry.entryID = existingEntryID;
+    }
 
-	form.loadingSpinner.show();
+    form.loadingSpinner.show();
 
-	AJS.$.ajax({
-		type: saveOptions.httpMethod,
-		url:  saveOptions.ajaxUrl,
-		contentType: "application/json",
-		data: JSON.stringify(entry) //causes error in FIREFOX
-	})
-	.then(function(entry) {
-		var augmentedEntry = augmentEntry(timesheetData, entry);
-		saveOptions.callback(augmentedEntry, timesheetData, form);
-	})
-	.fail(function (error) {
-	  console.log(error);
-		AJS.messages.error({
-			title: 'There was an error while saving.',
-			body: '<p>Reason: ' + error.responseText + '</p>'
-		});
-	})
-	.always(function () {
-		form.loadingSpinner.hide();
-		form.saveButton.prop('disabled', false);
-	});
+    AJS.$.ajax({
+            type: saveOptions.httpMethod,
+            url: saveOptions.ajaxUrl,
+            contentType: "application/json",
+            data: JSON.stringify(entry) //causes error in FIREFOX
+        })
+        .then(function (entry) {
+            var augmentedEntry = augmentEntry(timesheetData, entry);
+            saveOptions.callback(augmentedEntry, timesheetData, form);
+        })
+        .fail(function (error) {
+            console.log(error);
+            AJS.messages.error({
+                title: 'There was an error while saving.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+        })
+        .always(function () {
+            form.loadingSpinner.hide();
+            form.saveButton.prop('disabled', false);
+        });
 }
 
 /**
@@ -553,123 +555,123 @@ existingIsGoogleDocImportValue) {
  */
 function renderFormRow(timesheetData, entry, saveOptions) {
 
-	if (entry.pause === "") {
-		entry.pause = "00:00";
-	}
+    if (entry.pause === "") {
+        entry.pause = "00:00";
+    }
 
-	var form = prepareForm(entry, timesheetData);
+    var form = prepareForm(entry, timesheetData);
 
-	form.saveButton.click(function () {
-		saveEntryClicked(timesheetData, saveOptions, form, entry.entryID,
-		entry.isGoogleDocImport);
-	});
+    form.saveButton.click(function () {
+        saveEntryClicked(timesheetData, saveOptions, form, entry.entryID,
+            entry.isGoogleDocImport);
+    });
 
-	return form.row;
+    return form.row;
 }
 
 /**
  * Create form for editing a entry & instrument ui components
  * @param {object} entry
  * @param {object} timesheetData
- * @returns {object of jquery objects} 
+ * @returns {object of jquery objects}
  */
 function prepareForm(entry, timesheetData) {
 
-	var teams = timesheetData.teams;
-	var row = $(Confluence.Templates.Timesheet.timesheetEntryForm(
-					{entry: entry, teams: teams})
-	);
+    var teams = timesheetData.teams;
+    var row = $(Confluence.Templates.Timesheet.timesheetEntryForm(
+        {entry: entry, teams: teams})
+    );
 
-	var form = {
-		row: row,
-		loadingSpinner:   row.find('span.aui-icon-wait').hide(),
-		saveButton:       row.find('button.save'),
-		dateField:        row.find('input.date'),
-		beginTimeField:   row.find('input.time.start'),
-		endTimeField:     row.find('input.time.end'),
-		pauseTimeField:   row.find('input.time.pause'),
-		durationField:    row.find('input.duration'),
-		descriptionField: row.find('input.description'),
-		categorySelect:   row.find('span.category'),
-		teamSelect:       row.find('select.team')
-	};
+    var form = {
+        row: row,
+        loadingSpinner: row.find('span.aui-icon-wait').hide(),
+        saveButton: row.find('button.save'),
+        dateField: row.find('input.date'),
+        beginTimeField: row.find('input.time.start'),
+        endTimeField: row.find('input.time.end'),
+        pauseTimeField: row.find('input.time.pause'),
+        durationField: row.find('input.duration'),
+        descriptionField: row.find('input.description'),
+        categorySelect: row.find('span.category'),
+        teamSelect: row.find('select.team')
+    };
 
-	//date time columns
-	form.dateField
-		.datePicker(
-			{overrideBrowserDefault: true, languageCode: 'de'}
-		);
+    //date time columns
+    form.dateField
+        .datePicker(
+            {overrideBrowserDefault: true, languageCode: 'de'}
+        );
 
-	row.find('input.time.start, input.time.end')
-		.timepicker({
-			showDuration: false,
-			timeFormat: 'H:i',
-			scrollDefault: 'now',
-			step: 15
-		});
+    row.find('input.time.start, input.time.end')
+        .timepicker({
+            showDuration: false,
+            timeFormat: 'H:i',
+            scrollDefault: 'now',
+            step: 15
+        });
 
-	form.pauseTimeField.timepicker({timeFormat: 'H:i', step: 15})
-		.change(changePauseTimeField)
-		.on('timeFormatError', function () {
-			this.value = '00:00';
-		});
+    form.pauseTimeField.timepicker({timeFormat: 'H:i', step: 15})
+        .change(changePauseTimeField)
+        .on('timeFormatError', function () {
+            this.value = '00:00';
+        });
 
-	new Datepair(row.find(".time-picker")[0]);
+    new Datepair(row.find(".time-picker")[0]);
 
-	row.find('input.time')
-		.change(function () {
-			updateTimeField(form);
-		});
+    row.find('input.time')
+        .change(function () {
+            updateTimeField(form);
+        });
 
-	var initTeamID = (entry.teamID !== undefined)
-				? entry.teamID : Object.keys(teams)[0];
+    var initTeamID = (entry.teamID !== undefined)
+        ? entry.teamID : Object.keys(teams)[0];
 
-	form.teamSelect.auiSelect2()
-		.change(function() {
-			var selectedTeamID = this.value;
-			updateCategorySelect(form.categorySelect, selectedTeamID, entry, timesheetData);
-		})
-		.auiSelect2("val", initTeamID)
-		.trigger("change");
+    form.teamSelect.auiSelect2()
+        .change(function () {
+            var selectedTeamID = this.value;
+            updateCategorySelect(form.categorySelect, selectedTeamID, entry, timesheetData);
+        })
+        .auiSelect2("val", initTeamID)
+        .trigger("change");
 
-	if (countDefinedElementsInArray(teams) < 2) {
-		row.find(".team").hide();
-	}
-	
-	return form;
+    if (countDefinedElementsInArray(teams) < 2) {
+        row.find(".team").hide();
+    }
+
+    return form;
 }
 
 function parseEntriesFromGoogleDocTimesheet(googleDocContent, timesheetData) {
-	var entries = [];
-	
-	googleDocContent
-		.split("\n")
-		.forEach(function(row){
-			if(row.trim() === "") return;
-			var entry = parseEntryFromGoogleDocRow(row, timesheetData); 
-			entries.push(entry);
-		});
-	
-	return entries;
+    var entries = [];
+
+    googleDocContent
+        .split("\n")
+        .forEach(function (row) {
+            if (row.trim() === "") return;
+            var entry = parseEntryFromGoogleDocRow(row, timesheetData);
+            entries.push(entry);
+        });
+
+    return entries;
 }
 
 function parseEntryFromGoogleDocRow(row, timesheetData) {
-	var pieces = row.split("\t");
-	
-	var firstTeamID = Object.keys(timesheetData.teams)[0];
-	var firstTeam   = timesheetData.teams[firstTeamID];
-	var firstCategoryIDOfFirstTeam = firstTeam.teamCategories[0];
-	
-	return {
-		description  : pieces[6],
-		pauseMinutes : getMinutesFromTimeString(pieces[4]),
-		beginDate    : new Date(pieces[0] + " " + pieces[1]),
-		endDate      : new Date(pieces[0] + " " + pieces[2]),
-		teamID			 : firstTeamID,
-		categoryID	 : firstCategoryIDOfFirstTeam,
-		isGoogleDocImport : true
-	};
-} 
+    var pieces = row.split("\t");
+
+    var firstTeamID = Object.keys(timesheetData.teams)[0];
+    var firstTeam = timesheetData.teams[firstTeamID];
+    var firstCategoryIDOfFirstTeam = firstTeam.teamCategories[0];
+
+    return {
+        description: pieces[6],
+        pauseMinutes: getMinutesFromTimeString(pieces[4]),
+        beginDate: new Date(pieces[0] + " " + pieces[1]),
+        endDate: new Date(pieces[0] + " " + pieces[2]),
+        teamID: firstTeamID,
+        categoryID: firstCategoryIDOfFirstTeam,
+        isGoogleDocImport: true
+    };
+}
 
 /**
  * Updates the Category Seletion Box depending on the selected team
@@ -680,16 +682,16 @@ function parseEntryFromGoogleDocRow(row, timesheetData) {
  */
 function updateCategorySelect(categorySelect, selectedTeamID, entry, timesheetData) {
 
-	var selectedTeam = timesheetData.teams[selectedTeamID];
-	var categoryPerTeam = filterCategoriesPerTeam(selectedTeam, timesheetData.categories);
+    var selectedTeam = timesheetData.teams[selectedTeamID];
+    var categoryPerTeam = filterCategoriesPerTeam(selectedTeam, timesheetData.categories);
 
-	categorySelect.auiSelect2({data : categoryPerTeam});
+    categorySelect.auiSelect2({data: categoryPerTeam});
 
-	var selectedCategoryID = (entry.categoryID === undefined || selectedTeamID != entry.teamID)
-		? selectedTeam.teamCategories[0]
-		: entry.categoryID;
+    var selectedCategoryID = (entry.categoryID === undefined || selectedTeamID != entry.teamID)
+        ? selectedTeam.teamCategories[0]
+        : entry.categoryID;
 
-	categorySelect.val(selectedCategoryID).trigger("change");
+    categorySelect.val(selectedCategoryID).trigger("change");
 }
 
 /**
@@ -700,37 +702,37 @@ function updateCategorySelect(categorySelect, selectedTeamID, entry, timesheetDa
  */
 function filterCategoriesPerTeam(selectedTeam, categories) {
 
-	var categoriesPerTeam = [];
+    var categoriesPerTeam = [];
 
-	selectedTeam.teamCategories.map(function (categoryID) {
-		categoriesPerTeam.push(
-						{id: categoryID, text: categories[categoryID].categoryName}
-		);
-	});
+    selectedTeam.teamCategories.map(function (categoryID) {
+        categoriesPerTeam.push(
+            {id: categoryID, text: categories[categoryID].categoryName}
+        );
+    });
 
-	return categoriesPerTeam;
+    return categoriesPerTeam;
 }
 
 function updateTimeField(form) {
-	//todo: fix duration update without setTimeout
-	setTimeout(function () {
-		var duration = calculateDuration(
-						form.beginTimeField.timepicker('getTime'),
-						form.endTimeField.timepicker('getTime'),
-						form.pauseTimeField.timepicker('getTime'));
+    //todo: fix duration update without setTimeout
+    setTimeout(function () {
+        var duration = calculateDuration(
+            form.beginTimeField.timepicker('getTime'),
+            form.endTimeField.timepicker('getTime'),
+            form.pauseTimeField.timepicker('getTime'));
 
-		if (duration < 0) {
-			duration = new Date(0);
-		}
+        if (duration < 0) {
+            duration = new Date(0);
+        }
 
-		form.durationField.val(toUTCTimeString(duration));
-	}, 10);
+        form.durationField.val(toUTCTimeString(duration));
+    }, 10);
 }
 
 function changePauseTimeField() {
-	if (this.value === '') {
-		this.value = '00:00';
-	}
+    if (this.value === '') {
+        this.value = '00:00';
+    }
 }
 
 /**
@@ -741,64 +743,64 @@ function changePauseTimeField() {
  */
 function renderViewRow(timesheetData, entry) {
 
-	var augmentedEntry = augmentEntry(timesheetData, entry);
+    var augmentedEntry = augmentEntry(timesheetData, entry);
 
-	var editEntryOptions = {
-		httpMethod : "put",
-		callback   : editEntryCallback,
-		ajaxUrl    : restBaseUrl + "entries/" + entry.entryID
-	};
+    var editEntryOptions = {
+        httpMethod: "put",
+        callback: editEntryCallback,
+        ajaxUrl: restBaseUrl + "entries/" + entry.entryID
+    };
 
-	var viewRow = prepareViewRow(timesheetData, augmentedEntry);
-	viewRow.find("button.edit").click(function () {
-	  //augmentedEntry.isGoogleDocImport = false;
-		editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow);
-	});
+    var viewRow = prepareViewRow(timesheetData, augmentedEntry);
+    viewRow.find("button.edit").click(function () {
+        //augmentedEntry.isGoogleDocImport = false;
+        editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow);
+    });
 
-	viewRow.find("button.delete").click(function () {
-		deleteEntryClicked(viewRow, entry.entryID);
-	});
+    viewRow.find("button.delete").click(function () {
+        deleteEntryClicked(viewRow, entry.entryID);
+    });
 
-	return viewRow;
+    return viewRow;
 }
 
 function editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow) {
-	var formRow = getFormRow(viewRow);
-	
-	if (formRow === undefined) {
-		formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions);
-		viewRow.after(formRow);
-	} 
+    var formRow = getFormRow(viewRow);
 
-	viewRow.hide();
-	formRow.show();
+    if (formRow === undefined) {
+        formRow = renderFormRow(timesheetData, augmentedEntry, editEntryOptions);
+        viewRow.after(formRow);
+    }
+
+    viewRow.hide();
+    formRow.show();
 }
 
 function deleteEntryClicked(viewRow, entryID) {
 
-	var ajaxUrl = restBaseUrl + "entries/" + entryID;
+    var ajaxUrl = restBaseUrl + "entries/" + entryID;
 
-	var spinner = viewRow.find('span.aui-icon-wait');
-	spinner.show();
+    var spinner = viewRow.find('span.aui-icon-wait');
+    spinner.show();
 
-	AJS.$.ajax({
-		type: 'DELETE',
-		url: ajaxUrl,
-		contentType: "application/json"
-	})
-	.then(function () {
-		var formRow = getFormRow(viewRow);
-		if(formRow !== undefined) formRow.remove();
-		viewRow.remove();
-	})
-	.fail(function (error) {
-		AJS.messages.error({
-			title: 'There was an error while deleting.',
-			body: '<p>Reason: ' + error.responseText + '</p>'
-		});
-		console.log(error);
-		spinner.hide();
-	});
+    AJS.$.ajax({
+            type: 'DELETE',
+            url: ajaxUrl,
+            contentType: "application/json"
+        })
+        .then(function () {
+            var formRow = getFormRow(viewRow);
+            if (formRow !== undefined) formRow.remove();
+            viewRow.remove();
+        })
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error while deleting.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+            console.log(error);
+            spinner.hide();
+        });
 }
 
 /**
@@ -807,10 +809,10 @@ function deleteEntryClicked(viewRow, entryID) {
  * @returns {jQuery} formRow or undefined if not found
  */
 function getFormRow(viewRow) {
-	var formRow = viewRow.next(".entry-form");
-	if(formRow.data("id") === viewRow.data("id")) {
-		return formRow;
-	}
+    var formRow = viewRow.next(".entry-form");
+    if (formRow.data("id") === viewRow.data("id")) {
+        return formRow;
+    }
 }
 
 /**
@@ -822,25 +824,25 @@ function getFormRow(viewRow) {
  */
 function augmentEntry(timesheetData, entry) {
 
-	var pauseDate = new Date(entry.pauseMinutes * 1000 * 60);
+    var pauseDate = new Date(entry.pauseMinutes * 1000 * 60);
 
-	return {
-		date         : toDateString(new Date(entry.beginDate)),
-		begin        : toTimeString(new Date(entry.beginDate)),
-		end          : toTimeString(new Date(entry.endDate)),
-		pause        : (entry.pauseMinutes > 0) ? toUTCTimeString(pauseDate) : "",
-		duration     : toTimeString(calculateDuration(entry.beginDate, entry.endDate, pauseDate)),
-		category     : timesheetData.categories[entry.categoryID].categoryName,
-		team         : timesheetData.teams[entry.teamID].teamName,
-		entryID      : entry.entryID,
-		beginDate    : entry.beginDate,
-		endDate      : entry.endDate,
-		description  : entry.description ,
-		pauseMinutes : entry.pauseMinutes ,
-		teamID       : entry.teamID ,
-		categoryID   : entry.categoryID,
-		isGoogleDocImport : entry.isGoogleDocImport
-	};
+    return {
+        date: toDateString(new Date(entry.beginDate)),
+        begin: toTimeString(new Date(entry.beginDate)),
+        end: toTimeString(new Date(entry.endDate)),
+        pause: (entry.pauseMinutes > 0) ? toUTCTimeString(pauseDate) : "",
+        duration: toTimeString(calculateDuration(entry.beginDate, entry.endDate, pauseDate)),
+        category: timesheetData.categories[entry.categoryID].categoryName,
+        team: timesheetData.teams[entry.teamID].teamName,
+        entryID: entry.entryID,
+        beginDate: entry.beginDate,
+        endDate: entry.endDate,
+        description: entry.description,
+        pauseMinutes: entry.pauseMinutes,
+        teamID: entry.teamID,
+        categoryID: entry.categoryID,
+        isGoogleDocImport: entry.isGoogleDocImport
+    };
 }
 
 /**
@@ -850,77 +852,79 @@ function augmentEntry(timesheetData, entry) {
  */
 function prepareViewRow(timesheetData, entry) {
 
-  //todo: dont augment entry twice.
-	var augmentedEntry = augmentEntry(timesheetData, entry);
+    //todo: dont augment entry twice.
+    var augmentedEntry = augmentEntry(timesheetData, entry);
 
-	var viewRow = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
-					{entry: augmentedEntry, teams: timesheetData.teams}));
+    var viewRow = AJS.$(Confluence.Templates.Timesheet.timesheetEntry(
+        {entry: augmentedEntry, teams: timesheetData.teams}));
 
-	viewRow.find('span.aui-icon-wait').hide();
+    viewRow.find('span.aui-icon-wait').hide();
 
-	return viewRow;
-} 
+    return viewRow;
+}
 
 function toUTCTimeString(date) {
-	var h = date.getUTCHours(), m = date.getUTCMinutes();
-	var string =
-		((h < 10) ? "0" : "") + h + ":" +
-		((m < 10) ? "0" : "") + m;
-	return string;
+    var h = date.getUTCHours(), m = date.getUTCMinutes();
+    var string =
+        ((h < 10) ? "0" : "") + h + ":" +
+        ((m < 10) ? "0" : "") + m;
+    return string;
 }
 
 function toTimeString(date) {
-	var h = date.getHours(), m = date.getMinutes();
-	var string =
-		((h < 10) ? "0" : "") + h + ":" +
-		((m < 10) ? "0" : "") + m;
-	return string;
+    var h = date.getHours(), m = date.getMinutes();
+    var string =
+        ((h < 10) ? "0" : "") + h + ":" +
+        ((m < 10) ? "0" : "") + m;
+    return string;
 }
 
 function toDateString(date) {
-	var y = date.getFullYear(), d = date.getDate(), m = date.getMonth() + 1;
-	var string = y + "-" +
-		((m < 10) ? "0" : "") + m + "-" +
-		((d < 10) ? "0" : "") + d;
-	return string;
+    var y = date.getFullYear(), d = date.getDate(), m = date.getMonth() + 1;
+    var string = y + "-" +
+        ((m < 10) ? "0" : "") + m + "-" +
+        ((d < 10) ? "0" : "") + d;
+    return string;
 }
 
 function calculateDuration(begin, end, pause) {
-	var pauseDate = new Date(pause);
-	return new Date(end - begin - (pauseDate.getHours() * 60 + pauseDate.getMinutes()) * 60 * 1000);
+    var pauseDate = new Date(pause);
+    return new Date(end - begin - (pauseDate.getHours() * 60 + pauseDate.getMinutes()) * 60 * 1000);
 }
 
 function countDefinedElementsInArray(array) {
-	return array.filter(function (v) {return v !== undefined}).length;
+    return array.filter(function (v) {
+        return v !== undefined
+    }).length;
 }
 
 /**
  * Check if date is a valid Date
  * source: http://stackoverflow.com/questions/1353684/detecting-an-invalid-date-date-instance-in-javascript
  * @param {type} date
- * @returns {boolean} true, if date is valid 
+ * @returns {boolean} true, if date is valid
  */
 function isValidDate(date) {
-	if ( Object.prototype.toString.call(date) === "[object Date]" ) {
-		if ( isNaN( date.getTime() ) ) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-	else {
-		return false;
-	}
+    if (Object.prototype.toString.call(date) === "[object Date]") {
+        if (isNaN(date.getTime())) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    else {
+        return false;
+    }
 }
 
 function getMinutesFromTimeString(timeString) {
-	var pieces = timeString.split(":");
-	if(pieces.length === 2) {
-		var hours = parseInt(pieces[0]);		
-		var minutes = parseInt(pieces[1]);
-		return hours * 60 + minutes;
-	} else {
-		return 0; 
-	}
+    var pieces = timeString.split(":");
+    if (pieces.length === 2) {
+        var hours = parseInt(pieces[0]);
+        var minutes = parseInt(pieces[1]);
+        return hours * 60 + minutes;
+    } else {
+        return 0;
+    }
 }

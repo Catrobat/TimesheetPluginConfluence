@@ -8,13 +8,9 @@
     <span class="th date">Date</span>
     <span class="th range">Duration</span>
     <span class="th pause"></span>
-    <span class="th duration"></span>
     {if length(keys($teams)) > 1}
       <span class="th team"></span>
     {/if}
-    <span class="th category"></span>
-    <span class="th"></span>
-    <span class="th"></span>
   </div>
 {/template}
 
@@ -27,13 +23,8 @@
    <div class="tr entry-view" data-id="{$entry.entryID}">
     <span class="td date">{$entry.date}</span>
     <span class="td range">{$entry.begin}</span>
-    <span class="td pause"></span>
-    <span class="td duration"></span>
     {if length(keys($teams)) > 1}
       <span class="td"></span>
     {/if}
-    <span class="td"></span>
-    <span class="td"></span>
-    <span class="td"></span>
   </div>
 {/template}

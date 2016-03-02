@@ -306,6 +306,12 @@ public class ConfigResourceRest {
             return Response.serverError().entity("New category name must be different.").build();
         }
 
+        List<Category> categoryNames = categoryService.all();
+        for (Category category : categoryNames) {
+            if (category.getName().compareTo(categories[1]) == 0)
+                return Response.serverError().entity("Category name already exists.").build();
+        }
+
         boolean successful = configService.editCategoryName(categories[0], categories[1]) != null;
 
         if (successful)

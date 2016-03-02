@@ -48,11 +48,10 @@
                     <thead>
                     <tr>
                         <th id="basic-username">Username</th>
-                        <th id="basic-fist-name">First Name</th>
-                        <th id="basic-last-name">Last Name</th>
                         <th id="basic-email">E-Mail</th>
-                        <th id="basic-state">User Status</th>
+                        <th id="basic-state">Account Status</th>
                         <th id="basic-timesheet-state">Timesheet Status</th>
+                        <th id="basic-timesheet-disable">Disable Timesheet</th>
                     </tr>
                     </thead>
                     <tbody class="list" id="user-body">

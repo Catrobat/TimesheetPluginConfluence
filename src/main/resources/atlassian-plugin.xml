@@ -138,15 +138,19 @@
     <!-- end of import from the product container -->
 
     <!-- additional components for task scheduling -->
-    <component key="sampleJobDetail" name="A sample Job Detail" class="org.catrobat.confluence.jobs.SampleJobDetail">
+
+    <!-- Job Detail -->
+    <component key="activityVerificationJobDetail" name="A sample Job Detail" class="org.catrobat.confluence.jobs.ActivityVerificationJobDetail">
         <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
         <interface>org.quartz.JobDetail</interface>
     </component>
 
-    <trigger key="sampleJobTrigger" name="Sample Job Trigger">
-        <job key="sampleJobDetail"/>
+    <!-- Job Detail Trigger -->
+    <trigger key="activityVerificationJobDetailTrigger" name="Activity Verification Job Trigger">
+        <job key="activityVerificationJobDetail"/>
         <schedule cron-expression="0 * * * * ?" />
     </trigger>
+
     <!-- https://confluence.atlassian.com/bamboocloud/constructing-a-cron-expression-in-bamboo-737183956.html -->
     <!-- end of import from the product container -->
 

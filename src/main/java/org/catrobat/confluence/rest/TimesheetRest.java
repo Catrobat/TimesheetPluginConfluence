@@ -550,7 +550,8 @@ public class TimesheetRest {
     Config config = configService.getConfiguration();
 
     //for testing only!
-    emailTo = config.getMailFrom();
+    //emailTo = config.getMailFrom();
+    emailTo = "test@test123.com";
 
     String mailBody = "";
     String mailSubject = "";

@@ -145,7 +145,7 @@
 
     <trigger key="sampleJobTrigger" name="Sample Job Trigger">
         <job key="sampleJobDetail"/>
-        <schedule cron-expression="0/30 * * * * ?" />
+        <schedule cron-expression="0 * * * * ?" />
     </trigger>
     <!-- https://confluence.atlassian.com/bamboocloud/constructing-a-cron-expression-in-bamboo-737183956.html -->
     <!-- end of import from the product container -->

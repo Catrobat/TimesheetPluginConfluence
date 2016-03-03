@@ -14,7 +14,6 @@ import org.quartz.JobDetail;
 public class SampleJobDetail extends JobDetail {
     private final CategoryService categoryService;
     private final ActiveObjects ao;
-    private final JobDataMap jobDataMap = new JobDataMap();
 
     public SampleJobDetail(CategoryService categoryService, ActiveObjects ao)
     //public SampleJobDetail()
@@ -25,20 +24,6 @@ public class SampleJobDetail extends JobDetail {
 
         setName(SampleJobDetail.class.getSimpleName());
         setJobClass(SampleJob.class);
-
-        //System.out.println(categoryService.all());
-        /*
-        for(Category category : categoryService.all()){
-            jobDataMap.put("key"+category.getID(), category.getName());
-        }*/
-
-        /*
-        for(int i = 0; i < 5; i++){
-            jobDataMap.put("key"+i, "value"+i);
-        }
-        */
-        //hand data to the job
-        //setJobDataMap(jobDataMap);
     }
 
     public CategoryService getCategoryService() {

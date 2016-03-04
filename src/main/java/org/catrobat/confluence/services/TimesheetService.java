@@ -37,7 +37,7 @@ public interface TimesheetService {
    * @return the new Timesheet, or null
    */
   @Nullable
-  Timesheet editTimesheet(String userKey, int targetHoursPractice, int targetHoursTheory, String lecture);
+  Timesheet editTimesheet(String userKey, int targetHoursPractice, int targetHoursTheory, String lecture, Boolean isActive);
 
   /**
    * Adds a new Timesheet

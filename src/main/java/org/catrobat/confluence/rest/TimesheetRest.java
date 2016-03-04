@@ -469,7 +469,7 @@ public class TimesheetRest {
     }
 
     sheetService.editTimesheet(user.getUserKey().getStringValue(), jsonTimesheet.getTargetHourPractice(),
-            jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getLectures());
+            jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getLectures(), true);
 
     JsonTimesheet newJsonTimesheet = new JsonTimesheet(sheet.getID(),
             sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),

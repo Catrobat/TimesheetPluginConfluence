@@ -35,7 +35,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
   @Override
   public Timesheet editTimesheet(String userKey, int targetHoursPractice,
-                                 int targetHoursTheory, String lecture) {
+                                 int targetHoursTheory, String lecture, Boolean isActive) {
     Timesheet[] found = ao.find(Timesheet.class, "USER_KEY = ?", userKey);
     if ((found.length == 1)) {
       Timesheet sheet = found[0];
@@ -44,7 +44,7 @@ public class TimesheetServiceImpl implements TimesheetService {
       sheet.setTargetHoursPractice(targetHoursPractice);
       sheet.setTargetHoursTheory(targetHoursTheory);
       sheet.setLecture(lecture);
-      sheet.setIsActive(true);
+      sheet.setIsActive(isActive);
       sheet.save();
       return sheet;
     }
@@ -59,7 +59,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     sheet.setTargetHoursPractice(targetHoursPractice);
     sheet.setTargetHoursTheory(targetHoursTheory);
     sheet.setLecture(lecture);
-    sheet.setIsActive(true);
+    sheet.setIsActive(false);
     sheet.save();
     return sheet;
   }

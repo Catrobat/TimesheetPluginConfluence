@@ -139,16 +139,40 @@
 
     <!-- additional components for task scheduling -->
 
-    <!-- Job Detail -->
-    <component key="activityVerificationJobDetail" name="A sample Job Detail" class="org.catrobat.confluence.jobs.ActivityVerificationJobDetail">
+    <!-- Activity Verification Job Detail -->
+    <component key="activityVerificationJobDetail" name="Activity Verification Job Detail" class="org.catrobat.confluence.jobs.ActivityVerificationJobDetail">
         <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
         <interface>org.quartz.JobDetail</interface>
     </component>
 
-    <!-- Job Detail Trigger -->
+    <!-- Activity Verification Job Detail Trigger -->
     <trigger key="activityVerificationJobDetailTrigger" name="Activity Verification Job Trigger">
         <job key="activityVerificationJobDetail"/>
-        <schedule cron-expression="0 * * * * ?" />
+        <schedule cron-expression = "0 0/2 * * * ?" />
+    </trigger>
+
+    <!-- Activity Notification Job Detail -->
+    <component key="activityNotificationJobDetail" name="Activity Notification Job Detail" class="org.catrobat.confluence.jobs.ActivityNotificationJobDetail">
+        <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
+        <interface>org.quartz.JobDetail</interface>
+    </component>
+
+    <!-- Activity Notification Job Detail Trigger -->
+    <trigger key="activityNotificationJobDetailTrigger" name="Activity Notification Job Trigger">
+        <job key="activityNotificationJobDetail"/>
+        <schedule cron-expression = "0 0/3 * * * ?" />
+    </trigger>
+
+    <!-- Out Of Time Notification Job Detail -->
+    <component key="outOfTimeNotificationJobDetail" name="Out Of Time Notification Job Detail" class="org.catrobat.confluence.jobs.OutOfTimeVerificationJobDetail">
+        <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
+        <interface>org.quartz.JobDetail</interface>
+    </component>
+
+    <!-- Out Of Time Notification Job Detail Trigger -->
+    <trigger key="outOfTimeNotificationJobDetailTrigger" name="Out Of Time Notification Job Trigger">
+        <job key="outOfTimeNotificationJobDetail"/>
+        <schedule cron-expression = "0 0/1 * * * ?" />
     </trigger>
 
     <!-- https://confluence.atlassian.com/bamboocloud/constructing-a-cron-expression-in-bamboo-737183956.html -->
@@ -213,6 +237,7 @@
         <label key="Timesheet User Permissions" />
         <link linkId="administration_view_link">/plugins/servlet/timesheet/administration/</link>
     </web-item>
+
     <web-item key="user_information" name="Link to User Information View" section="system.admin/administration" weight="3">
         <label key="Timesheet User Information" />
         <link linkId="user_information_view_link">/plugins/servlet/timesheet/user/information/</link>

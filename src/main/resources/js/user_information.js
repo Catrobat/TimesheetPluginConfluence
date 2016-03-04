@@ -85,6 +85,7 @@ AJS.toInit(function () {
                 "<td headers=\"basic-state\" class=\"status\">" + state + "</td>" +
                 "<td headers=\"basic-timesheet-state\" class=\"timesheet\">" + tsState + "</td>" +
                 "<td headers=\"basic-timesheet-disable\" class=\"timsheet\"><input class=\"checkbox\" type=\"checkbox\" name=\"checkBoxOne\" id=\"checkBoxOne\"></td></tr>");
+                //last entry date hier noch einfügen
         }
 
         //enable checkbox

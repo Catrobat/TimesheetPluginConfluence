@@ -1,6 +1,6 @@
 package org.catrobat.confluence.jobs;
 
-import com.atlassian.confluence.user.UserAccessor;
+import org.catrobat.confluence.services.TimesheetEntryService;
 import org.catrobat.confluence.services.TimesheetService;
 import org.quartz.JobDetail;
 
@@ -10,23 +10,22 @@ import org.quartz.JobDetail;
  */
 public class ActivityVerificationJobDetail extends JobDetail {
     private final TimesheetService ts;
-    private final UserAccessor ua;
+    private final TimesheetEntryService te;
 
-    public ActivityVerificationJobDetail(TimesheetService ts, UserAccessor ua) {
+    public ActivityVerificationJobDetail(TimesheetService ts, TimesheetEntryService te) {
         super();
         this.ts = ts;
-        this.ua = ua;
+        this.te = te;
 
         setName(ActivityVerificationJobDetail.class.getSimpleName());
         setJobClass(ActivityVerificationJob.class);
-    }
-
-    public UserAccessor getUserAccessor() {
-        return ua;
     }
 
     public TimesheetService getTimesheetService() {
         return ts;
     }
 
+    public TimesheetEntryService getTimesheetEntryService() {
+        return te;
+    }
 }

@@ -54,7 +54,7 @@ public class VisualizationServlet extends HttpServlet {
       Timesheet sheet = sheetService.getTimesheetByUser(userKey);
 
       if (sheet == null) {
-        sheet = sheetService.add(userKey, 150, 0, "Confluence Timesheet");
+        sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5);
       }
 
       Map<String, Object> paramMap = Maps.newHashMap();

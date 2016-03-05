@@ -219,9 +219,9 @@ public class TimesheetRest {
       sendEmailNotification(user.getEmail(), "time", sheet, user);
     }
 
-    JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID,
-            sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-            sheet.getLecture(), sheet.getIsActive());
+    JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
+            sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
+            sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
 
     return Response.ok(jsonTimesheet).build();
   }
@@ -279,9 +279,9 @@ public class TimesheetRest {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
-    JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID,
-            sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-            sheet.getLecture(), sheet.getIsActive());
+    JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
+            sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
+            sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
 
     return Response.ok(jsonTimesheet).build();
   }
@@ -469,11 +469,13 @@ public class TimesheetRest {
     }
 
     sheetService.editTimesheet(user.getUserKey().getStringValue(), jsonTimesheet.getTargetHourPractice(),
-            jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getLectures(), true);
+            jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
+            jsonTimesheet.getLectures(), jsonTimesheet.getEcts(), jsonTimesheet.getLatestEntryDate(), jsonTimesheet.isActive(),
+            jsonTimesheet.isEnabled());
 
-    JsonTimesheet newJsonTimesheet = new JsonTimesheet(sheet.getID(),
-            sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-            sheet.getLecture(), sheet.getIsActive());
+    JsonTimesheet newJsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
+            sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
+            sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
 
     return Response.ok(newJsonTimesheet).build();
   }

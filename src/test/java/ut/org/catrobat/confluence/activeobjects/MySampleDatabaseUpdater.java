@@ -20,9 +20,9 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 		chrisSheet.setUserKey("chris");
 		chrisSheet.save();
 
-		Timesheet johSheet = em.create(Timesheet.class);
-		johSheet.setUserKey("joh");
-		johSheet.save();
+		Timesheet jsonSheet = em.create(Timesheet.class);
+		jsonSheet.setUserKey("joh");
+		jsonSheet.save();
 
 		Team scratchTeam = em.create(Team.class);
 		scratchTeam.setTeamName("SCRATCH");
@@ -81,7 +81,7 @@ public class MySampleDatabaseUpdater implements DatabaseUpdater {
 		entry2.setBeginDate(sdf.parse("02-01-2015 10:30"));
 		entry2.setEndDate(  sdf.parse("02-01-2015 10:45"));
 		entry2.setPauseMinutes(5);
-		entry2.setTimeSheet(johSheet);
+		entry2.setTimeSheet(jsonSheet);
 		entry2.setTeam(catrobatTeam);
 		entry2.setDescription("Master Fixen");
 		entry2.save();

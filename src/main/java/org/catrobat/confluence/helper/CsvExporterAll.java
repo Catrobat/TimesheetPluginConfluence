@@ -48,7 +48,7 @@ public class CsvExporterAll {
             sb.append(timesheet.getUserKey()).append(DELIMITER);
             sb.append(timesheet.getTargetHoursPractice()).append(DELIMITER);
             sb.append(timesheet.getTargetHoursTheory()).append(DELIMITER);
-            sb.append(timesheet.getLecture()).append(NEW_LINE);
+            sb.append(timesheet.getLectures()).append(NEW_LINE);
 
             for(TimesheetEntry timesheetEntry : timesheet.getEntries()){
                 sb.append("Begin Date" + DELIMITER +

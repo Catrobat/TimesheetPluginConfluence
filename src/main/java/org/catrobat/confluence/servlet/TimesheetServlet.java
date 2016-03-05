@@ -35,50 +35,50 @@ import java.util.Map;
 
 public class TimesheetServlet extends HttpServlet {
 
-  private final LoginUriProvider loginUriProvider;
-  private final TemplateRenderer templateRenderer;
-  private final TimesheetService sheetService;
-  private final PermissionService permissionService;
+    private final LoginUriProvider loginUriProvider;
+    private final TemplateRenderer templateRenderer;
+    private final TimesheetService sheetService;
+    private final PermissionService permissionService;
 
-  public TimesheetServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
-    this.loginUriProvider = loginUriProvider;
-    this.templateRenderer = templateRenderer;
-    this.sheetService = sheetService;
-    this.permissionService = permissionService;
-  }
-
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    try {
-      UserProfile userProfile = permissionService.checkIfUserExists(request);
-      String userKey = userProfile.getUserKey().getStringValue();
-      Timesheet sheet = sheetService.getTimesheetByUser(userKey);
-
-      if (sheet == null) {
-        sheet = sheetService.add(userKey, 150, 0, "Confluence Timesheet");
-      }
-
-      Map<String, Object> paramMap = Maps.newHashMap();
-      paramMap.put("timesheetid", sheet.getID());
-      response.setContentType("text/html;charset=utf-8");
-      templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
-
-    } catch (NotAuthorizedException e) {
-      redirectToLogin(request, response);
+    public TimesheetServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
+        this.loginUriProvider = loginUriProvider;
+        this.templateRenderer = templateRenderer;
+        this.sheetService = sheetService;
+        this.permissionService = permissionService;
     }
-  }
 
-  private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
-  }
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            UserProfile userProfile = permissionService.checkIfUserExists(request);
+            String userKey = userProfile.getUserKey().getStringValue();
+            Timesheet sheet = sheetService.getTimesheetByUser(userKey);
 
-  private URI getUri(HttpServletRequest request) {
-    StringBuffer builder = request.getRequestURL();
-    if (request.getQueryString() != null) {
-      builder.append("?");
-      builder.append(request.getQueryString());
+            if (sheet == null) {
+                sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5);
+            }
+
+            Map<String, Object> paramMap = Maps.newHashMap();
+            paramMap.put("timesheetid", sheet.getID());
+            response.setContentType("text/html;charset=utf-8");
+            templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
+
+        } catch (NotAuthorizedException e) {
+            redirectToLogin(request, response);
+        }
     }
-    return URI.create(builder.toString());
-  }
+
+    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
+    }
+
+    private URI getUri(HttpServletRequest request) {
+        StringBuffer builder = request.getRequestURL();
+        if (request.getQueryString() != null) {
+            builder.append("?");
+            builder.append(request.getQueryString());
+        }
+        return URI.create(builder.toString());
+    }
 
 }

@@ -25,90 +25,157 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JsonTimesheet {
 
-  @XmlElement
-  private int timesheetID;
-  @XmlElement
-  private String lectures;
-  @XmlElement
-  private int targetHourPractice;
-  @XmlElement
-  private int targetHourTheory;
-  @XmlElement
-  private boolean isActive;
+    @XmlElement
+    private int timesheetID;
+    @XmlElement
+    private String lectures;
+    @XmlElement
+    private int ects;
+    @XmlElement
+    private String latestEntryDate;
+    @XmlElement
+    private int targetHourPractice;
+    @XmlElement
+    private int targetHourTheory;
+    @XmlElement
+    private int targetHours;
+    @XmlElement
+    private int targetHoursCompleted;
+    @XmlElement
+    private boolean isActive;
+    @XmlElement
+    private boolean isEnabled;
 
-  public JsonTimesheet(int timesheetID, int targetHourPractice, int targetHourTheory, String lectures, boolean isActive) {
-    this.timesheetID = timesheetID;
-    this.targetHourPractice = targetHourPractice;
-    this.targetHourTheory = targetHourTheory;
-    this.lectures = lectures;
-    this.isActive = isActive;
-  }
+    public JsonTimesheet(int timesheetID, String lectures, int ects, String latestEntryDate, int targetHourPractice,
+                         int targetHourTheory, int targetHours, int targetHoursCompleted, boolean isActive,
+                         boolean isEnabled) {
+        this.timesheetID = timesheetID;
+        this.lectures = lectures;
+        this.ects = ects;
+        this.latestEntryDate = latestEntryDate;
+        this.targetHourPractice = targetHourPractice;
+        this.targetHourTheory = targetHourTheory;
+        this.targetHours = targetHours;
+        this.targetHoursCompleted = targetHoursCompleted;
+        this.isActive = isActive;
+        this.isEnabled = isEnabled;
+    }
 
-  public JsonTimesheet() {
-  }
+    public JsonTimesheet() {
+    }
 
-  public int getTimesheetID() {
-    return timesheetID;
-  }
+    public int getTimesheetID() {
+        return timesheetID;
+    }
 
-  public void setTimesheetID(int timesheetID) {
-    this.timesheetID = timesheetID;
-  }
+    public void setTimesheetID(int timesheetID) {
+        this.timesheetID = timesheetID;
+    }
 
-  public int getTargetHourPractice() {
-    return targetHourPractice;
-  }
+    public String getLectures() {
+        return lectures;
+    }
 
-  public void setTargetHourPractice(int targetHourPractice) {
-    this.targetHourPractice = targetHourPractice;
-  }
+    public void setLectures(String lectures) {
+        this.lectures = lectures;
+    }
 
-  public int getTargetHourTheory() {
-    return targetHourTheory;
-  }
+    public int getEcts() {
+        return ects;
+    }
 
-  public void setTargetHourTheory(int targetHourTheory) {
-    this.targetHourTheory = targetHourTheory;
-  }
+    public void setEcts(int ects) {
+        this.ects = ects;
+    }
 
-  public String getLectures() {
-    return lectures;
-  }
+    public String getLatestEntryDate() {
+        return latestEntryDate;
+    }
 
-  public void setLectures(String lectures) {
-    this.lectures = lectures;
-  }
+    public void setLatestEntryDate(String latestEntryDate) {
+        this.latestEntryDate = latestEntryDate;
+    }
 
-  public boolean isIsActive() {
-    return isActive;
-  }
+    public int getTargetHourPractice() {
+        return targetHourPractice;
+    }
 
-  public void setIsActive(boolean isActive) {
-    this.isActive = isActive;
-  }
+    public void setTargetHourPractice(int targetHourPractice) {
+        this.targetHourPractice = targetHourPractice;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    public int getTargetHourTheory() {
+        return targetHourTheory;
+    }
 
-    JsonTimesheet that = (JsonTimesheet) o;
+    public void setTargetHourTheory(int targetHourTheory) {
+        this.targetHourTheory = targetHourTheory;
+    }
 
-    if (timesheetID != that.timesheetID) return false;
-    if (targetHourPractice != that.targetHourPractice) return false;
-    if (targetHourTheory != that.targetHourTheory) return false;
-    if (isActive != that.isActive) return false;
+    public int getTargetHours() {
+        return targetHours;
+    }
 
-    return lectures.equals(that.lectures);
-  }
+    public void setTargetHours(int targetHours) {
+        this.targetHours = targetHours;
+    }
 
-  @Override
-  public int hashCode() {
-    int result = timesheetID;
-    result = 31 * result + lectures.hashCode();
-    result = 31 * result + targetHourPractice;
-    result = 31 * result + targetHourTheory;
-    result = 31 * result + (isActive ? 1 : 0);
-    return result;
-  }
+    public int getTargetHoursCompleted() {
+        return targetHoursCompleted;
+    }
+
+    public void setTargetHoursCompleted(int targetHoursCompleted) {
+        this.targetHoursCompleted = targetHoursCompleted;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JsonTimesheet that = (JsonTimesheet) o;
+
+        if (timesheetID != that.timesheetID) return false;
+        if (ects != that.ects) return false;
+        if (latestEntryDate != that.latestEntryDate) return false;
+        if (targetHourPractice != that.targetHourPractice) return false;
+        if (targetHourTheory != that.targetHourTheory) return false;
+        if (targetHours != that.targetHours) return false;
+        if (targetHoursCompleted != that.targetHoursCompleted) return false;
+        if (isActive != that.isActive) return false;
+        if (isEnabled != that.isEnabled) return false;
+
+        return lectures.equals(that.lectures);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = timesheetID;
+        result = 31 * result + lectures.hashCode();
+        result = 31 * result + ects;
+        result = 31 * result + latestEntryDate.hashCode();
+        result = 31 * result + targetHourPractice;
+        result = 31 * result + targetHourTheory;
+        result = 31 * result + targetHours;
+        result = 31 * result + targetHoursCompleted;
+        result = 31 * result + (isActive ? 1 : 0);
+        result = 31 * result + (isEnabled ? 1 : 0);
+        return result;
+    }
 }

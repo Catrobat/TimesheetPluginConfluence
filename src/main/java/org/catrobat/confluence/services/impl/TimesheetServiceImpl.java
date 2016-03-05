@@ -20,6 +20,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.services.TimesheetService;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
@@ -34,8 +35,9 @@ public class TimesheetServiceImpl implements TimesheetService {
   }
 
   @Override
-  public Timesheet editTimesheet(String userKey, int targetHoursPractice,
-                                 int targetHoursTheory, String lecture, Boolean isActive) {
+  public Timesheet editTimesheet(String userKey, int targetHoursPractice, int targetHoursTheory,
+                                 int targetHours, int targetHoursCompleted, String lectures, int ects,
+                                 String latestEntryDate, Boolean isActive, Boolean isEnabled) {
     Timesheet[] found = ao.find(Timesheet.class, "USER_KEY = ?", userKey);
     if ((found.length == 1)) {
       Timesheet sheet = found[0];
@@ -43,8 +45,13 @@ public class TimesheetServiceImpl implements TimesheetService {
       sheet.setUserKey(userKey);
       sheet.setTargetHoursPractice(targetHoursPractice);
       sheet.setTargetHoursTheory(targetHoursTheory);
-      sheet.setLecture(lecture);
+      sheet.setTargetHours(targetHours);
+      sheet.setTargetHoursCompleted(targetHoursCompleted);
+      sheet.setLectures(lectures);
+      sheet.setEcts(ects);
+      sheet.setLatestEntryDate(latestEntryDate);
       sheet.setIsActive(isActive);
+      sheet.setIsEnabled(isEnabled);
       sheet.save();
       return sheet;
     }
@@ -52,14 +59,19 @@ public class TimesheetServiceImpl implements TimesheetService {
   }
 
   @Override
-  public Timesheet add(String userKey, int targetHoursPractice,
-                       int targetHoursTheory, String lecture) {
+  public Timesheet add(String userKey, int targetHoursPractice, int targetHoursTheory,
+                       int targetHours, int targetHoursCompleted, String lectures, int ects) {
     Timesheet sheet = ao.create(Timesheet.class);
     sheet.setUserKey(userKey);
     sheet.setTargetHoursPractice(targetHoursPractice);
     sheet.setTargetHoursTheory(targetHoursTheory);
-    sheet.setLecture(lecture);
+    sheet.setTargetHours(targetHours);
+    sheet.setTargetHoursCompleted(targetHoursCompleted);
+    sheet.setLectures(lectures);
+    sheet.setEcts(ects);
+    sheet.setLatestEntryDate(new DateTime().toString());
     sheet.setIsActive(false);
+    sheet.setIsEnabled(true);
     sheet.save();
     return sheet;
   }

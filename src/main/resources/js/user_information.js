@@ -51,24 +51,6 @@ AJS.toInit(function () {
         config = ajaxConfig;
     });
 
-    var dialog = new AJS.Dialog({
-        width: 840,
-        height: 400,
-        id: "activate-dialog",
-        closeOnOutsideClick: true
-    });
-
-    dialog.addHeader("Enable User");
-    dialog.addPanel("Panel 1", tableSkeleton, "panel-body");
-
-    dialog.addButton("OK", function (dialog) {
-        getTeamList(baseUrl, modifyUser);
-        dialog.hide();
-    });
-    dialog.addLink("Cancel", function (dialog) {
-        dialog.hide();
-    }, "#");
-
     function populateTable(allUsers, allStates) {
         var users = allUsers[0];
         var timesheetState = allStates[0];

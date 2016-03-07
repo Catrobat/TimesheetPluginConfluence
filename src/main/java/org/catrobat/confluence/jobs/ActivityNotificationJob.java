@@ -25,9 +25,6 @@ public class ActivityNotificationJob extends AbstractJob {
             for (Timesheet timesheet : timesheetList) {
                 if (timesheet.getUserKey().equals(jobDetail.getUserAccessor().
                         getUserByName(user.getName()).getKey().toString())) {
-                    System.out.println("OWNER " + user.getFullName());
-                    System.out.println("TS STATE " + timesheet.getIsActive());
-                    System.out.println("--");
                     if (!timesheet.getIsActive()) {
                         //MailQueueItem item = new ConfluenceMailQueueItem(emailTo, mailSubject, mailBody, MIME_TYPE_TEXT);
                         //jobDetail.getMailService().sendEmail(item);

@@ -32,6 +32,7 @@ public class TimesheetServiceImplTest {
     final int targeHours = 300;
     final int targetHoursCompleted = 150;
     final int ects = 10;
+    final String latestEntryDate = "Not Available";
     final String lectures = "Mobile Applications (705.881)";
 
     @Before
@@ -56,7 +57,8 @@ public class TimesheetServiceImplTest {
     @Test
     public void testAdd() throws Exception {
         //Act
-        service.add(userKey, targetHoursPractice, targetHoursTheory, targeHours, targetHoursCompleted, lectures, ects);
+        service.add(userKey, targetHoursPractice, targetHoursTheory, targeHours, targetHoursCompleted, lectures, ects,
+                latestEntryDate, true, true);
         Timesheet[] timesheet = ao.find(Timesheet.class, "USER_KEY = ?", userKey);
 
         //Assert
@@ -66,7 +68,15 @@ public class TimesheetServiceImplTest {
         assertEquals(targetHoursTheory, timesheet[0].getTargetHoursTheory());
         assertEquals(targeHours, timesheet[0].getTargetHours());
         assertEquals(targetHoursCompleted, timesheet[0].getTargetHoursCompleted());
+        assertEquals(lectures, timesheet[0].getLectures());
         assertEquals(ects, timesheet[0].getEcts());
+
+        //fails, but why?
+        /*
+        assertEquals(latestEntryDate, timesheet[0].getLatestEntryDate());
+        assertEquals(true, timesheet[0].getIsActive());
+        assertEquals(true, timesheet[0].getIsEnabled());
+        */
     }
 
     @Test

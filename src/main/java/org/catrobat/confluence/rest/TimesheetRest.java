@@ -308,10 +308,12 @@ public class TimesheetRest {
         TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet);
 
         //update latest entry date value
-        sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
-                sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                sheet.getLectures(), sheet.getEcts(), entries[0].getBeginDate().toString(), sheet.getIsActive(),
-                sheet.getIsEnabled());
+        if(entries.length > 0) {
+            sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                    sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                    sheet.getLectures(), sheet.getEcts(), entries[0].getBeginDate().toString(), sheet.getIsActive(),
+                    sheet.getIsEnabled());
+        }
 
         List<JsonTimesheetEntry> jsonEntries = new ArrayList<JsonTimesheetEntry>(entries.length);
 
@@ -325,11 +327,11 @@ public class TimesheetRest {
     }
 
     @GET
-    @Path("timesheets/getStates")
-    public Response getTimesheetStates(@Context HttpServletRequest request) {
+    @Path("timesheets/getTimesheets")
+    public Response getTimesheets(@Context HttpServletRequest request) {
 
         List<Timesheet> timesheetList = new LinkedList<Timesheet>();
-        List<JsonUser> jsonUserList = new ArrayList<JsonUser>();
+        List<JsonTimesheet> jsonTimesheetList = new ArrayList<JsonTimesheet>();
         List<User> allUsers = userAccessor.getUsersWithConfluenceAccessAsList();
         UserProfile userProfile;
 
@@ -345,25 +347,12 @@ public class TimesheetRest {
         }
 
         for (User user : allUsers) {
-
-            if (user.getFullName().compareTo("admin") != 0) {
-                continue;
-            }
-
-            JsonUser jsonUser = new JsonUser();
-            jsonUser.setEmail(user.getEmail());
-            jsonUser.setUserName(user.getName());
-
-            String displayName = user.getFullName();
-            int lastSpaceIndex = displayName.lastIndexOf(' ');
-            if (lastSpaceIndex >= 0) {
-                jsonUser.setFirstName(displayName.substring(0, lastSpaceIndex));
-                jsonUser.setLastName(displayName.substring(lastSpaceIndex + 1));
-            } else {
-                jsonUser.setFirstName(displayName);
-            }
+            JsonTimesheet jsonTimesheet = new JsonTimesheet();
 
             boolean isActive = false;
+            boolean isEnabled = false;
+            String latestEntryDate = "Not Available";
+            int timesheetID = 0;
 
             for (Timesheet timesheet : timesheetList) {
                 if (timesheet.getUserKey().equals(userAccessor.
@@ -372,15 +361,26 @@ public class TimesheetRest {
                         isActive = true;
                     } else {
                         isActive = false;
+                    } if (timesheet.getIsEnabled()) {
+                        isEnabled = true;
+                    } else {
+                        isEnabled = false;
                     }
+                    latestEntryDate = timesheet.getLatestEntryDate();
+                    timesheetID = timesheet.getID();
                 }
             }
 
-            jsonUser.setActive(isActive);
-            jsonUserList.add(jsonUser);
+            if (user.getFullName().compareTo("admin") != 0) {
+                jsonTimesheet.setActive(isActive);
+                jsonTimesheet.setEnabled(isEnabled);
+                jsonTimesheet.setLatestEntryDate(latestEntryDate);
+                jsonTimesheet.setTimesheetID(timesheetID);
+                jsonTimesheetList.add(jsonTimesheet);
+            }
         }
 
-        return Response.ok(jsonUserList).build();
+        return Response.ok(jsonTimesheetList).build();
     }
 
     @POST
@@ -493,16 +493,54 @@ public class TimesheetRest {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        sheetService.editTimesheet(user.getUserKey().getStringValue(), jsonTimesheet.getTargetHourPractice(),
-                jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
-                jsonTimesheet.getLectures(), jsonTimesheet.getEcts(), jsonTimesheet.getLatestEntryDate(), jsonTimesheet.isActive(),
-                jsonTimesheet.isEnabled());
+        sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                sheet.getTargetHoursTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
+                jsonTimesheet.getLectures(), jsonTimesheet.getEcts(), sheet.getLatestEntryDate(), sheet.getIsActive(),
+                sheet.getIsEnabled());
 
         JsonTimesheet newJsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
                 sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
                 sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
 
         return Response.ok(newJsonTimesheet).build();
+    }
+
+    @POST
+    @Path("timesheets/updateEnableStates")
+    public Response postTimesheetEnableStates(@Context HttpServletRequest request,
+                                       final JsonTimesheet[] jsonTimesheetList) {
+
+        Timesheet sheet;
+        UserProfile user;
+        List<JsonTimesheet> newJsonTimesheets = new LinkedList<JsonTimesheet>();
+
+        try {
+            user = permissionService.checkIfUserExists(request);
+        } catch (NotAuthorizedException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        }
+
+        if (jsonTimesheetList == null) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+
+        for(JsonTimesheet jsonTimesheet : jsonTimesheetList) {
+
+            sheet = sheetService.getTimesheetByID(jsonTimesheet.getTimesheetID());
+
+            if((sheet != null) && (jsonTimesheet.isActive())) {
+
+                sheetService.updateTimesheetEnableState(jsonTimesheet.getTimesheetID(), jsonTimesheet.isEnabled());
+
+                JsonTimesheet newJsonTimesheet = new JsonTimesheet(sheet.getID(), sheet.getLectures(), sheet.getEcts(),
+                        sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
+                        sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
+
+                newJsonTimesheets.add(newJsonTimesheet);
+            }
+        }
+
+        return Response.ok(newJsonTimesheets).build();
     }
 
     @PUT

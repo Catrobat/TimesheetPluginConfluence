@@ -241,7 +241,7 @@ public class TimesheetRestTest {
                 timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
                 timeSheetEntry.getDescription(), 1, 1, false);
 
-        TimesheetEntry[] entries =  {timeSheetEntry};
+        TimesheetEntry[] entries = {timeSheetEntry};
 
         Category category1 = Mockito.mock(Category.class);
         Mockito.when(category1.getID()).thenReturn(1);
@@ -271,7 +271,8 @@ public class TimesheetRestTest {
         Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
 
         sheetService.add(userKey.getStringValue(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
-                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts());
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts()
+                , timeSheet.getLatestEntryDate(), timeSheet.getIsActive(), timeSheet.getIsEnabled());
 
         response = timesheetRest.postTimesheetEntry(request, expectedTimesheetEntry, 1);
 
@@ -328,7 +329,7 @@ public class TimesheetRestTest {
 
     @Test
     public void testDeleteTimesheetEntryOk() throws Exception {
-        TimesheetEntry[] entries =  {timeSheetEntry};
+        TimesheetEntry[] entries = {timeSheetEntry};
 
         TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
         Mockito.when(newEntry.getID()).thenReturn(1);
@@ -338,7 +339,8 @@ public class TimesheetRestTest {
         Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
 
         sheetService.add(userKey.getStringValue(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
-                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts());
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts()
+                , timeSheet.getLatestEntryDate(), timeSheet.getIsActive(), timeSheet.getIsEnabled());
 
         response = timesheetRest.deleteTimesheetEntry(request, 1);
 

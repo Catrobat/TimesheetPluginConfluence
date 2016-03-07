@@ -55,7 +55,7 @@ public class TimesheetServlet extends HttpServlet {
             Timesheet sheet = sheetService.getTimesheetByUser(userKey);
 
             if (sheet == null) {
-                sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5);
+                sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5, "Not Available", true, true);
             }
 
             Map<String, Object> paramMap = Maps.newHashMap();

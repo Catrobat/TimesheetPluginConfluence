@@ -54,7 +54,8 @@ public interface TimesheetService {
      */
     @Nonnull
     Timesheet add(String userKey, int targetHoursPractice, int targetHoursTheory,
-                  int targetHours, int targetHoursCompleted, String lectures, int ects);
+                  int targetHours, int targetHoursCompleted, String lectures, int ects,
+                  String latestEntryDate, Boolean isActive, Boolean isEnabled);
 
     /**
      * Return all Timesheets
@@ -63,6 +64,9 @@ public interface TimesheetService {
      */
     @Nonnull
     List<Timesheet> all();
+
+    @Nullable
+    Timesheet updateTimesheetEnableState(int timesheetID, Boolean isEnabled);
 
     /**
      * Returns Timesheet corresponding to a User

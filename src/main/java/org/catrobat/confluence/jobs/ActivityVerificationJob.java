@@ -39,7 +39,7 @@ public class ActivityVerificationJob extends AbstractJob {
         }
 
         for(Timesheet abc : jobDetail.getTimesheetService().all()){
-            System.out.println("# State: " + abc.getIsActive() + " latest entry: " + abc.getLatestEntryDate());
+            System.out.println("# State: " + abc.getIsActive() + " Enabled: " + abc.getIsEnabled() + " latest entry: " + abc.getLatestEntryDate());
         }
 
         System.out.println("ActivityVerificationJob: " + jobExecutionContext.getFireTime());

@@ -1,6 +1,7 @@
 package ut.org.catrobat.confluence.rest;
 
 import com.atlassian.confluence.user.UserAccessor;
+import com.atlassian.sal.api.user.UserKey;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import junit.framework.Assert;
@@ -41,6 +42,7 @@ public class TimesheetRestTest {
     private TimesheetRest timesheetRest;
     private TimesheetEntryService entryService;
     private Team team;
+    UserKey userKey = new UserKey("USER_001");
     private DBFillerService dbFillerService;
     private ConfigService configService;
     private MailService mailService;
@@ -70,10 +72,12 @@ public class TimesheetRestTest {
         timesheetRest = new TimesheetRest(entryService, sheetService, categoryService, userManager, teamService, permissionService, dbfiller, configService, mailService, userAccessor);
         Mockito.when(permissionService.checkIfUserExists(request)).thenReturn(userProfile);
         Mockito.when(userProfile.getUsername()).thenReturn("testUser");
+        Mockito.when(userProfile.getUserKey()).thenReturn(userKey);
         Mockito.when(permissionService.userCanViewTimesheet(userProfile, timeSheet)).thenReturn(true);
 
         //Timesheet
         Mockito.when(sheetService.getTimesheetByID(1)).thenReturn(timeSheet);
+        Mockito.when(sheetService.getTimesheetByUser(userProfile.getUserKey().getStringValue())).thenReturn(timeSheet);
         Mockito.when(timeSheet.getTargetHoursPractice()).thenReturn(50);
         Mockito.when(timeSheet.getTargetHoursTheory()).thenReturn(100);
         Mockito.when(timeSheet.getTargetHours()).thenReturn(300);
@@ -82,7 +86,7 @@ public class TimesheetRestTest {
         Mockito.when(timeSheet.getLatestEntryDate()).thenReturn(new DateTime().toString());
         Mockito.when(timeSheet.getLectures()).thenReturn("Mobile Computing");
         Mockito.when(timeSheet.getIsActive()).thenReturn(true);
-        Mockito.when(timeSheet.getIsEnabled()).thenReturn(true);
+        Mockito.when(timeSheet.getUserKey()).thenReturn(userKey.getStringValue());
 
         //TimesheetEntry
         sdf = new SimpleDateFormat("dd-MM-yy hh:mm");
@@ -237,6 +241,8 @@ public class TimesheetRestTest {
                 timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), timeSheetEntry.getPauseMinutes(),
                 timeSheetEntry.getDescription(), 1, 1, false);
 
+        TimesheetEntry[] entries =  {timeSheetEntry};
+
         Category category1 = Mockito.mock(Category.class);
         Mockito.when(category1.getID()).thenReturn(1);
         Mockito.when(category1.getName()).thenReturn("Meeting");
@@ -258,6 +264,14 @@ public class TimesheetRestTest {
         Mockito.when(entryService.add(timeSheet,
                 timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category1,
                 timeSheetEntry.getDescription(), timeSheetEntry.getPauseMinutes(), team, false)).thenReturn(newEntry);
+
+        Mockito.when(newEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2016 00:01"));
+        Mockito.when(timeSheet.getEntries()).thenReturn(entries);
+        Mockito.when(entryService.getEntriesBySheet(timeSheet)).thenReturn(entries);
+        Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
+
+        sheetService.add(userKey.getStringValue(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts());
 
         response = timesheetRest.postTimesheetEntry(request, expectedTimesheetEntry, 1);
 
@@ -314,8 +328,17 @@ public class TimesheetRestTest {
 
     @Test
     public void testDeleteTimesheetEntryOk() throws Exception {
+        TimesheetEntry[] entries =  {timeSheetEntry};
+
         TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
         Mockito.when(newEntry.getID()).thenReturn(1);
+        Mockito.when(newEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2016 00:01"));
+        Mockito.when(timeSheet.getEntries()).thenReturn(entries);
+        Mockito.when(entryService.getEntriesBySheet(timeSheet)).thenReturn(entries);
+        Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
+
+        sheetService.add(userKey.getStringValue(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts());
 
         response = timesheetRest.deleteTimesheetEntry(request, 1);
 

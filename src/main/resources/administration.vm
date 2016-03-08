@@ -42,34 +42,21 @@
             <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
             <input style="display:none" type="text" name="fakeusernameremembered"/>
             <input style="display:none" type="password" name="fakepasswordremembered"/>
-            <h2>Permission</h2>
-            <fieldset>
-                <div class="field-group">
-                    <label for="plugin-permission">Allowed Groups/Users</label>
-                    <input class="text" type="text" id="plugin-permission" name="plugin-permission"
-                           title="plugin-permission">
 
-                    <div class="description">
-                        <ul>
-                            <li>If nothing is given, every Confluence Administrator may read/write</li>
-                            <li>If a group is given, every Confluence Administrator within this group may read/write
-                            </li>
-                            <li>If a single user is given and this user is a Confluence Administrator this user may
-                                read/write
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </fieldset>
+            <h2>Global Timesheet Read Access</h2>
+            <p>
+                Selected users are able to view all available timesheets, but are not able to apply any changes.
+            </p>
+            <p></p>
 
-            <h2>Read Access To All Timesheets</h2>
+            <div id="permissions"></div>
 
             <h2>E-Mail Notifications</h2>
             <fieldset>
                 <div class="field-group">
                     <label for="mail-from-name">From Name</label>
                     <input class="text" type="text" id="mail-from-name" name="mail-from-name"
-                           title="mail-from-name">
+                           title="mail-from-name" placeholder="Full Sender Name">
                     <div class="description">
                         The name of the sender which is shown in the welcome mail.
                     </div>
@@ -79,7 +66,7 @@
                 <div class="field-group">
                     <label for="mail-from">From</label>
                     <input class="text" type="text" id="mail-from" name="mail-from"
-                           title="mail-from">
+                           title="mail-from" placeholder="Sender Email Address">
                     <div class="description">
                         The e-mail address of the sender which is shown in the welcome mail.
                     </div>
@@ -91,7 +78,7 @@
                 <div class="field-group">
                     <label for="mail-subject-out-of-time">Subject</label>
                     <input class="text" type="text" id="mail-subject-out-of-time" name="mail-subject-out-of-time"
-                           title="mail-subject-out-of-time">
+                           title="mail-subject-out-of-time" placeholder="e.g.: [Out Of Time] ...">
                     <div class="description">
                         The subject of the mail, if a student has no time left.
                     </div>
@@ -100,7 +87,7 @@
             <fieldset>
                 <div class="field-group">
                     <label for="mail-body-out-of-time">Body</label>
-                    <textarea name="mail-body-out-of-time" id="mail-body-out-of-time"></textarea>
+                    <textarea name="mail-body-out-of-time" id="mail-body-out-of-time" rows="10" cols="70" placeholder="Text Of The Email"></textarea>
                     <div class="description">
                         The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>
@@ -116,7 +103,7 @@
                 <div class="field-group">
                     <label for="mail-subject-inactive">Subject</label>
                     <input class="text" type="text" id="mail-subject-inactive" name="mail-subject-inactive"
-                           title="mail-subject-inactive">
+                           title="mail-subject-inactive" placeholder="e.g.: [Inactive Notification] ...">
                     <div class="description">
                         The subject of the mail, if a student was not active since two weeks.
                     </div>
@@ -125,7 +112,7 @@
             <fieldset>
                 <div class="field-group">
                     <label for="mail-body-inactive">Body</label>
-                    <textarea name="mail-body-inactive" id="mail-body-inactive"></textarea>
+                    <textarea name="mail-body-inactive" id="mail-body-inactive" rows="10" cols="70" placeholder="Text Of The Email"></textarea>
                     <div class="description">
                         The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>
@@ -141,7 +128,7 @@
                 <div class="field-group">
                     <label for="mail-subject-entry-change">Subject</label>
                     <input class="text" type="text" id="mail-subject-entry-change" name="mail-subject-entry-change"
-                           title="mail-subject-entry-change">
+                           title="mail-subject-entry-change" placeholder="e.g.: [Timesheet Entry Change] ...">
                     <div class="description">
                         The subject of the mail, if an administrator changed an user timesheet entry.
                     </div>
@@ -150,7 +137,7 @@
             <fieldset>
                 <div class="field-group">
                     <label for="mail-body-entry-change">Body</label>
-                    <textarea name="mail-body-entry-change" id="mail-body-entry-change"></textarea>
+                    <textarea name="mail-body-entry-change" id="mail-body-entry-change" rows="10" cols="70" placeholder="Text Of The Email"></textarea>
                     <div class="description">
                         The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>

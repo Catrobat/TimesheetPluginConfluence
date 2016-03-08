@@ -53,7 +53,7 @@ public interface ConfigService {
 
     Config removeApprovedGroup(String approvedGroupName);
 
-    ApprovedUser addApprovedUser(String approvedUserKey);
+    ApprovedUser addApprovedUser(String approvedUserName);
 
     Config removeApprovedUser(String approvedUserKey);
 

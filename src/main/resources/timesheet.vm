@@ -89,10 +89,11 @@
     </div>
 
     <div class="tabs-pane" id="tabs-timesheet-settings">
-        <p>
+        <p></p>
         <form id="timesheet-settings" class="aui">
-            <div id="selectTimesheetOfUser"></div>
-    </form>
+            <div id="coordinatorTimesheetSelect"></div>
+            <div id="approvedUserTimesheetSelect"></div>
+        </form>
     </div>
 
     <div class="tabs-pane active-pane" id="tabs-timesheet">

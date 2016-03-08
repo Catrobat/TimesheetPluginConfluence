@@ -466,17 +466,17 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   @Override
-  public ApprovedUser addApprovedUser(String approvedUserKey) {
-    if (approvedUserKey == null || approvedUserKey.trim().length() == 0) {
+  public ApprovedUser addApprovedUser(String approvedUserName) {
+    if (approvedUserName == null || approvedUserName.trim().length() == 0) {
       return null;
     }
-    approvedUserKey = approvedUserKey.trim();
+    approvedUserName = approvedUserName.trim();
 
     ApprovedUser[] approvedUserArray = ao.find(ApprovedUser.class, Query.select()
-            .where("upper(\"USER_KEY\") = upper(?)", approvedUserKey));
+            .where("upper(\"USER_KEY\") = upper(?)", approvedUserName));
     if (approvedUserArray.length == 0) {
       ApprovedUser approvedUser = ao.create(ApprovedUser.class);
-      approvedUser.setUserKey(approvedUserKey);
+      approvedUser.setUserKey(approvedUserName);
       approvedUser.setConfiguration(getConfiguration());
       approvedUser.save();
 

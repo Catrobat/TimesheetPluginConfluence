@@ -81,9 +81,12 @@ public class PermissionServiceImpl implements PermissionService {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     } else if (!userManager.isSystemAdmin(userKey)) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
-    } else if (!isApproved(userAccessor.getUserByKey(userKey).getFullName())) {
+    }
+    /*
+    else if (!isApproved(userAccessor.getUserByKey(userKey).getFullName())) {
       return Response.status(Response.Status.UNAUTHORIZED).build();
     }
+    */
 
     return null;
   }

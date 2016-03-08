@@ -3,9 +3,6 @@
 //var baseUrl, timesheetTable, timesheetForm, restBaseUrl;
 var restBaseUrl;
 
-//ToDO: is this a good idea?
-var listOfUsers = [];
-
 AJS.toInit(function () {
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
     restBaseUrl = baseUrl + "/rest/timesheet/latest/";
@@ -29,19 +26,27 @@ function initSelectTimesheetButton() {
         e.preventDefault();
         if (AJS.$(document.activeElement).val() === 'Show') {
             var selectedUser = AJS.$("#user-select2-field").val().split(',');
-            getTimesheetOfUser(selectedUser);
+            if (selectedUser[0] !== "")
+                getTimesheetOfUser(selectedUser);
+        } else if (AJS.$(document.activeElement).val() === 'Display') {
+            var selectedUser = AJS.$("#approved-user-select2-field").val().split(',');
+            if (selectedUser[0] !== "")
+                getTimesheetOfUser(selectedUser);
         }
     });
 }
 
-function initUserSelect(jsonConfig, jsonUser) {
+function initCoordinatorTimesheetSelect(jsonConfig, jsonUser) {
     var config = jsonConfig[0];
     var userName = jsonUser[0]['userName'];
     var isTeamCoordinator = false;
-    AJS.$("#selectTimesheetOfUser").append("<field-group>");
-    AJS.$("#selectTimesheetOfUser").append("<div class=\"field-group\"><label for=\"permission\">Timesheet Of</label><input class=\"text selectTimesheetOfUserField\" type=\"text\" id=\"user-select2-field\"></div>");
-    AJS.$("#selectTimesheetOfUser").append("<div class=\"field-group\"><input type=\"submit\" value=\"Show\" class=\"aui-button aui-button-primary\"></field-group>");
-    AJS.$("#selectTimesheetOfUser").append("</field-group>");
+    var listOfUsers = [];
+
+    AJS.$("#coordinatorTimesheetSelect").append("<field-group>");
+    AJS.$("#coordinatorTimesheetSelect").append("<h3>Coordinator Space</h3>");
+    AJS.$("#coordinatorTimesheetSelect").append("<div class=\"field-group\"><label for=\"permission\">Timesheet Of</label><input class=\"text selectTimesheetOfUserField\" type=\"text\" id=\"user-select2-field\"></div>");
+    AJS.$("#coordinatorTimesheetSelect").append("<div class=\"field-group\"><input type=\"submit\" value=\"Show\" class=\"aui-button aui-button-primary\"></field-group>");
+    AJS.$("#coordinatorTimesheetSelect").append("</field-group>");
     for (var i = 0; i < config.teams.length; i++) {
         var team = config.teams[i];
         //check if user is coordinator of a team
@@ -68,12 +73,54 @@ function initUserSelect(jsonConfig, jsonUser) {
 
     if (isTeamCoordinator) {
         initSelectTimesheetButton();
-        AJS.$("#selectTimesheetOfUser").show();
+        AJS.$("#coordinatorTimesheetSelect").show();
     } else {
-        AJS.$("#selectTimesheetOfUser").hide();
+        AJS.$("#coordinatorTimesheetSelect").hide();
     }
+}
 
+function initApprovedUserTimesheetSelect(jsonConfig, jsonUser) {
+    var config = jsonConfig[0];
+    var userName = jsonUser[0]['userName'];
+    var isApprovedUser = false;
+    var listOfUsers = [];
 
+    AJS.$("#approvedUserTimesheetSelect").append("<field-group>");
+    AJS.$("#approvedUserTimesheetSelect").append("<h3>Approved User Space</h3>");
+    AJS.$("#approvedUserTimesheetSelect").append("<div class=\"field-group\"><label for=\"approvedUserSelect\">Timesheet Of</label><input class=\"text approvedUserSelectTimesheetOfUserField\" type=\"text\" id=\"approved-user-select2-field\"></div>");
+    AJS.$("#approvedUserTimesheetSelect").append("<div class=\"field-group\"><input type=\"submit\" value=\"Display\" class=\"aui-button aui-button-primary\"></field-group>");
+    AJS.$("#approvedUserTimesheetSelect").append("</field-group>");
+    for (var i = 0; i < config.teams.length; i++) {
+        var team = config.teams[i];
+        //check if user is coordinator of a team
+        for (var j = 0; j < config.approvedUsers.length; j++) {
+            var approvedUserName = config.approvedUsers[j].replace(/\s/g, '');
+            if (approvedUserName.localeCompare(userName) == 0) {
+                isApprovedUser = true;
+            }
+        }
+        //add member of available team to the select2 box
+        if (isApprovedUser) {
+            for (var k = 0; k < team['developerGroups'].length; k++) {
+                listOfUsers.push(team['developerGroups'][k]);
+            }
+        }
+    }
+    AJS.$(".approvedUserSelectTimesheetOfUserField").auiSelect2({
+        placeholder: "Select User Name",
+        tags: listOfUsers.sort(),
+        tokenSeparators: [",", " "],
+        maximumSelectionSize: 1
+    });
+
+    if (isApprovedUser) {
+        initSelectTimesheetButton();
+        AJS.$("#approvedUserTimesheetSelect").show();
+        AJS.$("#coordinatorTimesheetSelect").hide();
+    } else {
+        AJS.$("#approvedUserTimesheetSelect").hide();
+        AJS.$("#coordinatorTimesheetSelect").hide();
+    }
 }
 
 function fetchDataCoordinator(selectedUserTimesheetID) {
@@ -191,7 +238,8 @@ function fetchUsers() {
     });
 
     AJS.$.when(config, jsonUser)
-        .done(initUserSelect)
+        .done(initCoordinatorTimesheetSelect)
+        .done(initApprovedUserTimesheetSelect)
         .fail(function (error) {
             AJS.messages.error({
                 title: 'There was an error while fetching data.',

@@ -30,6 +30,7 @@ AJS.toInit(function () {
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
     restBaseUrl = baseUrl + "/rest/timesheet/latest/";
     var teams = [];
+    var approvedUsers = [];
     var editNameDialog, editCategoryNameDialog;
 
     function scrollToAnchor(aid) {
@@ -53,6 +54,7 @@ AJS.toInit(function () {
 
         AJS.$.when(allUsersFetched, categoriesFetched)
             .done(populateForm)
+            .done(populateApprovedUsers)
             .fail(function (error) {
                 AJS.messages.error({
                     title: 'There was an error while fetching user data.',
@@ -60,6 +62,41 @@ AJS.toInit(function () {
                 });
                 console.log(error);
             });
+    }
+
+    function populateApprovedUsers(allUsers) {
+        AJS.$(".loadingDiv").show();
+        AJS.$.ajax({
+            url: restBaseUrl + 'config/getConfig',
+            dataType: "json",
+            success: function (config) {
+                AJS.$("#permissions").empty();
+                AJS.$("#permissions").append("<fieldset>");
+                AJS.$("#permissions").append("<div class=\"field-group\"><label for=\"approvedUser\">Approved User</label><input class=\"text approved\" type=\"text\" id=\"approvedUser\" value=\"" + config.approvedUsers + "\"></div>");
+                AJS.$("#permissions").append("</fieldset>");
+
+                var userNameList = [];
+                for (var i = 0; i < allUsers[0].length; i++) {
+                    userNameList.push(allUsers[0][i]['userName']);
+                }
+
+                AJS.$(".approved").auiSelect2({
+                    placeholder: "Search for user",
+                    tags: userNameList.sort(),
+                    tokenSeparators: [",", " "]
+                });
+
+                AJS.$(".loadingDiv").hide();
+            },
+            error: function (error) {
+                AJS.messages.error({
+                    title: "Error!",
+                    body: "Something went wrong!"
+                });
+
+                AJS.$(".loadingDiv").hide();
+            }
+        });
     }
 
     function populateForm(allUsers, allCategories) {
@@ -124,44 +161,21 @@ AJS.toInit(function () {
                     AJS.$("#categories").append("</fieldset>");
                 }
 
-                if (config.approvedUsers) {
-                    AJS.$(".coordinator").auiSelect2({
-                        placeholder: "Search for user",
-                        tags: userNameList.sort(),
-                        tokenSeparators: [",", " "]
-                    });
-                    AJS.$(".user").auiSelect2({
-                        placeholder: "Search for user",
-                        tags: userNameList.sort(),
-                        tokenSeparators: [",", " "]
-                    });
-                    AJS.$(".category").auiSelect2({
-                        placeholder: "Search for category",
-                        tags: categoryList.sort(),
-                        tokenSeparators: [",", " "]
-                    });
-                }
-
-                /*
-                var approved = [];
-                if (config.approvedGroups) {
-                    for (var i = 0; i < config.approvedGroups.length; i++) {
-                        approved.push({id: "groups-" + config.approvedGroups[i], text: config.approvedGroups[i]});
-                    }
-                }
-
-                if (config.approvedUsers) {
-                    for (var i = 0; i < config.approvedUsers.length; i++) {
-                        approved.push({id: "users-" + config.approvedUsers[i], text: config.approvedUsers[i]});
-                    }
-                }
-
-                AJS.$("#plugin-permission").auiSelect2("data", approved);
-                AJS.$("#userdirectory").auiSelect2("data", {
-                    id: config.userDirectoryId,
-                    text: config.userDirectoryName
+                AJS.$(".coordinator").auiSelect2({
+                    placeholder: "Search for user",
+                    tags: userNameList.sort(),
+                    tokenSeparators: [",", " "]
                 });
-                */
+                AJS.$(".user").auiSelect2({
+                    placeholder: "Search for user",
+                    tags: userNameList.sort(),
+                    tokenSeparators: [",", " "]
+                });
+                AJS.$(".category").auiSelect2({
+                    placeholder: "Search for category",
+                    tags: categoryList.sort(),
+                    tokenSeparators: [",", " "]
+                });
 
                 AJS.$(".loadingDiv").hide();
             },
@@ -178,6 +192,7 @@ AJS.toInit(function () {
 
     function updateConfig() {
         var config = {};
+
         config.mailFromName = AJS.$("#mail-from-name").val();
         config.mailFrom = AJS.$("#mail-from").val();
 
@@ -189,18 +204,8 @@ AJS.toInit(function () {
         config.mailBodyInactive = AJS.$("#mail-body-inactive").val();
         config.mailBodyEntry = AJS.$("#mail-body-entry-change").val();
 
-        var usersAndGroups = AJS.$("#plugin-permission").auiSelect2("val");
-        var approvedUsers = [];
+        var approvedUsers = AJS.$("#approvedUser").auiSelect2("val");
         var approvedGroups = [];
-
-        /*
-         for (var i = 0; i < usersAndGroups.length; i++) {
-         if (usersAndGroups[i].match("^users-")) {
-         approvedUsers.push(usersAndGroups[i].split("users-")[1]);
-         } else if (usersAndGroups[i].match("^groups-")) {
-         approvedGroups.push(usersAndGroups[i].split("groups-")[1]);
-         }
-         }*/
 
         config.approvedUsers = approvedUsers;
         config.approvedGroups = approvedGroups;

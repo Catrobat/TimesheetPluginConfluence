@@ -34,7 +34,6 @@ import org.catrobat.confluence.services.MailService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
 import org.quartz.CronTrigger;
-import org.quartz.JobDetail;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -188,7 +187,7 @@ public class ConfigResourceRest {
             for (String approvedUserName : jsonConfig.getApprovedUsers()) {
                 UserProfile userProfile = userManager.getUserProfile(approvedUserName);
                 if (userProfile != null) {
-                    configService.addApprovedUser(userManager.getRemoteUser().getUserKey().toString());
+                    configService.addApprovedUser(userProfile.getFullName());
                 }
             }
         }
@@ -211,7 +210,7 @@ public class ConfigResourceRest {
         Response unauthorized = permissionService.checkPermission(request);
         if (unauthorized != null) {
             return unauthorized;
-        } else if(teamName.isEmpty()) {
+        } else if (teamName.isEmpty()) {
             return Response.serverError().entity("Team name must not be empty.").build();
         }
 
@@ -342,14 +341,14 @@ public class ConfigResourceRest {
 
     @POST
     @Path("/scheduling/changeVerificationInterval")
-    public Response changeVerificationJobInterval(final String croneString,@Context HttpServletRequest request) {
+    public Response changeVerificationJobInterval(final String croneString, @Context HttpServletRequest request) {
         CronTrigger cronTrigger = new CronTrigger();
         try {
             cronTrigger.setCronExpression(croneString);
         } catch (ParseException e) {
             e.printStackTrace();
         }
- 
+
         return Response.serverError().build();
     }
 }

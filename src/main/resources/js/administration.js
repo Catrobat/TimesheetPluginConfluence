@@ -487,6 +487,31 @@ AJS.toInit(function () {
         });
     }
 
+    function modifyActivityVerificationScheduling() {
+        AJS.$(".loadingDiv").show();
+        AJS.$.ajax({
+            url: restBaseUrl + 'scheduling/changeVerificationInterval',
+            type: "PUT",
+            contentType: "application/json",
+            data: AJS.$("#activity-verification-job").attr("value"),
+            processData: false,
+            success: function () {
+                AJS.messages.success({
+                    title: "Success!",
+                    body: "Scheduling interval changes applied!"
+                });
+                AJS.$(".loadingDiv").hide();
+            },
+            error: function () {
+                AJS.messages.error({
+                    title: "Error!",
+                    body: "Something went wrong!"
+                });
+                AJS.$(".loadingDiv").hide();
+            }
+        });
+    }
+
     fetchData();
 
     AJS.$("#general").submit(function (e) {

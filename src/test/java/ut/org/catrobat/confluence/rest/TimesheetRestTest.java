@@ -86,6 +86,7 @@ public class TimesheetRestTest {
         Mockito.when(timeSheet.getLatestEntryDate()).thenReturn(new DateTime().toString());
         Mockito.when(timeSheet.getLectures()).thenReturn("Mobile Computing");
         Mockito.when(timeSheet.getIsActive()).thenReturn(true);
+        Mockito.when(timeSheet.getIsEnabled()).thenReturn(true);
         Mockito.when(timeSheet.getUserKey()).thenReturn(userKey.getStringValue());
 
         //TimesheetEntry
@@ -311,6 +312,11 @@ public class TimesheetRestTest {
 
         TimesheetEntry newEntry = Mockito.mock(TimesheetEntry.class);
         Mockito.when(newEntry.getID()).thenReturn(1);
+
+        TimesheetEntry[] entries = {timeSheetEntry};
+        Mockito.when(timeSheet.getEntries()).thenReturn(entries);
+        Mockito.when(entryService.getEntriesBySheet(timeSheet)).thenReturn(entries);
+        Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
 
         Mockito.when(entryService.edit(1, timeSheetEntry.getTimeSheet(),
                 timeSheetEntry.getBeginDate(), timeSheetEntry.getEndDate(), category2,

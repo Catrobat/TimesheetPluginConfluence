@@ -33,12 +33,15 @@ import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.MailService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
+import org.quartz.CronTrigger;
+import org.quartz.JobDetail;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -334,6 +337,19 @@ public class ConfigResourceRest {
         if (successful)
             return Response.noContent().build();
 
+        return Response.serverError().build();
+    }
+
+    @POST
+    @Path("/scheduling/changeVerificationInterval")
+    public Response changeVerificationJobInterval(final String croneString,@Context HttpServletRequest request) {
+        CronTrigger cronTrigger = new CronTrigger();
+        try {
+            cronTrigger.setCronExpression(croneString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+ 
         return Response.serverError().build();
     }
 }

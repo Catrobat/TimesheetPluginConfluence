@@ -141,19 +141,20 @@
 
     <!-- Activity Verification Job Detail -->
     <component key="activityVerificationJobDetail" name="Activity Verification Job Detail" class="org.catrobat.confluence.jobs.ActivityVerificationJobDetail">
-        <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
+        <description>This Job verifies student timesheet activities automatically.</description>
         <interface>org.quartz.JobDetail</interface>
     </component>
 
     <!-- Activity Verification Job Detail Trigger -->
     <trigger key="activityVerificationJobDetailTrigger" name="Activity Verification Job Trigger">
         <job key="activityVerificationJobDetail"/>
-        <schedule cron-expression = "0 0/2 * * * ?" />
+        <schedule cron-expression = "0/10 * * * * ?" />
+        <managed editable="true" keepingHistory="true" canRunAdhoc="true" canDisable="true"/>
     </trigger>
 
     <!-- Activity Notification Job Detail -->
     <component key="activityNotificationJobDetail" name="Activity Notification Job Detail" class="org.catrobat.confluence.jobs.ActivityNotificationJobDetail">
-        <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
+        <description>This Job will inform the administrator and coordinators about lazy students.</description>
         <interface>org.quartz.JobDetail</interface>
     </component>
 
@@ -161,11 +162,12 @@
     <trigger key="activityNotificationJobDetailTrigger" name="Activity Notification Job Trigger">
         <job key="activityNotificationJobDetail"/>
         <schedule cron-expression = "0 0/3 * * * ?" />
+        <managed editable="true" keepingHistory="true" canRunAdhoc="true" canDisable="true"/>
     </trigger>
 
     <!-- Out Of Time Notification Job Detail -->
     <component key="outOfTimeNotificationJobDetail" name="Out Of Time Notification Job Detail" class="org.catrobat.confluence.jobs.OutOfTimeVerificationJobDetail">
-        <description>This SampleJobDetail is a component module that will be autowired by Spring.</description>
+        <description>This Job will inform students about their remaining time.</description>
         <interface>org.quartz.JobDetail</interface>
     </component>
 
@@ -173,6 +175,7 @@
     <trigger key="outOfTimeNotificationJobDetailTrigger" name="Out Of Time Notification Job Trigger">
         <job key="outOfTimeNotificationJobDetail"/>
         <schedule cron-expression = "0 0/1 * * * ?" />
+        <managed editable="true" keepingHistory="true" canRunAdhoc="true" canDisable="true"/>
     </trigger>
 
     <!-- https://confluence.atlassian.com/bamboocloud/constructing-a-cron-expression-in-bamboo-737183956.html -->

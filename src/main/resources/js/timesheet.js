@@ -62,7 +62,8 @@ function initUserSelect(jsonConfig, jsonUser) {
     AJS.$(".selectTimesheetOfUserField").auiSelect2({
         placeholder: "Select User Name",
         tags: listOfUsers.sort(),
-        tokenSeparators: [",", " "]
+        tokenSeparators: [",", " "],
+        maximumSelectionSize: 1
     });
 
     if (isTeamCoordinator) {
@@ -72,23 +73,7 @@ function initUserSelect(jsonConfig, jsonUser) {
         AJS.$("#selectTimesheetOfUser").hide();
     }
 
-    //Dropdown List
-    /*
-     AJS.$("#selectTimesheetOfUser").append("<fieldset>");
-     AJS.$("#selectTimesheetOfUser").append("<p>");
-     AJS.$("#selectTimesheetOfUser").append("<a href=\"#dwarfers\" aria-owns=\"dwarfers\" aria-haspopup=\"true\" class=\"aui-button aui-dropdown2-trigger aui-style-default\">Shipmates</a>");
-     AJS.$("#selectTimesheetOfUser").append("</p>");
-     AJS.$("#selectTimesheetOfUser").append("<div id=\"dwarfers\" class=\"aui-dropdown2 aui-style-default\">");
-     AJS.$("#selectTimesheetOfUser").append("<ul class=\"aui-list-truncate\">");
-     AJS.$("#selectTimesheetOfUser").append("<li><a href=\"http://example.com/\">Lister</a></li>");
-     /*
-     for(var k = 0; k < listOfUsers.length; k++) {
-     AJS.$("#selectTimesheetOfUser").append("<li><a href=\"#\">Menu item</a></li>");
-     }
-     AJS.$("#selectTimesheetOfUser").append("</ul>");
-     AJS.$("#selectTimesheetOfUser").append("</div>");
-     AJS.$("#selectTimesheetOfUser").append("</fieldset>");
-     */
+
 }
 
 function fetchDataCoordinator(selectedUserTimesheetID) {
@@ -170,9 +155,12 @@ function getExistingTimesheetHours() {
 function updateTimesheetHours(existingTimesheetData) {
     var timesheetUpdateData = {
         timesheetID: existingTimesheetData.timesheetID,
-        lectures: existingTimesheetData.lectures,
-        targetHourPractice: AJS.$("#timesheet-hours-text").val(),
-        targetHourTheory: existingTimesheetData.targetHourTheory,
+        lectures: AJS.$("#timesheet-hours-lectures").val(),
+        ects: AJS.$("#timesheet-hours-ects").val(),
+        targetHourPractice: AJS.$("#timesheet-hours-theory").val(),
+        targetHourTheory: AJS.$("#timesheet-hours-practical").val(),
+        targetHours: AJS.$("#timesheet-hours-text").val(),
+        targetHoursCompleted: AJS.$("#timesheet-hours-text").val() - AJS.$("#timesheet-hours-remain").val(),
         isActive: existingTimesheetData.isActive,
     };
     AJS.$.ajax({
@@ -250,9 +238,10 @@ function fetchData() {
         });
 }
 
-function calculateTotalTime(availableEntries) {
+function calculateTime(timesheetData) {
     var totalHours = 0;
     var totalMinutes = 0;
+    var availableEntries = timesheetData.entries;
 
     for (var i = 0; i < availableEntries.length; i++) {
         var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
@@ -273,15 +262,52 @@ function calculateTotalTime(availableEntries) {
     return totalHours + totalMinutes / 60;
 }
 
-function calculateRemainingTimesheetTime(timesheetTime, availableEntries) {
-    return (timesheetTime - calculateTotalTime(availableEntries));
+function calculateTheoryTime(timesheetData) {
+    var totalHours = 0;
+    var totalMinutes = 0;
+    var availableEntries = timesheetData.entries;
+
+    for (var i = 0; i < availableEntries.length; i++) {
+        var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+            availableEntries[i].pauseMinutes).getHours();
+        var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+            availableEntries[i].pauseMinutes).getMinutes();
+        var pause = availableEntries[i].pauseMinutes;
+        var calculatedTime = hours * 60 + minutes - pause;
+
+        if (timesheetData.categories[availableEntries[i].categoryID].categoryName === "a")
+            totalMinutes = totalMinutes + calculatedTime;
+
+        if (totalMinutes >= 60) {
+            var minutesToFullHours = Math.floor(totalMinutes / 60); //get only full hours
+            totalHours = totalHours + minutesToFullHours;
+            totalMinutes = totalMinutes - minutesToFullHours * 60;
+        }
+    }
+    return totalHours + totalMinutes / 60;
+}
+
+function initTimesheetInformationValues() {
+    AJS.$("#timesheet-hours-text").val(timesheetData.targetHours);
+    AJS.$("#timesheet-hours-remain").val(timesheetData.targetHours - timesheetData.targetHoursCompleted);
+    AJS.$("#timesheet-hours-theory").val(timesheetData.targetHourTheory);
+    AJS.$("#timesheet-hours-practial").val(timesheetData.targetHourPractice);
+    AJS.$("#timesheet-hours-ects").val(timesheetData.ects);
+    AJS.$("#timesheet-hours-lectures").val(timesheetData.lectures);
+}
+
+function updateTimesheetInformationValues(timesheetData) {
+    AJS.$("#timesheet-hours-text").val(timesheetData.targetHours);
+    AJS.$("#timesheet-hours-remain").val(AJS.$("#timesheet-hours-text").val() - calculateTime(timesheetData));
+    AJS.$("#timesheet-hours-theory").val(calculateTheoryTime(timesheetData));
+    AJS.$("#timesheet-hours-practical").val(calculateTime(timesheetData) - calculateTheoryTime(timesheetData));
+    AJS.$("#timesheet-hours-ects").val(timesheetData.ects);
+    AJS.$("#timesheet-hours-lectures").val(timesheetData.lectures);
 }
 
 function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
+    initTimesheetInformationValues
     var timesheetData = timesheetReply[0];
-    //set timesheet hours text field
-    AJS.$("#timesheet-hours-text").val(timesheetData.targetHourPractice);
-
     timesheetData.entries = entriesReply[0];
     timesheetData.categories = [];
     timesheetData.teams = [];
@@ -315,7 +341,7 @@ function populateTable(timesheetDataReply, allUsers) {
 
     var emptyEntry = {
         entryID: "new-id",
-        date: "",
+        date: toDateString(actualDate),
         begin: actualDate.getHours() + ":" + actualDate.getMinutes(),
         end: (actualDate.getHours() + 1) + ":" + actualDate.getMinutes(),
         pause: "00:00",
@@ -337,9 +363,6 @@ function populateTable(timesheetDataReply, allUsers) {
 }
 
 function appendEntriesToTable(timesheetData) {
-    //calculate remaining timesheet hours
-    AJS.$("#timesheet-hours-remain").val(calculateRemainingTimesheetTime(AJS.$("#timesheet-hours-text").val(), timesheetData.entries));
-
     //append timesheet entries to table
     var timesheetTable = AJS.$("#timesheet-table");
 
@@ -760,6 +783,8 @@ function renderViewRow(timesheetData, entry) {
     viewRow.find("button.delete").click(function () {
         deleteEntryClicked(viewRow, entry.entryID);
     });
+
+    updateTimesheetInformationValues(timesheetData);
 
     return viewRow;
 }

@@ -308,7 +308,7 @@ public class TimesheetRest {
         TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet);
 
         //update latest entry date value
-        if(entries.length > 0) {
+        if (entries.length > 0) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                     sheet.getLectures(), sheet.getEcts(), entries[0].getBeginDate().toString(), sheet.getIsActive(),
@@ -357,15 +357,8 @@ public class TimesheetRest {
             for (Timesheet timesheet : timesheetList) {
                 if (timesheet.getUserKey().equals(userAccessor.
                         getUserByName(user.getName()).getKey().toString())) {
-                    if (timesheet.getIsActive()) {
-                        isActive = true;
-                    } else {
-                        isActive = false;
-                    } if (timesheet.getIsEnabled()) {
-                        isEnabled = true;
-                    } else {
-                        isEnabled = false;
-                    }
+                    isActive = timesheet.getIsActive();
+                    isEnabled = timesheet.getIsEnabled();
                     latestEntryDate = timesheet.getLatestEntryDate();
                     timesheetID = timesheet.getID();
                 }
@@ -404,12 +397,22 @@ public class TimesheetRest {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
+        if (!sheet.getIsEnabled()) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
+        }
+
         TimesheetEntry newEntry = entryService.add(sheet, entry.getBeginDate(),
                 entry.getEndDate(), category, entry.getDescription(),
                 entry.getPauseMinutes(), team, entry.getIsGoogleDocImport());
 
         //update latest timesheet entry date if latest entry date is < new latest entry in the table
-        if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) > 0) {
+        if(sheet.getEntries().length == 1) {
+            sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                    sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                    sheet.getLectures(), sheet.getEcts(),
+                    entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                    sheet.getIsEnabled());
+        } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                     sheet.getLectures(), sheet.getEcts(), entry.getBeginDate().toString(), sheet.getIsActive(),
@@ -436,6 +439,10 @@ public class TimesheetRest {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
+        if (!sheet.getIsEnabled()) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
+        }
+
         List<JsonTimesheetEntry> newEntries = new LinkedList<JsonTimesheetEntry>();
         List<String> errorMessages = new LinkedList<String>();
 
@@ -451,10 +458,17 @@ public class TimesheetRest {
                         entry.getPauseMinutes(), team, entry.getIsGoogleDocImport());
 
                 //update latest timesheet entry date if latest entry date is < new latest entry in the table
-                if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) > 0) {
+                if(sheet.getEntries().length == 1) {
                     sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                             sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                            sheet.getLectures(), sheet.getEcts(), entry.getBeginDate().toString(), sheet.getIsActive(),
+                            sheet.getLectures(), sheet.getEcts(),
+                            entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                            sheet.getIsEnabled());
+                } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
+                    sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                            sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                            sheet.getLectures(), sheet.getEcts(),
+                            entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
                             sheet.getIsEnabled());
                 }
 
@@ -493,8 +507,12 @@ public class TimesheetRest {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        if (!sheet.getIsEnabled()) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
+        }
+
         sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
-                sheet.getTargetHoursTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
+                jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
                 jsonTimesheet.getLectures(), jsonTimesheet.getEcts(), sheet.getLatestEntryDate(), sheet.getIsActive(),
                 sheet.getIsEnabled());
 
@@ -508,7 +526,7 @@ public class TimesheetRest {
     @POST
     @Path("timesheets/updateEnableStates")
     public Response postTimesheetEnableStates(@Context HttpServletRequest request,
-                                       final JsonTimesheet[] jsonTimesheetList) {
+                                              final JsonTimesheet[] jsonTimesheetList) {
 
         Timesheet sheet;
         UserProfile user;
@@ -524,11 +542,11 @@ public class TimesheetRest {
             return Response.status(Response.Status.NO_CONTENT).build();
         }
 
-        for(JsonTimesheet jsonTimesheet : jsonTimesheetList) {
+        for (JsonTimesheet jsonTimesheet : jsonTimesheetList) {
 
             sheet = sheetService.getTimesheetByID(jsonTimesheet.getTimesheetID());
 
-            if((sheet != null) && (jsonTimesheet.isActive())) {
+            if (sheet != null) {
 
                 sheetService.updateTimesheetEnableState(jsonTimesheet.getTimesheetID(), jsonTimesheet.isEnabled());
 
@@ -551,23 +569,42 @@ public class TimesheetRest {
         TimesheetEntry entry;
         Category category;
         Team team;
+        Timesheet sheet;
 
         try {
             user = permissionService.checkIfUserExists(request);
             entry = entryService.getEntryByID(entryID);
             category = categoryService.getCategoryByID(jsonEntry.getCategoryID());
             team = teamService.getTeamByID(jsonEntry.getTeamID());
+            sheet = sheetService.getTimesheetByUser(user.getUserKey().getStringValue());
             checkIfCategoryIsAssociatedWithTeam(team, category);
             permissionService.userCanEditTimesheetEntry(user, entry.getTimeSheet(), jsonEntry);
         } catch (NotAuthorizedException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        entryService.edit(entryID, entry.getTimeSheet(), jsonEntry.getBeginDate(),
-                jsonEntry.getEndDate(), category, jsonEntry.getDescription(),
-                jsonEntry.getPauseMinutes(), team, jsonEntry.getIsGoogleDocImport());
+        if (sheet.getIsEnabled()) {
+            entryService.edit(entryID, entry.getTimeSheet(), jsonEntry.getBeginDate(),
+                    jsonEntry.getEndDate(), category, jsonEntry.getDescription(),
+                    jsonEntry.getPauseMinutes(), team, jsonEntry.getIsGoogleDocImport());
 
-        return Response.ok(jsonEntry).build();
+            if(sheet.getEntries().length == 1) {
+                sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                        sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                        sheet.getLectures(), sheet.getEcts(),
+                        entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                        sheet.getIsEnabled());
+            } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
+                sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                        sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                        sheet.getLectures(), sheet.getEcts(),
+                        entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                        sheet.getIsEnabled());
+            }
+
+            return Response.ok(jsonEntry).build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
     }
 
     @DELETE
@@ -585,19 +622,33 @@ public class TimesheetRest {
         } catch (NotAuthorizedException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
-        entryService.delete(entry);
 
         //update latest date
         sheet = sheetService.getTimesheetByUser(user.getUserKey().getStringValue());
+
+        if (!sheet.getIsEnabled()) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
+        }
+
         if (sheet == null || !permissionService.userCanViewTimesheet(user, sheet)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
+        entryService.delete(entry);
+
         //update latest timesheet entry date if latest entry date is < new latest entry in the table
-        if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) > 0) {
+        if (sheet.getEntries().length > 0) {
+            if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) > 0) {
+                sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
+                        sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                        sheet.getLectures(), sheet.getEcts(),
+                        entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                        sheet.getIsEnabled());
+            }
+        } else {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                    sheet.getLectures(), sheet.getEcts(),
-                    entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                    sheet.getLectures(), sheet.getEcts(), "Not Available", sheet.getIsActive(),
                     sheet.getIsEnabled());
         }
         return Response.ok().build();

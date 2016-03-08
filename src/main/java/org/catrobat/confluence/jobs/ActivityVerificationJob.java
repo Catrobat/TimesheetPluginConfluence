@@ -20,10 +20,9 @@ public class ActivityVerificationJob extends AbstractJob {
         List<Timesheet> timesheetList = jobDetail.getTimesheetService().all();
 
         for (Timesheet timesheet : timesheetList) {
-            if (timesheet.getEntries().length != 0) {
+            if (timesheet.getEntries().length > 0) {
                 TimesheetEntry[] entries = jobDetail.getTimesheetEntryService().getEntriesBySheet(timesheet);
-                if (dateIsOlderThanTwoWeeks(entries[0].getBeginDate()) ||
-                        dateIsOlderThanTwoWeeks(entries[0].getEndDate())) {
+                if (dateIsOlderThanTwoWeeks(entries[0].getBeginDate())) {
                     timesheet.setIsActive(false);
                     timesheet.save();
                 } else {
@@ -39,7 +38,8 @@ public class ActivityVerificationJob extends AbstractJob {
         }
 
         for(Timesheet abc : jobDetail.getTimesheetService().all()){
-            System.out.println("# State: " + abc.getIsActive() + " Enabled: " + abc.getIsEnabled() + " latest entry: " + abc.getLatestEntryDate());
+            System.out.println("# State: " + abc.getIsActive() + " Enabled: " + abc.getIsEnabled() + " latest entry: " + abc.getLatestEntryDate() +
+                    " # entries: " + abc.getEntries().length);
         }
 
         System.out.println("ActivityVerificationJob: " + jobExecutionContext.getFireTime());

@@ -34,49 +34,54 @@ import java.util.Map;
 
 public class VisualizationServlet extends HttpServlet {
 
-  private final LoginUriProvider loginUriProvider;
-  private final TemplateRenderer templateRenderer;
-  private final TimesheetService sheetService;
-  private final PermissionService permissionService;
+    private final LoginUriProvider loginUriProvider;
+    private final TemplateRenderer templateRenderer;
+    private final TimesheetService sheetService;
+    private final PermissionService permissionService;
 
-  public VisualizationServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
-    this.loginUriProvider = loginUriProvider;
-    this.templateRenderer = templateRenderer;
-    this.sheetService = sheetService;
-    this.permissionService = permissionService;
-  }
-
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    try {
-      UserProfile userProfile = permissionService.checkIfUserExists(request);
-      String userKey = userProfile.getUserKey().getStringValue();
-      Timesheet sheet = sheetService.getTimesheetByUser(userKey);
-
-      if (sheet == null) {
-        sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5, "Not Available", true, true);
-      }
-
-      Map<String, Object> paramMap = Maps.newHashMap();
-      paramMap.put("timesheetid", sheet.getID());
-      response.setContentType("text/html;charset=utf-8");
-      templateRenderer.render("visualization.vm", paramMap, response.getWriter());
-
-    } catch (NotAuthorizedException e) {
-      redirectToLogin(request, response);
+    public VisualizationServlet(LoginUriProvider loginUriProvider, TemplateRenderer templateRenderer, TimesheetService sheetService, PermissionService permissionService) {
+        this.loginUriProvider = loginUriProvider;
+        this.templateRenderer = templateRenderer;
+        this.sheetService = sheetService;
+        this.permissionService = permissionService;
     }
-  }
 
-  private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
-  }
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            if (!permissionService.checkIfUserIsGroupMember(request, "Timesheet") &&
+                    !permissionService.checkIfUserIsGroupMember(request, "confluence-administrators")) {
+                throw new NotAuthorizedException("User is no Timesheet-Group member.");
+            }
 
-  private URI getUri(HttpServletRequest request) {
-    StringBuffer builder = request.getRequestURL();
-    if (request.getQueryString() != null) {
-      builder.append("?");
-      builder.append(request.getQueryString());
+            UserProfile userProfile = permissionService.checkIfUserExists(request);
+            String userKey = userProfile.getUserKey().getStringValue();
+            Timesheet sheet = sheetService.getTimesheetByUser(userKey);
+
+            if (sheet == null) {
+                sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5, "Not Available", true, true);
+            }
+
+            Map<String, Object> paramMap = Maps.newHashMap();
+            paramMap.put("timesheetid", sheet.getID());
+            response.setContentType("text/html;charset=utf-8");
+            templateRenderer.render("visualization.vm", paramMap, response.getWriter());
+
+        } catch (NotAuthorizedException e) {
+            redirectToLogin(request, response);
+        }
     }
-    return URI.create(builder.toString());
-  }
+
+    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
+    }
+
+    private URI getUri(HttpServletRequest request) {
+        StringBuffer builder = request.getRequestURL();
+        if (request.getQueryString() != null) {
+            builder.append("?");
+            builder.append(request.getQueryString());
+        }
+        return URI.create(builder.toString());
+    }
 }

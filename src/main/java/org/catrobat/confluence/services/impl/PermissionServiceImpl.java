@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class PermissionServiceImpl implements PermissionService {
@@ -55,6 +56,20 @@ public class PermissionServiceImpl implements PermissionService {
             throw new NotAuthorizedException("User does not exist.");
         }
         return userProfile;
+    }
+
+    public boolean checkIfUserIsGroupMember(HttpServletRequest request, String groupName) {
+        UserProfile userProfile = userManager.getRemoteUser(request);
+
+        if (userProfile == null) {
+            return false;
+        }
+
+        List<String> userGroups = userAccessor.getGroupNames(userAccessor.getUserByKey(userProfile.getUserKey()));
+        if (userGroups.contains(groupName))
+            return true;
+
+        return false;
     }
 
     public UserProfile checkIfUsernameExists(String userName) {
@@ -82,23 +97,13 @@ public class PermissionServiceImpl implements PermissionService {
         } else if (!userManager.isSystemAdmin(userKey)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-    /*
-    else if (!isApproved(userAccessor.getUserByKey(userKey).getFullName())) {
-      return Response.status(Response.Status.UNAUTHORIZED).build();
-    }
-    */
-
         return null;
     }
 
     public boolean isApproved(UserProfile applicationUser) {
-        if (applicationUser == null || !userManager.isSystemAdmin(applicationUser.getUserKey())) {
-            return false;
-        }
-
         Config config = configService.getConfiguration();
         if (config.getApprovedGroups().length == 0 && config.getApprovedUsers().length == 0) {
-            return true;
+            return false;
         }
 
         if (configService.isUserApproved(applicationUser.getUserKey().getStringValue())) {

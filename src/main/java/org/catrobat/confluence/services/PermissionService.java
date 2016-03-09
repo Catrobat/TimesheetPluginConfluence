@@ -26,17 +26,19 @@ import javax.ws.rs.core.Response;
 
 public interface PermissionService {
 
-  public UserProfile checkIfUserExists(HttpServletRequest request);
+    public UserProfile checkIfUserExists(HttpServletRequest request);
 
-  public UserProfile checkIfUsernameExists(String userName);
+    public boolean checkIfUserIsGroupMember(HttpServletRequest request, String groupName);
 
-  public boolean checkIfUserExists(String userName);
+    public UserProfile checkIfUsernameExists(String userName);
 
-  public Response checkPermission(HttpServletRequest request);
+    public boolean checkIfUserExists(String userName);
 
-  public boolean userCanViewTimesheet(UserProfile user, Timesheet sheet);
+    public Response checkPermission(HttpServletRequest request);
 
-  public void userCanEditTimesheetEntry(UserProfile user, Timesheet sheet, JsonTimesheetEntry entry);
+    public boolean userCanViewTimesheet(UserProfile user, Timesheet sheet);
 
-  public void userCanDeleteTimesheetEntry(UserProfile user, TimesheetEntry entry);
+    public void userCanEditTimesheetEntry(UserProfile user, Timesheet sheet, JsonTimesheetEntry entry);
+
+    public void userCanDeleteTimesheetEntry(UserProfile user, TimesheetEntry entry);
 }

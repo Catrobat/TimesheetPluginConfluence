@@ -50,6 +50,11 @@ public class TimesheetServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            if(!permissionService.checkIfUserIsGroupMember(request, "Timesheet") &&
+                    !permissionService.checkIfUserIsGroupMember(request, "confluence-administrators")) {
+                throw new NotAuthorizedException("User is no Timesheet-Group member.");
+            }
+
             UserProfile userProfile = permissionService.checkIfUserExists(request);
             String userKey = userProfile.getUserKey().getStringValue();
             Timesheet sheet = sheetService.getTimesheetByUser(userKey);
@@ -62,7 +67,6 @@ public class TimesheetServlet extends HttpServlet {
             paramMap.put("timesheetid", sheet.getID());
             response.setContentType("text/html;charset=utf-8");
             templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
-
         } catch (NotAuthorizedException e) {
             redirectToLogin(request, response);
         }

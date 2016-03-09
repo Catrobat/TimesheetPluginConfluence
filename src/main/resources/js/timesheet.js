@@ -76,28 +76,24 @@ function initCoordinatorTimesheetSelect(jsonConfig, jsonUser) {
     }
 }
 
-function initApprovedUserTimesheetSelect(jsonConfig, jsonUser) {
+function initApprovedUserTimesheetSelect(jsonConfig, jsonUser, userList) {
     var config = jsonConfig[0];
     var userName = jsonUser[0]['userName'];
     var isApprovedUser = false;
-    console.log(userList);
+    var listOfUsers = [];
 
     AJS.$("#approvedUserTimesheetSelect").append("<field-group>");
     AJS.$("#approvedUserTimesheetSelect").append("<h3>Approved User Space</h3>");
     AJS.$("#approvedUserTimesheetSelect").append("<div class=\"field-group\"><label for=\"approvedUserSelect\">Timesheet Of</label><input class=\"text approvedUserSelectTimesheetOfUserField\" type=\"text\" id=\"approved-user-select2-field\"></div>");
     AJS.$("#approvedUserTimesheetSelect").append("<div class=\"field-group\"><input type=\"submit\" value=\"Display\" class=\"aui-button aui-button-primary\"></field-group>");
     AJS.$("#approvedUserTimesheetSelect").append("</field-group>");
-    for (var i = 0; i < config.teams.length; i++) {
-        var team = config.teams[i];
-        //check if user is coordinator of a team
-        for (var j = 0; j < config.approvedUsers.length; j++) {
-            var approvedUserName = config.approvedUsers[j].replace(/\s/g, '');
-            if (approvedUserName.localeCompare(userName) == 0) {
-                for (var k = 0; k < team['developerGroups'].length; k++) {
-                    listOfUsers.push(team['developerGroups'][k]);
-                }
-                isApprovedUser = true;
-            }
+    //check if user is approved
+    for (var i = 0; i < config.approvedUsers.length; i++) {
+        var approvedUserName = config.approvedUsers[i].replace(/\s/g, '');
+        if (approvedUserName.localeCompare(userName) == 0) {
+            isApprovedUser = true;
+            for (var j = 0; j < userList[0].length; j++)
+                listOfUsers.push(userList[0][j]['userName']);
         }
     }
     AJS.$(".approvedUserSelectTimesheetOfUserField").auiSelect2({
@@ -116,7 +112,7 @@ function initApprovedUserTimesheetSelect(jsonConfig, jsonUser) {
     }
 }
 
-function fetchDataCoordinator(selectedUserTimesheetID) {
+function fetchUserTimesheetData(selectedUserTimesheetID) {
 
     var timesheetFetched = AJS.$.ajax({
         type: 'GET',
@@ -163,7 +159,7 @@ function getTimesheetOfUser(selectedUser) {
     });
 
     AJS.$.when(timesheetFetched)
-        .done(fetchDataCoordinator)
+        .done(fetchUserTimesheetData)
         .done(location.reload())
         .fail(function (error) {
             AJS.messages.error({
@@ -230,7 +226,13 @@ function fetchUsers() {
         contentType: "application/json"
     });
 
-    AJS.$.when(config, jsonUser)
+    var userList = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'user/getUsers',
+        contentType: "application/json"
+    });
+
+    AJS.$.when(config, jsonUser, userList)
         .done(initCoordinatorTimesheetSelect)
         .done(initApprovedUserTimesheetSelect)
         .fail(function (error) {

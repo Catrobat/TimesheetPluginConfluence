@@ -92,10 +92,10 @@ function appendTimeToPiChart(theoryTime, practicalTime, totalTime) {
     var piChartDataPoints = [];
 
     //practice hours
-    piChartDataPoints.push("Practice Hours Percentage");
+    piChartDataPoints.push("Practice");
     piChartDataPoints.push(((practicalTime * 100) / totalTime).toString().slice(0,5));
     //theory hours
-    piChartDataPoints.push("Theory Hours Percentage");
+    piChartDataPoints.push("Theory");
     piChartDataPoints.push(((theoryTime * 100) / totalTime).toString().slice(0,5));
 
     drawPiChartDiagram(piChartDataPoints);

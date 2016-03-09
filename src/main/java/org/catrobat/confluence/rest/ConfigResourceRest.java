@@ -187,7 +187,7 @@ public class ConfigResourceRest {
             for (String approvedUserName : jsonConfig.getApprovedUsers()) {
                 UserProfile userProfile = userManager.getUserProfile(approvedUserName);
                 if (userProfile != null) {
-                    configService.addApprovedUser(userProfile.getFullName());
+                    configService.addApprovedUser(userProfile.getUsername(), userProfile.getUserKey().getStringValue());
                 }
             }
         }

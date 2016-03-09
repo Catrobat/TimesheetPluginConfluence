@@ -52,15 +52,11 @@ function initCoordinatorTimesheetSelect(jsonConfig, jsonUser) {
         //check if user is coordinator of a team
         for (var j = 0; j < team['coordinatorGroups'].length; j++) {
             if (team['coordinatorGroups'][j].localeCompare(userName) == 0) {
+                //add users of that team to the select2
+                for (var j = 0; j < team['developerGroups'].length; j++) {
+                    listOfUsers.push(team['developerGroups'][j]);
+                }
                 isTeamCoordinator = true;
-            } else {
-                isTeamCoordinator = false;
-            }
-        }
-        //add member of his team to the select2 box
-        if (isTeamCoordinator) {
-            for (var j = 0; j < team['developerGroups'].length; j++) {
-                listOfUsers.push(team['developerGroups'][j]);
             }
         }
     }
@@ -74,6 +70,7 @@ function initCoordinatorTimesheetSelect(jsonConfig, jsonUser) {
     if (isTeamCoordinator) {
         initSelectTimesheetButton();
         AJS.$("#coordinatorTimesheetSelect").show();
+        AJS.$("#approvedUserTimesheetSelect").hide();
     } else {
         AJS.$("#coordinatorTimesheetSelect").hide();
     }
@@ -83,7 +80,7 @@ function initApprovedUserTimesheetSelect(jsonConfig, jsonUser) {
     var config = jsonConfig[0];
     var userName = jsonUser[0]['userName'];
     var isApprovedUser = false;
-    var listOfUsers = [];
+    console.log(userList);
 
     AJS.$("#approvedUserTimesheetSelect").append("<field-group>");
     AJS.$("#approvedUserTimesheetSelect").append("<h3>Approved User Space</h3>");
@@ -96,13 +93,10 @@ function initApprovedUserTimesheetSelect(jsonConfig, jsonUser) {
         for (var j = 0; j < config.approvedUsers.length; j++) {
             var approvedUserName = config.approvedUsers[j].replace(/\s/g, '');
             if (approvedUserName.localeCompare(userName) == 0) {
+                for (var k = 0; k < team['developerGroups'].length; k++) {
+                    listOfUsers.push(team['developerGroups'][k]);
+                }
                 isApprovedUser = true;
-            }
-        }
-        //add member of available team to the select2 box
-        if (isApprovedUser) {
-            for (var k = 0; k < team['developerGroups'].length; k++) {
-                listOfUsers.push(team['developerGroups'][k]);
             }
         }
     }
@@ -119,7 +113,6 @@ function initApprovedUserTimesheetSelect(jsonConfig, jsonUser) {
         AJS.$("#coordinatorTimesheetSelect").hide();
     } else {
         AJS.$("#approvedUserTimesheetSelect").hide();
-        AJS.$("#coordinatorTimesheetSelect").hide();
     }
 }
 

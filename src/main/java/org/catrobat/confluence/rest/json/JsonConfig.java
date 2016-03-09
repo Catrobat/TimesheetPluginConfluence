@@ -72,11 +72,10 @@ public final class JsonConfig {
     this.teams = new ArrayList<JsonTeam>();
     this.teams.addAll(teamMap.values());
 
-    //ToDO: not correct
     this.approvedUsers = new ArrayList<String>();
     for (ApprovedUser approvedUser : toCopy.getApprovedUsers()) {
       if (approvedUser.getUserKey() != null) {
-        approvedUsers.add(approvedUser.getUserKey());
+        approvedUsers.add(approvedUser.getUserName());
       }
     }
 

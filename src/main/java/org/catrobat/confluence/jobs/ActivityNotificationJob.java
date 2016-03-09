@@ -39,8 +39,10 @@ public class ActivityNotificationJob extends AbstractJob {
                 }
             }
         }
+        /*
         System.out.println("ActivityNotificationJob: " + jobExecutionContext.getFireTime());
         System.out.println("ActivityNotificationJob next: " + jobExecutionContext.getNextFireTime());
+        */
     }
 
     private boolean dateIsOlderThanTwoMonths(Date date) {

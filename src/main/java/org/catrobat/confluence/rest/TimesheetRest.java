@@ -34,6 +34,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.atlassian.confluence.mail.template.ConfluenceMailQueueItem.MIME_TYPE_TEXT;
@@ -405,17 +407,19 @@ public class TimesheetRest {
                 entry.getEndDate(), category, entry.getDescription(),
                 entry.getPauseMinutes(), team, entry.getIsGoogleDocImport());
 
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
         //update latest timesheet entry date if latest entry date is < new latest entry in the table
         if(sheet.getEntries().length == 1) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                     sheet.getLectures(), sheet.getEcts(),
-                    entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                    df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                     sheet.getIsEnabled());
         } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                    sheet.getLectures(), sheet.getEcts(), entry.getBeginDate().toString(), sheet.getIsActive(),
+                    sheet.getLectures(), sheet.getEcts(), df.format(entry.getBeginDate()), sheet.getIsActive(),
                     sheet.getIsEnabled());
         }
 
@@ -446,6 +450,8 @@ public class TimesheetRest {
         List<JsonTimesheetEntry> newEntries = new LinkedList<JsonTimesheetEntry>();
         List<String> errorMessages = new LinkedList<String>();
 
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
         for (JsonTimesheetEntry entry : entries) {
             try {
                 permissionService.userCanEditTimesheetEntry(user, sheet, entry);
@@ -462,13 +468,13 @@ public class TimesheetRest {
                     sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                             sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                             sheet.getLectures(), sheet.getEcts(),
-                            entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                            df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                             sheet.getIsEnabled());
                 } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
                     sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                             sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                             sheet.getLectures(), sheet.getEcts(),
-                            entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                            df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                             sheet.getIsEnabled());
                 }
 
@@ -571,6 +577,8 @@ public class TimesheetRest {
         Team team;
         Timesheet sheet;
 
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
         try {
             user = permissionService.checkIfUserExists(request);
             entry = entryService.getEntryByID(entryID);
@@ -592,13 +600,13 @@ public class TimesheetRest {
                 sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                         sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                         sheet.getLectures(), sheet.getEcts(),
-                        entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                        df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                         sheet.getIsEnabled());
             } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
                 sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                         sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                         sheet.getLectures(), sheet.getEcts(),
-                        entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                        df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                         sheet.getIsEnabled());
             }
 
@@ -614,6 +622,8 @@ public class TimesheetRest {
         UserProfile user;
         TimesheetEntry entry;
         Timesheet sheet;
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         try {
             user = permissionService.checkIfUserExists(request);
@@ -642,7 +652,7 @@ public class TimesheetRest {
                 sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                         sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
                         sheet.getLectures(), sheet.getEcts(),
-                        entryService.getEntriesBySheet(sheet)[0].getBeginDate().toString(), sheet.getIsActive(),
+                        df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                         sheet.getIsEnabled());
             }
         } else {
@@ -659,17 +669,10 @@ public class TimesheetRest {
     public Response cleanAndInitDB() {
 
         if (userManager.isAdmin(userManager.getRemoteUserKey())) {
-            System.out.println("clean db. before cleaning: ");
             dbfiller.printDBStatus();
-
             dbfiller.cleanDB();
-
-            System.out.println("after cleaning: ");
             dbfiller.printDBStatus();
-
             dbfiller.insertDefaultData();
-
-            System.out.println("after default data: ");
             dbfiller.printDBStatus();
             return Response.ok("cleanandinitdb").build();
         } else {

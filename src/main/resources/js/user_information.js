@@ -106,8 +106,6 @@ AJS.toInit(function () {
             data.push(tempData);
         }
 
-        console.log(data);
-
         AJS.$(".loadingDiv").show();
         AJS.$.ajax({
             url: restBaseUrl + 'timesheets/updateEnableStates',

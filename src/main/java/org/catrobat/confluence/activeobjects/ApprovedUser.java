@@ -29,4 +29,8 @@ public interface ApprovedUser extends Entity {
   String getUserKey();
 
   void setUserKey(String userKey);
+
+  String getUserName();
+
+  void setUserName(String userName);
 }

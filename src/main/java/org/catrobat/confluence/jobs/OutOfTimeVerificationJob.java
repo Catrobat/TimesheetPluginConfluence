@@ -32,8 +32,10 @@ public class OutOfTimeVerificationJob extends AbstractJob {
                 }
             }
         }
+        /*
         System.out.println("OutOfTimeVerificationJob: " + jobExecutionContext.getFireTime());
         System.out.println("OutOfTimeVerificationJob next: " + jobExecutionContext.getNextFireTime());
+        */
     }
 
     private boolean dateIsOlderThanTwoWeeks(Date date) {

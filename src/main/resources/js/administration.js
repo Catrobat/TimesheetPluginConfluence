@@ -349,7 +349,6 @@ AJS.toInit(function () {
                         body: "Team edited!"
                     });
                     fetchData();
-                    scrollToAnchor('top');
                     AJS.$(".loadingDiv").hide();
                 },
                 error: function (error) {
@@ -418,7 +417,6 @@ AJS.toInit(function () {
                         body: "Category edited!"
                     });
                     fetchData();
-                    scrollToAnchor('top');
                     AJS.$(".loadingDiv").hide();
                 },
                 error: function (error) {

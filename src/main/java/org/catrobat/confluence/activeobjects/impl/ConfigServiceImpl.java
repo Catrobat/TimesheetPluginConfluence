@@ -155,7 +155,7 @@ public class ConfigServiceImpl implements ConfigService {
 
       //update relation
       CategoryToTeam categoryToTeam;
-      if (categoryToTeamArray.length == 0) {
+      if ((categoryToTeamArray.length == 0) || (categoryToTeamArray[0].getTeam().getTeamName() != team.getTeamName())) {
         categoryToTeam = ao.create(CategoryToTeam.class);
       } else {
         categoryToTeam = categoryToTeamArray[0];
@@ -245,41 +245,15 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     //retrieve all existing relations of a team
-
     TeamToGroup[] allTeamToGroups = ao.find(TeamToGroup.class, Query.select().where("\"TEAM_ID\" = ? AND \"ROLE\" = ?", team.getID(), role));
     //update all existing categoryToTeam relations of a team
     for (TeamToGroup oldTeamRelation : allTeamToGroups) {
-
-      /*
-      System.out.println("- - - - - - - ");
-      System.out.println("\n");
-      System.out.println("AVAILABLE\n");
-      System.out.println("username: " + oldTeamRelation.getGroup().getGroupName() + "\n");
-      System.out.println("role: " + oldTeamRelation.getRole().toString() + "\n");
-      System.out.println("\n");
-      */
-
       if (!addedRelations.contains(oldTeamRelation)) {
-        /*
-        System.out.println("DELETE\n");
-        System.out.println("username: " + oldTeamRelation.getGroup().getGroupName() + "\n");
-        System.out.println("role: " + oldTeamRelation.getRole().toString() + "\n");
-        System.out.println("- - - - - - - ");
-        System.out.println("\n");
-        */
-
         oldTeamRelation.setGroup(null);
         oldTeamRelation.setRole(null);
         oldTeamRelation.setTeam(null);
         oldTeamRelation.save();
       }
-      /*else {
-        System.out.println("UPDATE\n");
-        System.out.println("username: " + oldTeamRelation.getGroup().getGroupName() + "\n");
-        System.out.println("role: " + oldTeamRelation.getRole().toString() + "\n");
-        System.out.println("- - - - - - - ");
-        System.out.println("\n");
-      }*/
     }
   }
 
@@ -466,17 +440,18 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   @Override
-  public ApprovedUser addApprovedUser(String approvedUserName) {
-    if (approvedUserName == null || approvedUserName.trim().length() == 0) {
+  public ApprovedUser addApprovedUser(String approvedUserName, String approvedUserKey) {
+    if (approvedUserKey == null || approvedUserKey.trim().length() == 0) {
       return null;
     }
-    approvedUserName = approvedUserName.trim();
+    approvedUserKey = approvedUserKey.trim();
 
     ApprovedUser[] approvedUserArray = ao.find(ApprovedUser.class, Query.select()
-            .where("upper(\"USER_KEY\") = upper(?)", approvedUserName));
+            .where("upper(\"USER_KEY\") = upper(?)", approvedUserKey));
     if (approvedUserArray.length == 0) {
       ApprovedUser approvedUser = ao.create(ApprovedUser.class);
-      approvedUser.setUserKey(approvedUserName);
+      approvedUser.setUserKey(approvedUserKey);
+      approvedUser.setUserName(approvedUserName);
       approvedUser.setConfiguration(getConfiguration());
       approvedUser.save();
 

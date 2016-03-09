@@ -37,6 +37,7 @@ public class ActivityVerificationJob extends AbstractJob {
             }
         }
 
+        /*
         for(Timesheet abc : jobDetail.getTimesheetService().all()){
             System.out.println("# State: " + abc.getIsActive() + " Enabled: " + abc.getIsEnabled() + " latest entry: " + abc.getLatestEntryDate() +
                     " # entries: " + abc.getEntries().length);
@@ -44,6 +45,7 @@ public class ActivityVerificationJob extends AbstractJob {
 
         System.out.println("ActivityVerificationJob: " + jobExecutionContext.getFireTime());
         System.out.println("ActivityVerificationJob next: " + jobExecutionContext.getNextFireTime());
+        */
     }
 
     private boolean dateIsOlderThanTwoWeeks(Date date) {

@@ -41,6 +41,10 @@ public interface Timesheet extends Entity {
 
     void setTargetHoursCompleted(int hours);
 
+    int getTargetHoursRemoved();
+
+    void setTargetHoursRemoved(int hours);
+
     boolean getIsActive();
 
     void setIsActive(boolean isActive);
@@ -52,6 +56,10 @@ public interface Timesheet extends Entity {
     String getLectures();
 
     void setLectures(String lectures);
+
+    String getReason();
+
+    void setReason(String reason);
 
     int getEcts();
 

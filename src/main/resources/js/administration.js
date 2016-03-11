@@ -554,6 +554,17 @@ AJS.toInit(function () {
         scrollToAnchor('top');
     });
 
+    AJS.$("#modify-scheduling").submit(function (e) {
+        e.preventDefault();
+        if (AJS.$(document.activeElement).val() === 'Activity Verification') {
+            //call function from the server
+        } else if (AJS.$(document.activeElement).val() === 'Activity Notification') {
+            //call function from the server
+        } else {
+            //call function from the server
+        }
+    });
+
     AJS.$("a[href='#tabs-general']").click(function () {
         AJS.$("#teams").html("");
         fetchData();

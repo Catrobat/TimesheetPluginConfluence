@@ -31,9 +31,11 @@ public class TimesheetServiceImplTest {
     final int targetHoursTheory = 0;
     final int targeHours = 300;
     final int targetHoursCompleted = 150;
+    final int targetHoursRemoved = 0;
     final int ects = 10;
     final String latestEntryDate = "Not Available";
     final String lectures = "Mobile Applications (705.881)";
+    final String reason = "Agathe Bauer";
 
     @Before
     public void setUp() throws Exception {
@@ -57,8 +59,8 @@ public class TimesheetServiceImplTest {
     @Test
     public void testAdd() throws Exception {
         //Act
-        service.add(userKey, targetHoursPractice, targetHoursTheory, targeHours, targetHoursCompleted, lectures, ects,
-                latestEntryDate, true, true);
+        service.add(userKey, targetHoursPractice, targetHoursTheory, targeHours, targetHoursCompleted,
+                targetHoursRemoved, lectures, reason, ects, latestEntryDate, true, true);
         Timesheet[] timesheet = ao.find(Timesheet.class, "USER_KEY = ?", userKey);
 
         //Assert

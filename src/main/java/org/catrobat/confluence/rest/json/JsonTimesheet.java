@@ -30,6 +30,8 @@ public final class JsonTimesheet {
     @XmlElement
     private String lectures;
     @XmlElement
+    private String reason;
+    @XmlElement
     private int ects;
     @XmlElement
     private String latestEntryDate;
@@ -42,21 +44,25 @@ public final class JsonTimesheet {
     @XmlElement
     private int targetHoursCompleted;
     @XmlElement
+    private int targetHoursRemoved;
+    @XmlElement
     private boolean isActive;
     @XmlElement
     private boolean isEnabled;
 
-    public JsonTimesheet(int timesheetID, String lectures, int ects, String latestEntryDate, int targetHourPractice,
-                         int targetHourTheory, int targetHours, int targetHoursCompleted, boolean isActive,
+    public JsonTimesheet(int timesheetID, String lectures, String reason, int ects, String latestEntryDate, int targetHourPractice,
+                         int targetHourTheory, int targetHours, int targetHoursCompleted, int targetHoursRemoved, boolean isActive,
                          boolean isEnabled) {
         this.timesheetID = timesheetID;
         this.lectures = lectures;
+        this.reason = reason;
         this.ects = ects;
         this.latestEntryDate = latestEntryDate;
         this.targetHourPractice = targetHourPractice;
         this.targetHourTheory = targetHourTheory;
         this.targetHours = targetHours;
         this.targetHoursCompleted = targetHoursCompleted;
+        this.targetHoursRemoved = targetHoursRemoved;
         this.isActive = isActive;
         this.isEnabled = isEnabled;
     }
@@ -78,6 +84,14 @@ public final class JsonTimesheet {
 
     public void setLectures(String lectures) {
         this.lectures = lectures;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public int getEcts() {
@@ -128,6 +142,14 @@ public final class JsonTimesheet {
         this.targetHoursCompleted = targetHoursCompleted;
     }
 
+    public int getTargetHoursRemoved() {
+        return targetHoursRemoved;
+    }
+
+    public void setTargetHoursRemoved(int targetHoursRemoved) {
+        this.targetHoursRemoved = targetHoursRemoved;
+    }
+
     public boolean isActive() {
         return isActive;
     }
@@ -158,6 +180,7 @@ public final class JsonTimesheet {
         if (targetHourTheory != that.targetHourTheory) return false;
         if (targetHours != that.targetHours) return false;
         if (targetHoursCompleted != that.targetHoursCompleted) return false;
+        if (targetHoursRemoved != that.targetHoursRemoved) return false;
         if (isActive != that.isActive) return false;
         if (isEnabled != that.isEnabled) return false;
 
@@ -168,12 +191,14 @@ public final class JsonTimesheet {
     public int hashCode() {
         int result = timesheetID;
         result = 31 * result + lectures.hashCode();
+        result = 31 * result + reason.hashCode();
         result = 31 * result + ects;
-        result = 31 * result + latestEntryDate.hashCode();
+        //result = 31 * result + latestEntryDate.hashCode();
         result = 31 * result + targetHourPractice;
         result = 31 * result + targetHourTheory;
         result = 31 * result + targetHours;
         result = 31 * result + targetHoursCompleted;
+        result = 31 * result + targetHoursRemoved;
         result = 31 * result + (isActive ? 1 : 0);
         result = 31 * result + (isEnabled ? 1 : 0);
         return result;

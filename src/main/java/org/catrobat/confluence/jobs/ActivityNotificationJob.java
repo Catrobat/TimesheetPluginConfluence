@@ -30,11 +30,14 @@ public class ActivityNotificationJob extends AbstractJob {
                     if (!timesheet.getIsActive()) {
                         //email to admin + coordinators
                         //MailQueueItem item = new ConfluenceMailQueueItem(emailTo, mailSubject, mailBody, MIME_TYPE_TEXT);
-                        //jobDetail.getMailService().sendEmail(item);
-                    } else if (dateIsOlderThanTwoMonths(jobDetail.getTimesheetEntryService().getEntriesBySheet(timesheet)[0].getBeginDate())) {
-                        //email to admin after 2 monts
-                        //MailQueueItem item = new ConfluenceMailQueueItem(emailTo, mailSubject, mailBody, MIME_TYPE_TEXT);
-                        //jobDetail.getMailService().sendEmail(item);
+                        //jobDetail.getMailServihttps://answers.atlassian.com/questions/266166/confluence-doesnt-show-plugin-job-on-scheduled-jobs-pagece().sendEmail(item);
+                    } else {
+                        if (jobDetail.getTimesheetEntryService().getEntriesBySheet(timesheet).length > 0)
+                            if (dateIsOlderThanTwoMonths(jobDetail.getTimesheetEntryService().getEntriesBySheet(timesheet)[0].getBeginDate())) {
+                                //email to admin after 2 monts
+                                //MailQueueItem item = new ConfluenceMailQueueItem(emailTo, mailSubject, mailBody, MIME_TYPE_TEXT);
+                                //jobDetail.getMailService().sendEmail(item);
+                            }
                     }
                 }
             }

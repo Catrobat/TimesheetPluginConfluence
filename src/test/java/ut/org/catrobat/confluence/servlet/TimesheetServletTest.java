@@ -74,6 +74,8 @@ public class TimesheetServletTest {
     Mockito.when(userManager.getRemoteUser(request)).thenReturn(admin);
     Mockito.when(permissionService.checkIfUserExists(request)).thenReturn(admin);
     Mockito.when(sheetService.getTimesheetByUser("admin_key")).thenReturn(timeSheet);
+    Mockito.when(permissionService.checkIfUserIsGroupMember(request, "confluence-administrators")).thenReturn(false);
+    Mockito.when(permissionService.checkIfUserIsGroupMember(request, "Timesheet")).thenReturn(true);
 
     timesheetServlet.doGet(request, response);
   }

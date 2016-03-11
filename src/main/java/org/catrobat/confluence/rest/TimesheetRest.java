@@ -120,6 +120,38 @@ public class TimesheetRest {
     }
 
     @GET
+    @Path("teams/{timesheetID}")
+    public Response getTimesheetTeams(@Context HttpServletRequest request,
+                                      @PathParam("timesheetID") int timesheetID) {
+
+        List<JsonTeam> teams = new LinkedList<JsonTeam>();
+        List<User> allUsers = userAccessor.getUsersWithConfluenceAccessAsList();
+        UserProfile userProfile;
+
+        try {
+            userProfile = permissionService.checkIfUserExists(request);
+        } catch (NotAuthorizedException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        }
+
+        for (User user : allUsers) {
+            if (sheetService.getTimesheetByID(timesheetID).getUserKey().equals(userAccessor.
+                    getUserByName(user.getName()).getKey().toString())) {
+                for (Team team : teamService.getTeamsOfUser(user.getName())) {
+                    Category[] categories = team.getCategories();
+                    int[] categoryIDs = new int[categories.length];
+                    for (int i = 0; i < categories.length; i++) {
+                        categoryIDs[i] = categories[i].getID();
+                    }
+                    teams.add(new JsonTeam(team.getID(), team.getTeamName(), categoryIDs));
+                }
+            }
+        }
+
+        return Response.ok(teams).build();
+    }
+
+    @GET
     @Path("categories")
     public Response getCategories(@Context HttpServletRequest request) {
 
@@ -221,9 +253,10 @@ public class TimesheetRest {
             sendEmailNotification(user.getEmail(), "time", sheet, user);
         }
 
-        JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
-                sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-                sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
+        JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getReason(),
+                sheet.getEcts(), sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(),
+                sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                sheet.getTargetHoursRemoved(), sheet.getIsActive(), sheet.getIsEnabled());
 
         return Response.ok(jsonTimesheet).build();
     }
@@ -281,9 +314,10 @@ public class TimesheetRest {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
-                sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-                sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
+        JsonTimesheet jsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getReason(),
+                sheet.getEcts(), sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(),
+                sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                sheet.getTargetHoursRemoved(), sheet.getIsActive(), sheet.getIsEnabled());
 
         return Response.ok(jsonTimesheet).build();
     }
@@ -313,8 +347,8 @@ public class TimesheetRest {
         if (entries.length > 0) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                    sheet.getLectures(), sheet.getEcts(), entries[0].getBeginDate().toString(), sheet.getIsActive(),
-                    sheet.getIsEnabled());
+                    sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
+                    entries[0].getBeginDate().toString(), sheet.getIsActive(), sheet.getIsEnabled());
         }
 
         List<JsonTimesheetEntry> jsonEntries = new ArrayList<JsonTimesheetEntry>(entries.length);
@@ -383,6 +417,10 @@ public class TimesheetRest {
     public Response postTimesheetEntry(@Context HttpServletRequest request,
                                        final JsonTimesheetEntry entry, @PathParam("timesheetID") int timesheetID) {
 
+        if (entry.getDescription().isEmpty()) {
+            return Response.status(Response.Status.FORBIDDEN).entity("The 'Task Description' field must not be empty.").build();
+        }
+
         Timesheet sheet;
         UserProfile user;
         Category category;
@@ -410,17 +448,17 @@ public class TimesheetRest {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         //update latest timesheet entry date if latest entry date is < new latest entry in the table
-        if(sheet.getEntries().length == 1) {
+        if (sheet.getEntries().length == 1) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                    sheet.getLectures(), sheet.getEcts(),
+                    sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
                     df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                     sheet.getIsEnabled());
         } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                    sheet.getLectures(), sheet.getEcts(), df.format(entry.getBeginDate()), sheet.getIsActive(),
-                    sheet.getIsEnabled());
+                    sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
+                    df.format(entry.getBeginDate()), sheet.getIsActive(), sheet.getIsEnabled());
         }
 
         entry.setEntryID(newEntry.getID());
@@ -453,6 +491,10 @@ public class TimesheetRest {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         for (JsonTimesheetEntry entry : entries) {
+            if (entry.getDescription().isEmpty()) {
+                return Response.status(Response.Status.FORBIDDEN).entity("The 'Task Description' field must not be empty.").build();
+            }
+
             try {
                 permissionService.userCanEditTimesheetEntry(user, sheet, entry);
                 Category category = categoryService.getCategoryByID(entry.getCategoryID());
@@ -464,16 +506,16 @@ public class TimesheetRest {
                         entry.getPauseMinutes(), team, entry.getIsGoogleDocImport());
 
                 //update latest timesheet entry date if latest entry date is < new latest entry in the table
-                if(sheet.getEntries().length == 1) {
+                if (sheet.getEntries().length == 1) {
                     sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                             sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                            sheet.getLectures(), sheet.getEcts(),
+                            sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
                             df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                             sheet.getIsEnabled());
                 } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
                     sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                             sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                            sheet.getLectures(), sheet.getEcts(),
+                            sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
                             df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                             sheet.getIsEnabled());
                 }
@@ -495,7 +537,7 @@ public class TimesheetRest {
     }
 
     @POST
-    @Path("timesheets/{timesheetID}/changeHours")
+    @Path("timesheets/update/{timesheetID}")
     public Response postTimesheetHours(@Context HttpServletRequest request,
                                        final JsonTimesheet jsonTimesheet, @PathParam("timesheetID") int timesheetID) {
 
@@ -517,14 +559,23 @@ public class TimesheetRest {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
         }
 
-        sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
-                jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
-                jsonTimesheet.getLectures(), jsonTimesheet.getEcts(), sheet.getLatestEntryDate(), sheet.getIsActive(),
-                sheet.getIsEnabled());
+        if(userManager.isAdmin(user.getUserKey())) {
+            sheetService.editTimesheet(sheet.getUserKey(), jsonTimesheet.getTargetHourPractice(),
+                    jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
+                    jsonTimesheet.getTargetHoursRemoved(), jsonTimesheet.getLectures(), jsonTimesheet.getReason(),
+                    jsonTimesheet.getEcts(), jsonTimesheet.getLatestEntryDate(), sheet.getIsActive(), sheet.getIsEnabled());
+        } else {
+            sheetService.editTimesheet(user.getUserKey().getStringValue(), jsonTimesheet.getTargetHourPractice(),
+                    jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
+                    jsonTimesheet.getTargetHoursRemoved(), jsonTimesheet.getLectures(), jsonTimesheet.getReason(),
+                    jsonTimesheet.getEcts(), jsonTimesheet.getLatestEntryDate(), sheet.getIsActive(), sheet.getIsEnabled());
+        }
 
-        JsonTimesheet newJsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getEcts(),
-                sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-                sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
+
+        JsonTimesheet newJsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getReason(),
+                sheet.getEcts(), sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
+                sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getTargetHoursRemoved(),sheet.getIsActive(),
+                sheet.getIsEnabled());
 
         return Response.ok(newJsonTimesheet).build();
     }
@@ -556,9 +607,10 @@ public class TimesheetRest {
 
                 sheetService.updateTimesheetEnableState(jsonTimesheet.getTimesheetID(), jsonTimesheet.isEnabled());
 
-                JsonTimesheet newJsonTimesheet = new JsonTimesheet(sheet.getID(), sheet.getLectures(), sheet.getEcts(),
-                        sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-                        sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getIsActive(), sheet.getIsEnabled());
+                JsonTimesheet newJsonTimesheet = new JsonTimesheet(sheet.getID(), sheet.getLectures(), sheet.getReason(),
+                        sheet.getEcts(), sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(),
+                        sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
+                        sheet.getTargetHoursRemoved(), sheet.getIsActive(), sheet.getIsEnabled());
 
                 newJsonTimesheets.add(newJsonTimesheet);
             }
@@ -571,6 +623,11 @@ public class TimesheetRest {
     @Path("entries/{entryID}")
     public Response putTimesheetEntry(@Context HttpServletRequest request,
                                       final JsonTimesheetEntry jsonEntry, @PathParam("entryID") int entryID) {
+
+        if (jsonEntry.getDescription().isEmpty()) {
+            return Response.status(Response.Status.FORBIDDEN).entity("The 'Task Description' field must not be empty.").build();
+        }
+
         UserProfile user;
         TimesheetEntry entry;
         Category category;
@@ -596,16 +653,16 @@ public class TimesheetRest {
                     jsonEntry.getEndDate(), category, jsonEntry.getDescription(),
                     jsonEntry.getPauseMinutes(), team, jsonEntry.getIsGoogleDocImport());
 
-            if(sheet.getEntries().length == 1) {
+            if (sheet.getEntries().length == 1) {
                 sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                         sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                        sheet.getLectures(), sheet.getEcts(),
+                        sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
                         df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                         sheet.getIsEnabled());
             } else if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) >= 0) {
                 sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                         sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                        sheet.getLectures(), sheet.getEcts(),
+                        sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
                         df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                         sheet.getIsEnabled());
             }
@@ -651,15 +708,15 @@ public class TimesheetRest {
             if (entry.getBeginDate().compareTo(entryService.getEntriesBySheet(sheet)[0].getBeginDate()) > 0) {
                 sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                         sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                        sheet.getLectures(), sheet.getEcts(),
+                        sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
                         df.format(entryService.getEntriesBySheet(sheet)[0].getBeginDate()), sheet.getIsActive(),
                         sheet.getIsEnabled());
             }
         } else {
             sheetService.editTimesheet(user.getUserKey().getStringValue(), sheet.getTargetHoursPractice(),
                     sheet.getTargetHoursTheory(), sheet.getTargetHours(), sheet.getTargetHoursCompleted(),
-                    sheet.getLectures(), sheet.getEcts(), "Not Available", sheet.getIsActive(),
-                    sheet.getIsEnabled());
+                    sheet.getTargetHoursRemoved(), sheet.getLectures(), sheet.getReason(), sheet.getEcts(),
+                    "Not Available", sheet.getIsActive(), sheet.getIsEnabled());
         }
         return Response.ok().build();
     }

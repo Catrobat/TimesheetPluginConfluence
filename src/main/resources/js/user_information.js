@@ -89,6 +89,11 @@ AJS.toInit(function () {
         });
 
         userList.on('updated', function () {
+            if(AJS.$("#search-filter-overview").val() === "") {
+                AJS.$("#update-timesheet-button").show();
+            } else {
+                AJS.$("#update-timesheet-button").hide();
+            }
             AJS.$("#user-table").trigger("update");
         });
         AJS.$(".loadingDiv").hide();

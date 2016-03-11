@@ -38,8 +38,8 @@ public interface TimesheetService {
      */
     @Nullable
     Timesheet editTimesheet(String userKey, int targetHoursPractice, int targetHoursTheory,
-                            int targetHours, int targetHoursCompleted, String lectures, int ects,
-                            String latestEntryDate, Boolean isActive, Boolean isEnabled);
+                            int targetHours, int targetHoursCompleted, int targetHoursRemoved, String lectures,
+                            String reason, int ects, String latestEntryDate, Boolean isActive, Boolean isEnabled);
 
     /**
      * Adds a new Timesheet
@@ -54,8 +54,8 @@ public interface TimesheetService {
      */
     @Nonnull
     Timesheet add(String userKey, int targetHoursPractice, int targetHoursTheory,
-                  int targetHours, int targetHoursCompleted, String lectures, int ects,
-                  String latestEntryDate, Boolean isActive, Boolean isEnabled);
+                  int targetHours, int targetHoursCompleted, int targetHoursRemoved, String lectures,
+                  String reason, int ects, String latestEntryDate, Boolean isActive, Boolean isEnabled);
 
     /**
      * Return all Timesheets

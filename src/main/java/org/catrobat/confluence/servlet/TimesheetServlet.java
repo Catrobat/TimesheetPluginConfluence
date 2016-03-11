@@ -60,11 +60,17 @@ public class TimesheetServlet extends HttpServlet {
             Timesheet sheet = sheetService.getTimesheetByUser(userKey);
 
             if (sheet == null) {
-                sheet = sheetService.add(userKey, 0, 0, 150, 0, "Bachelor Thesis", 5, "Not Available", true, true);
+                sheet = sheetService.add(userKey, 0, 0, 150, 0, 0, "Bachelor Thesis",
+                        "Hint: Do not make other people angry.", 5, "Not Available", true, true);
             }
 
             Map<String, Object> paramMap = Maps.newHashMap();
             paramMap.put("timesheetid", sheet.getID());
+            if(permissionService.checkIfUserIsGroupMember(request, "confluence-administrators"))
+                paramMap.put("isadmin", true);
+            else
+                paramMap.put("isadmin", false);
+
             response.setContentType("text/html;charset=utf-8");
             templateRenderer.render("timesheet.vm", paramMap, response.getWriter());
         } catch (NotAuthorizedException e) {

@@ -88,6 +88,8 @@ public class TimesheetRestTest {
         Mockito.when(timeSheet.getIsActive()).thenReturn(true);
         Mockito.when(timeSheet.getIsEnabled()).thenReturn(true);
         Mockito.when(timeSheet.getUserKey()).thenReturn(userKey.getStringValue());
+        Mockito.when(timeSheet.getTargetHoursRemoved()).thenReturn(0);
+        Mockito.when(timeSheet.getReason()).thenReturn("Agathe Bauer");
 
         //TimesheetEntry
         sdf = new SimpleDateFormat("dd-MM-yy hh:mm");
@@ -216,9 +218,10 @@ public class TimesheetRestTest {
 
     @Test
     public void testGetAndVerifyTimeSheetOk() throws Exception {
-        JsonTimesheet expectedTimesheet = new JsonTimesheet(1, timeSheet.getLectures(), timeSheet.getEcts(),
+        JsonTimesheet expectedTimesheet = new JsonTimesheet(1, timeSheet.getLectures(), timeSheet.getReason(), timeSheet.getEcts(),
                 timeSheet.getLatestEntryDate(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
-                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getIsActive(), timeSheet.getIsEnabled());
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getTargetHoursRemoved(),
+                timeSheet.getIsActive(), timeSheet.getIsEnabled());
 
         response = timesheetRest.getTimesheet(request, 1);
 
@@ -227,9 +230,10 @@ public class TimesheetRestTest {
 
     @Test
     public void testGetAndVerifyTimeSheetNotOk() throws Exception {
-        JsonTimesheet expectedTimesheet = new JsonTimesheet(5, timeSheet.getLectures(), timeSheet.getEcts(),
+        JsonTimesheet expectedTimesheet = new JsonTimesheet(5, timeSheet.getLectures(), timeSheet.getReason(), timeSheet.getEcts(),
                 timeSheet.getLatestEntryDate(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
-                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getIsActive(), timeSheet.getIsEnabled());
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getTargetHoursRemoved(),
+                timeSheet.getIsActive(), timeSheet.getIsEnabled());
 
         response = timesheetRest.getTimesheet(request, 1);
 
@@ -272,8 +276,9 @@ public class TimesheetRestTest {
         Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
 
         sheetService.add(userKey.getStringValue(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
-                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts()
-                , timeSheet.getLatestEntryDate(), timeSheet.getIsActive(), timeSheet.getIsEnabled());
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getTargetHoursRemoved(),
+                timeSheet.getLectures(), timeSheet.getReason(), timeSheet.getEcts(), timeSheet.getLatestEntryDate(),
+                timeSheet.getIsActive(), timeSheet.getIsEnabled());
 
         response = timesheetRest.postTimesheetEntry(request, expectedTimesheetEntry, 1);
 
@@ -345,8 +350,9 @@ public class TimesheetRestTest {
         Mockito.when(timeSheetEntry.getBeginDate()).thenReturn(sdf.parse("01-01-2015 00:01"));
 
         sheetService.add(userKey.getStringValue(), timeSheet.getTargetHoursPractice(), timeSheet.getTargetHoursTheory(),
-                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getLectures(), timeSheet.getEcts()
-                , timeSheet.getLatestEntryDate(), timeSheet.getIsActive(), timeSheet.getIsEnabled());
+                timeSheet.getTargetHours(), timeSheet.getTargetHoursCompleted(), timeSheet.getTargetHoursRemoved(),
+                timeSheet.getLectures(), timeSheet.getReason(), timeSheet.getEcts(), timeSheet.getLatestEntryDate(),
+                timeSheet.getIsActive(), timeSheet.getIsEnabled());
 
         response = timesheetRest.deleteTimesheetEntry(request, 1);
 

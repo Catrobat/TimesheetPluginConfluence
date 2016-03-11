@@ -7,16 +7,25 @@ AJS.toInit(function () {
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
     restBaseUrl = baseUrl + "/rest/timesheet/latest/";
 
-    initSaveButton();
+    initUserSaveButton();
     fetchUsers();
     fetchData();
 });
 
-function initSaveButton() {
+function initUserSaveButton() {
     AJS.$("#timesheet-information").submit(function (e) {
         e.preventDefault();
         if (AJS.$(document.activeElement).val() === 'Save') {
-            getExistingTimesheetHours();
+            getExistingTimesheetHours(timesheetID);
+        }
+    });
+}
+
+function initAdminSaveButton(timesheetID) {
+    AJS.$("#timesheet-information").submit(function (e) {
+        e.preventDefault();
+        if (AJS.$(document.activeElement).val() === 'Save') {
+            getExistingTimesheetHours(timesheetID);
         }
     });
 }
@@ -61,7 +70,7 @@ function initCoordinatorTimesheetSelect(jsonConfig, jsonUser) {
         }
     }
     AJS.$(".selectTimesheetOfUserField").auiSelect2({
-        placeholder: "Select User Name",
+        placeholder: "Select User",
         tags: listOfUsers.sort(),
         tokenSeparators: [",", " "],
         maximumSelectionSize: 1
@@ -96,14 +105,18 @@ function initApprovedUserTimesheetSelect(jsonConfig, jsonUser, userList) {
                 listOfUsers.push(userList[0][j]['userName']);
         }
     }
+    if(isAdmin)
+        for (var j = 0; j < userList[0].length; j++)
+            listOfUsers.push(userList[0][j]['userName']);
+
     AJS.$(".approvedUserSelectTimesheetOfUserField").auiSelect2({
-        placeholder: "Select User Name",
+        placeholder: "Select User",
         tags: listOfUsers.sort(),
         tokenSeparators: [",", " "],
         maximumSelectionSize: 1
     });
 
-    if (isApprovedUser) {
+    if (isApprovedUser || isAdmin) {
         initSelectTimesheetButton();
         AJS.$("#approvedUserTimesheetSelect").show();
         AJS.$("#coordinatorTimesheetSelect").hide();
@@ -112,17 +125,17 @@ function initApprovedUserTimesheetSelect(jsonConfig, jsonUser, userList) {
     }
 }
 
-function fetchUserTimesheetData(selectedUserTimesheetID) {
+function fetchUserTimesheetData(timesheetID) {
 
     var timesheetFetched = AJS.$.ajax({
         type: 'GET',
-        url: restBaseUrl + 'coordinator/' + selectedUserTimesheetID,
+        url: restBaseUrl + 'coordinator/' + timesheetID,
         contentType: "application/json"
     });
 
     var entriesFetched = AJS.$.ajax({
         type: 'GET',
-        url: restBaseUrl + 'coordinator/' + selectedUserTimesheetID + '/entries',
+        url: restBaseUrl + 'coordinator/' + timesheetID + '/entries',
         contentType: "application/json"
     });
 
@@ -134,7 +147,7 @@ function fetchUserTimesheetData(selectedUserTimesheetID) {
 
     var teamsFetched = AJS.$.ajax({
         type: 'GET',
-        url: restBaseUrl + 'teams',
+        url: restBaseUrl + 'teams/' + timesheetID,
         contentType: "application/json"
     });
 
@@ -150,27 +163,26 @@ function fetchUserTimesheetData(selectedUserTimesheetID) {
         });
 }
 
-//ToDo: Only the first one will be taken
 function getTimesheetOfUser(selectedUser) {
-    var timesheetFetched = AJS.$.ajax({
+    var timesheetIDFetched = AJS.$.ajax({
         type: 'GET',
         url: restBaseUrl + 'timesheetID/fromUser/' + selectedUser[0],
         contentType: "application/json"
     });
 
-    AJS.$.when(timesheetFetched)
+    AJS.$.when(timesheetIDFetched)
         .done(fetchUserTimesheetData)
-        .done(location.reload())
+        .done(initAdminSaveButton)
         .fail(function (error) {
             AJS.messages.error({
-                title: 'There was an error while fetching data.',
+                title: 'There was an error while getting timesheet data of another user.',
                 body: '<p>Reason: ' + error.responseText + '</p>'
             });
             console.log(error);
         });
 }
 
-function getExistingTimesheetHours() {
+function getExistingTimesheetHours(timesheetID) {
     var timesheetFetched = AJS.$.ajax({
         type: 'GET',
         url: restBaseUrl + 'timesheets/' + timesheetID,
@@ -178,10 +190,10 @@ function getExistingTimesheetHours() {
     });
     AJS.$.when(timesheetFetched)
         .done(updateTimesheetHours)
-        .done(location.reload())
+        //.done(location.reload())
         .fail(function (error) {
             AJS.messages.error({
-                title: 'There was an error while fetching data.',
+                title: 'There was an error while fetching existing timesheet data.',
                 body: '<p>Reason: ' + error.responseText + '</p>'
             });
             console.log(error);
@@ -192,22 +204,26 @@ function updateTimesheetHours(existingTimesheetData) {
     var timesheetUpdateData = {
         timesheetID: existingTimesheetData.timesheetID,
         lectures: AJS.$("#timesheet-hours-lectures").val(),
+        reason: AJS.$("#timesheet-substract-hours-text").val(),
         ects: AJS.$("#timesheet-hours-ects").val(),
         targetHourPractice: AJS.$("#timesheet-hours-theory").val(),
         targetHourTheory: AJS.$("#timesheet-hours-practical").val(),
         targetHours: AJS.$("#timesheet-hours-text").val(),
-        targetHoursCompleted: AJS.$("#timesheet-hours-text").val() - AJS.$("#timesheet-hours-remain").val(),
-        isActive: existingTimesheetData.isActive,
+        targetHoursCompleted: AJS.$("#timesheet-hours-text").val() - AJS.$("#timesheet-hours-remain").val()
+        + AJS.$("#timesheet-hours-substract").val(),
+        targetHoursRemoved: AJS.$("#timesheet-hours-substract").val(),
+        isActive: existingTimesheetData.isActive
     };
+
     AJS.$.ajax({
             type: "post",
-            url: restBaseUrl + 'timesheets/' + timesheetID + '/changeHours',
+            url: restBaseUrl + 'timesheets/update/' + existingTimesheetData.timesheetID,
             contentType: "application/json",
             data: JSON.stringify(timesheetUpdateData)
         })
         .fail(function (error) {
             AJS.messages.error({
-                title: 'There was an error during your Google Timesheet import.',
+                title: 'There was an error while updating the timesheet data.',
                 body: '<p>Reason: ' + error.responseText + '</p>'
             });
         });
@@ -318,7 +334,7 @@ function calculateTheoryTime(timesheetData) {
         var pause = availableEntries[i].pauseMinutes;
         var calculatedTime = hours * 60 + minutes - pause;
 
-        if (timesheetData.categories[availableEntries[i].categoryID].categoryName === "a")
+        if (timesheetData.categories[availableEntries[i].categoryID].categoryName === "Theory")
             totalMinutes = totalMinutes + calculatedTime;
 
         if (totalMinutes >= 60) {
@@ -330,26 +346,61 @@ function calculateTheoryTime(timesheetData) {
     return totalHours + totalMinutes / 60;
 }
 
-function initTimesheetInformationValues() {
+function initTimesheetInformationValues(timesheetData) {
     AJS.$("#timesheet-hours-text").val(timesheetData.targetHours);
-    AJS.$("#timesheet-hours-remain").val(timesheetData.targetHours - timesheetData.targetHoursCompleted);
+    AJS.$("#timesheet-hours-remain").val(timesheetData.targetHours - timesheetData.targetHoursCompleted
+        + timesheetData.targetHoursRemoved);
     AJS.$("#timesheet-hours-theory").val(timesheetData.targetHourTheory);
-    AJS.$("#timesheet-hours-practial").val(timesheetData.targetHourPractice);
+    AJS.$("#timesheet-hours-practical").val(timesheetData.targetHourPractice);
     AJS.$("#timesheet-hours-ects").val(timesheetData.ects);
     AJS.$("#timesheet-hours-lectures").val(timesheetData.lectures);
+
+    if(isAdmin) {
+        AJS.$("#substractTimesheetHours").empty();
+        AJS.$("#substractTimesheetHours").append("<fieldset>");
+        AJS.$("#substractTimesheetHours").append("<label for=\"timesheet-hours-substract\">Substracted Timesheet Hours</label>");
+        AJS.$("#substractTimesheetHours").append("<input class=\"text\" type=\"text\" id=\"timesheet-hours-substract\" name=\"timesheet-hours-substract\" title=\"timesheet-hours-substract\">");
+        AJS.$("#substractTimesheetHours").append("<div class=\"description\">Shows your remaining timesheet hours.</div>");
+        AJS.$("#substractTimesheetHours").append("<label for=\"timesheet-substract-hours-text\">Description Text Field</label>");
+        AJS.$("#substractTimesheetHours").append("<textarea name=\"timesheet-substract-hours-text\" id=\"timesheet-substract-hours-text\" rows=\"8\" cols=\"32\" placeholder=\"You can add here what ever you want...\"></textarea>");
+        AJS.$("#substractTimesheetHours").append("<div class=\"description\">Reason(s) why some hours of your timesheet <br> have been \'terminated\'.</div>");
+        AJS.$("#substractTimesheetHours").append("</fieledset>");
+
+        //load values
+        AJS.$("#timesheet-substract-hours-text").val(timesheetData.reason);
+        AJS.$("#timesheet-hours-substract").val(timesheetData.targetHoursRemoved);
+    } else {
+        AJS.$("#substractTimesheetHours").empty();
+        AJS.$("#substractTimesheetHours").append("<fieldset>");
+        AJS.$("#substractTimesheetHours").append("<label for=\"timesheet-hours-substract\">Substracted Timesheet Hours</label>");
+        AJS.$("#substractTimesheetHours").append("<input class=\"text\" type=\"text\" id=\"timesheet-hours-substract\" name=\"timesheet-hours-substract\" title=\"timesheet-hours-substract\" readonly>");
+        AJS.$("#substractTimesheetHours").append("<div class=\"description\">Shows your remaining timesheet hours.</div>");
+        AJS.$("#substractTimesheetHours").append("<label for=\"timesheet-substract-hours-text\">Description Text Field</label>");
+        AJS.$("#substractTimesheetHours").append("<textarea name=\"timesheet-substract-hours-text\" id=\"timesheet-substract-hours-text\" rows=\"8\" cols=\"32\" placeholder=\"You can add here what ever you want...\" readonly></textarea>");
+        AJS.$("#substractTimesheetHours").append("<div class=\"description\">Reason(s) why some hours of your timesheet <br> have been \'terminated\'.</div>");
+        AJS.$("#substractTimesheetHours").append("</fieledset>");
+
+        //load values
+        AJS.$("#timesheet-substract-hours-text").val(timesheetData.reason);
+        AJS.$("#timesheet-hours-substract").val(timesheetData.targetHoursRemoved);
+    }
+
 }
 
 function updateTimesheetInformationValues(timesheetData) {
+    AJS.$("#timesheet-hours-substract").val(timesheetData.targetHoursRemoved);
+    AJS.$("#timesheet-substract-hours-text").val(timesheetData.reason);
     AJS.$("#timesheet-hours-text").val(timesheetData.targetHours);
-    AJS.$("#timesheet-hours-remain").val(AJS.$("#timesheet-hours-text").val() - calculateTime(timesheetData));
     AJS.$("#timesheet-hours-theory").val(calculateTheoryTime(timesheetData));
     AJS.$("#timesheet-hours-practical").val(calculateTime(timesheetData) - calculateTheoryTime(timesheetData));
+    AJS.$("#timesheet-hours-remain").val(AJS.$("#timesheet-hours-text").val() - AJS.$("#timesheet-hours-theory").val()
+        - AJS.$("#timesheet-hours-practical").val() - (- AJS.$("#timesheet-hours-substract").val()));
     AJS.$("#timesheet-hours-ects").val(timesheetData.ects);
     AJS.$("#timesheet-hours-lectures").val(timesheetData.lectures);
 }
 
 function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
-    initTimesheetInformationValues
+
     var timesheetData = timesheetReply[0];
     timesheetData.entries = entriesReply[0];
     timesheetData.categories = [];
@@ -368,10 +419,12 @@ function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entr
         };
     });
 
+    initTimesheetInformationValues(timesheetData);
+
     return timesheetData;
 }
 
-function populateTable(timesheetDataReply, allUsers) {
+function populateTable(timesheetDataReply) {
     var timesheetData = timesheetDataReply[0];
     var timesheetTable = AJS.$("#timesheet-table");
     timesheetTable.empty();
@@ -665,7 +718,7 @@ function prepareForm(entry, timesheetData) {
     //date time columns
     form.dateField
         .datePicker(
-            {overrideBrowserDefault: true, languageCode: 'de'}
+            {overrideBrowserDefault: true, languageCode: 'en'}
         );
 
     row.find('input.time.start, input.time.end')
@@ -818,6 +871,7 @@ function renderViewRow(timesheetData, entry) {
     };
 
     var viewRow = prepareViewRow(timesheetData, augmentedEntry);
+
     viewRow.find("button.edit").click(function () {
         //augmentedEntry.isGoogleDocImport = false;
         editEntryClicked(timesheetData, augmentedEntry, editEntryOptions, viewRow);

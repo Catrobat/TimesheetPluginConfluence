@@ -36,6 +36,9 @@
         <li class="menu-item">
             <a href="#tabs-categories"><strong>Add/Remove Category</strong></a>
         </li>
+        <li class="menu-item">
+            <a href="#tabs-scheduling"><strong>Backgroud Jobs</strong></a>
+        </li>
     </ul>
     <div class="tabs-pane active-pane" id="tabs-general">
         <form id="general" class="aui">
@@ -87,7 +90,8 @@
             <fieldset>
                 <div class="field-group">
                     <label for="mail-body-out-of-time">Body</label>
-                    <textarea name="mail-body-out-of-time" id="mail-body-out-of-time" rows="10" cols="70" placeholder="Text Of The Email"></textarea>
+                    <textarea name="mail-body-out-of-time" id="mail-body-out-of-time" rows="10" cols="70"
+                              placeholder="Text Of The Email"></textarea>
                     <div class="description">
                         The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>
@@ -112,7 +116,8 @@
             <fieldset>
                 <div class="field-group">
                     <label for="mail-body-inactive">Body</label>
-                    <textarea name="mail-body-inactive" id="mail-body-inactive" rows="10" cols="70" placeholder="Text Of The Email"></textarea>
+                    <textarea name="mail-body-inactive" id="mail-body-inactive" rows="10" cols="70"
+                              placeholder="Text Of The Email"></textarea>
                     <div class="description">
                         The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>
@@ -137,7 +142,8 @@
             <fieldset>
                 <div class="field-group">
                     <label for="mail-body-entry-change">Body</label>
-                    <textarea name="mail-body-entry-change" id="mail-body-entry-change" rows="10" cols="70" placeholder="Text Of The Email"></textarea>
+                    <textarea name="mail-body-entry-change" id="mail-body-entry-change" rows="10" cols="70"
+                              placeholder="Text Of The Email"></textarea>
                     <div class="description">
                         The text of the mail. Following strings will be replaced by Confluence automatically:
                         <ul>
@@ -208,6 +214,31 @@
                 <div class="field-group">
                     <input type="submit" value="Create" class="aui-button aui-button-primary">
                     <input type="submit" value="Remove" id="removeCategory" class="aui-button">
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="tabs-pane" id="tabs-scheduling">
+        <h2>Task Scheduling</h2>
+        <p>
+            Interval has to be inserted as 'chron-expression'.
+            Please take a careful look at the <a
+                href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/tutorial-lesson-06">Quartz
+            Tutorial lesson 06</a> for further information.
+        </p>
+        <form id="modify-scheduling" class="aui">
+            <fieldset>
+                <div class="field-group">
+                    <label for="activity-verification-job">Trigger - Activity Verification Job Manually</label>
+                    <input type="submit" value="Activity Verification" id="applyActivityVerificationInterval" class="aui-button aui-button-primary">
+                </div>
+                <div class="field-group">
+                    <label for="activity-notification-job">Trigger - Activity Notification Job Manually</label>
+                    <input type="submit" value="Activity Notification" id="applyActivityNotificationInterval" class="aui-button aui-button-primary">
+                </div>
+                <div class="field-group">
+                    <label for="out-of-time-verification-job">Trigger - Out Of Time Notification Job Manually</label>
+                    <input type="submit" value="Out Of Time" id="applyOutOfTimeInterval" class="aui-button aui-button-primary">
                 </div>
             </fieldset>
         </form>

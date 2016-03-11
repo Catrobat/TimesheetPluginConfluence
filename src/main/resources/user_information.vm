@@ -44,7 +44,7 @@
                     This is a basic information overview of all available LDAP users. The basic implementation
                     provides a search function and shows the project members timesheet states.
                 </p>
-                <div class="field-group">
+                <div id="update-timesheet-button" class="field-group">
                     <form id="update-timesheet-status">
                         <input type="submit" value="Refresh List" class="aui-button aui-button-primary" style="float: right;">
                     </form>
@@ -56,7 +56,7 @@
                         <th id="basic-email">E-Mail</th>
                         <th id="basic-state">Account</th>
                         <th id="basic-timesheet-state">Timesheet</th>
-                        <th id="basic-timesheet-latest-entry">Latest Entry</th>
+                        <th id="basic-timesheet-latest-entry">Last Entry</th>
                         <th id="basic-timesheet-disable">Timesheet Enabled</th>
                     </tr>
                     </thead>

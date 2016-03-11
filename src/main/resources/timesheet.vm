@@ -8,6 +8,7 @@
 <body>
 <script type="text/javascript">
     var timesheetID = $timesheetid;
+    var isAdmin = $isadmin;
 </script>
 <a name="top"></a>
 <div id="aui-message-bar"></div>
@@ -36,6 +37,9 @@
                     Shows your remaining timesheet hours.
                 </div>
             </div>
+
+            <div class="field-group" id="substractTimesheetHours"></div>
+
             <div class="field-group">
                 <label for="timesheet-hours-practical">Practical Hours</label>
                 <input readonly class="text" type="text" id="timesheet-hours-practical" name="timesheet-hours-practical"

@@ -7,6 +7,7 @@ AJS.toInit(function () {
     var baseUrl = AJS.$("meta[id$='-base-url']").attr("content");
     restBaseUrl = baseUrl + "/rest/timesheet/latest/";
     fetchData();
+    fetchTeamData();
 });
 
 function fetchData() {
@@ -46,6 +47,43 @@ function fetchData() {
         });
 }
 
+function fetchTeamData() {
+    var timesheetFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'timesheet/' + timesheetID + '/teamEntries',
+        contentType: "application/json"
+    });
+
+    var entriesFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'timesheets/' + timesheetID + '/entries',
+        contentType: "application/json"
+    });
+
+    var categoriesFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'categories',
+        contentType: "application/json"
+    });
+
+    var teamsFetched = AJS.$.ajax({
+        type: 'GET',
+        url: restBaseUrl + 'teams',
+        contentType: "application/json"
+    });
+
+    AJS.$.when(timesheetFetched, categoriesFetched, teamsFetched, entriesFetched)
+        .done(assembleTimesheetData)
+        .done(assignTeamData)
+        .fail(function (error) {
+            AJS.messages.error({
+                title: 'There was an error while fetching data.',
+                body: '<p>Reason: ' + error.responseText + '</p>'
+            });
+            console.log(error);
+        });
+}
+
 function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
     var timesheetData = timesheetReply[0];
 
@@ -66,6 +104,95 @@ function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entr
         };
     });
     return timesheetData;
+}
+
+function assignTeamData(timesheetDataReply) {
+    var availableEntries = timesheetDataReply[0].entries;
+    var availableCategories = timesheetDataReply[0].categories;
+    var availableTeams = timesheetDataReply[0].teams;
+
+    var pos = 0;
+    //variables for the time calculation
+    var totalHours = 0;
+    var totalMinutes = 0;
+
+    //data array
+    var data = {};
+    data['label'] = [];
+    data['year'] = [];
+    data['team'] = [];
+
+    for (var j = 1; j < availableTeams.length; j++) {
+        if (!data['label'].contains(availableTeams[j].teamName))
+            data['label'].push(availableTeams[j].teamName);
+
+
+        for (var i = 0; i < availableEntries.length; i++) {
+            //calculate spent time for team
+            if (availableEntries[i].teamID === j) {
+
+                var referenceEntryDate = new Date(availableEntries[pos].beginDate);
+                var compareToDate = new Date(availableEntries[i].beginDate);
+                var oldPos = pos;
+
+                if ((referenceEntryDate.getFullYear() == compareToDate.getFullYear()) &&
+                    (referenceEntryDate.getMonth() == compareToDate.getMonth())) {
+                    //add all times for the same year-month pairs
+                    var hours = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+                        availableEntries[i].pauseMinutes).getHours();
+                    var minutes = calculateDuration(availableEntries[i].beginDate, availableEntries[i].endDate,
+                        availableEntries[i].pauseMinutes).getMinutes();
+                    var pause = availableEntries[i].pauseMinutes;
+                    var calculatedTime = hours * 60 + minutes - pause;
+
+                    totalMinutes = totalMinutes + calculatedTime;
+
+                    if (totalMinutes >= 60) {
+                        var minutesToFullHours = Math.floor(totalMinutes / 60); //get only full hours
+                        totalHours = totalHours + minutesToFullHours;
+                        totalMinutes = totalMinutes - minutesToFullHours * 60;
+                    }
+
+                } else {
+                    pos = i;
+                    i = i - 1;
+                }
+
+                if (oldPos != pos || i == availableEntries.length - 1) {
+                    data['year'].push(referenceEntryDate.getFullYear() + "-" + (referenceEntryDate.getMonth() + 1));
+                    data['team'].push((totalHours + totalMinutes / 60));
+                    totalHours = 0;
+                    totalMinutes = 0;
+                }
+            }
+        }
+    }
+
+    var temp = []
+    //build data JSON object (year is represented on the x-axis; time on the y-axis
+    for (var i = 0; i < data['year'].length; i++) {
+        temp.push(data['year'][i]);
+        temp.push(data['label'][i]);
+        temp.push(data['team'][i]);
+    }
+
+    var dataJSON = [];
+    for (var i = 0; i < temp.length; i = i + 3) {
+        if (i % 2 == 0)
+            dataJSON.push({
+                year: temp[i],
+                team1: temp[i + 2],
+                team2: 0
+            });
+        else
+            dataJSON.push({
+                year: temp[i],
+                team1: 0,
+                team2: temp[i + 2]
+            });
+    }
+
+    drawTeamDiagram(dataJSON, data['label']);
 }
 
 function populateTable(timesheetDataReply) {
@@ -93,10 +220,10 @@ function appendTimeToPiChart(theoryTime, practicalTime, totalTime) {
 
     //practice hours
     piChartDataPoints.push("Practice");
-    piChartDataPoints.push(((practicalTime * 100) / totalTime).toString().slice(0,5));
+    piChartDataPoints.push(((practicalTime * 100) / totalTime).toString().slice(0, 5));
     //theory hours
     piChartDataPoints.push("Theory");
-    piChartDataPoints.push(((theoryTime * 100) / totalTime).toString().slice(0,5));
+    piChartDataPoints.push(((theoryTime * 100) / totalTime).toString().slice(0, 5));
 
     drawPiChartDiagram(piChartDataPoints);
 }
@@ -230,7 +357,6 @@ function appendEntriesToTable(timesheetData) {
 
     //draw line graph
     diagram(dataPoints);
-    console.log(theoryHours);
     appendTimeToPiChart(theoryHours, totalTime - theoryHours, totalTime);
 }
 

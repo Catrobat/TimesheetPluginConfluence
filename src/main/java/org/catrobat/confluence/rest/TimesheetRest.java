@@ -134,8 +134,6 @@ public class TimesheetRest {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
-        System.out.println("TEST 123 TEST");
-
         for (User user : allUsers) {
             if (sheetService.getTimesheetByID(timesheetID).getUserKey().equals(userAccessor.
                     getUserByName(user.getName()).getKey().toString())) {
@@ -185,8 +183,8 @@ public class TimesheetRest {
     }
 
     @GET
-    @Path("timesheet/team/entries/{timesheetID}")
-    public Response getTimesheetEntriesForTeammember(@Context HttpServletRequest request,
+    @Path("timesheet/{timesheetID}/teamEntries")
+    public Response getTeamTimesheetEntries(@Context HttpServletRequest request,
                                                      @PathParam("timesheetID") int timesheetID) {
 
         List<JsonTimesheetEntry> jsonTimesheetEntries = new LinkedList<JsonTimesheetEntry>();

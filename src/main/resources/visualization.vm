@@ -1,77 +1,103 @@
 <html>
-  <head>
+<head>
     <title>Visualization</title>
     <meta name="decorator" content="atl.userprofile">
     $webResourceManager.requireResource("org.catrobat.confluence.timesheet:visualization-resources")
-  </head>
-  <body>
-    <script type="text/javascript">
-      var timesheetID = $timesheetid;
-    </script>
+</head>
+<body>
+<script type="text/javascript">
+    var timesheetID = $timesheetid;
+</script>
 
-    <div id="aui-message-bar"></div>
+<div id="aui-message-bar"></div>
 
-		<div id="visualization-table" class="aui aui-table-interactive table">
-			<div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
-		</div>
+<div id="visualization-table" class="aui aui-table-interactive table">
+    <div class="tr"><span class="td"><span class="aui-icon aui-icon-wait">Loading...</span></span></div>
+</div>
 
-    <br><h3>Visualization of your spent time</h3>
-    <div id="lineDiagram" style="height: 250px;"></div>
+<br>
+<h3>Visualization of your spent time</h3>
+<div id="lineDiagram" style="height: 250px;"></div>
 
-    <br><h3>Visualization of your theory - practical hours distribution</h3>
-    <div id="piChartDiagram" style="height: 250px;"></div>
+<br>
+<h3>Visualization of your theory - practical hours distribution</h3>
+<div id="piChartDiagram" style="height: 200px;"></div>
 
-    <br><h3>Visualization of your spent time on categories</h3>
-    <div id="categoryLineDiagram" style="height: 250px;"></div>
+<br>
+<h3>Visualization of your spent time on categories</h3>
+<div id="categoryLineDiagram" style="height: 250px;"></div>
 
-    <script>
+<br>
+<h3>Team Visualization</h3>
+<div id="teamLineDiagram" style="height: 250px;"></div>
+
+<script>
     function drawDiagram(data) {
-      new Morris.Line({
-        // ID of the element in which to draw the chart.
-        element: 'lineDiagram',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data,
-        // The name of the data record attribute that contains x-values.
-        xkey: 'year',
-        // A list of names of data record attributes that contain y-values.
-        ykeys: ['value'],
-        // Labels for the ykeys -- will be displayed when you hover over the
-        // chart.
-        labels: ['hours']
-      });
+        new Morris.Line({
+            // ID of the element in which to draw the chart.
+            element: 'lineDiagram',
+            // Chart data records -- each entry in this array corresponds to a point on
+            // the chart.
+            data,
+            // The name of the data record attribute that contains x-values.
+            xkey: 'year',
+            // A list of names of data record attributes that contain y-values.
+            ykeys: ['value'],
+            // Labels for the ykeys -- will be displayed when you hover over the
+            // chart.
+            labels: ['hours']
+        });
     }
-    </script>
+</script>
 
-    <script>
+<script>
     function drawPiChart(data) {
-      new Morris.Donut({
-        // ID of the element in which to draw the chart.
-        element: 'piChartDiagram',
-        // Chart data records -- each entry in this array corresponds to a point on
-        // the chart.
-        data
-      });
+        new Morris.Donut({
+            // ID of the element in which to draw the chart.
+            element: 'piChartDiagram',
+            // Chart data records -- each entry in this array corresponds to a point on
+            // the chart.
+            data
+        });
     }
-    </script>
+</script>
 
-    <script>
+<script>
     function drawCategoryDiagram(data, labelData) {
-      new Morris.Area({
-         // ID of the element in which to draw the chart.
-         element: 'categoryLineDiagram',
-         // Chart data records -- each entry in this array corresponds to a point on
-         // the chart.
-         data,
-         // The name of the data record attribute that contains x-values.
-         xkey: 'year',
-         // A list of names of data record attributes that contain y-values.
-         ykeys: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
-         // Labels for the ykeys -- will be displayed when you hover over the
-         // chart.
-         labels: labelData
-       });
+        new Morris.Area({
+            // ID of the element in which to draw the chart.
+            element: 'categoryLineDiagram',
+            // Chart data records -- each entry in this array corresponds to a point on
+            // the chart.
+            data,
+            // The name of the data record attribute that contains x-values.
+            xkey: 'year',
+            // A list of names of data record attributes that contain y-values.
+            ykeys: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
+            // Labels for the ykeys -- will be displayed when you hover over the
+            // chart.
+            labels: labelData
+        });
     }
-    </script>
-  </body>
+</script>
+
+<script>
+    function drawTeamDiagram(data, labelData) {
+        new Morris.Area({
+            // ID of the element in which to draw the chart.
+            element: 'teamLineDiagram',
+            // Chart data records -- each entry in this array corresponds to a point on
+            // the chart.
+            data,
+            // The name of the data record attribute that contains x-values.
+            xkey: 'year',
+            // A list of names of data record attributes that contain y-values.
+            ykeys: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
+            // Labels for the ykeys -- will be displayed when you hover over the
+            // chart.
+            labels: labelData
+        });
+    }
+</script>
+</body>
 </html>

@@ -229,7 +229,8 @@ public class ConfigServiceImpl implements ConfigService {
 
       //update relation
       TeamToGroup teamToGroup;
-      if ((teamToGroups.length == 0) || (teamToGroups[0].getRole() != role)) {
+      if ((teamToGroups.length == 0) || (teamToGroups[0].getRole() != role) || (teamToGroups[0].getTeam().getTeamName()
+              != team.getTeamName())) {
         teamToGroup = ao.create(TeamToGroup.class);
       } else {
         teamToGroup = teamToGroups[0];

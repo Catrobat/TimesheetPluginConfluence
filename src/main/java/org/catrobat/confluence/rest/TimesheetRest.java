@@ -134,6 +134,8 @@ public class TimesheetRest {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
 
+        System.out.println("TEST 123 TEST");
+
         for (User user : allUsers) {
             if (sheetService.getTimesheetByID(timesheetID).getUserKey().equals(userAccessor.
                     getUserByName(user.getName()).getKey().toString())) {
@@ -180,6 +182,50 @@ public class TimesheetRest {
         }
 
         return Response.ok(teams).build();
+    }
+
+    @GET
+    @Path("timesheet/team/entries/{timesheetID}")
+    public Response getTimesheetEntriesForTeammember(@Context HttpServletRequest request,
+                                                     @PathParam("timesheetID") int timesheetID) {
+
+        List<JsonTimesheetEntry> jsonTimesheetEntries = new LinkedList<JsonTimesheetEntry>();
+        List<User> allUsers = userAccessor.getUsersWithConfluenceAccessAsList();
+        UserProfile userProfile;
+
+        try {
+            userProfile = permissionService.checkIfUserExists(request);
+        } catch (NotAuthorizedException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        }
+
+        for (User user : allUsers) {
+            //get user name
+            if (sheetService.getTimesheetByID(timesheetID).getUserKey().equals(userAccessor.
+                    getUserByName(user.getName()).getKey().toString())) {
+                //get all teams of that user
+                for (Team team : teamService.getTeamsOfUser(user.getName())) {
+                    //get all team members
+                    for (String teamMember : configService.getGroupsForRole(team.getTeamName(), TeamToGroup.Role.DEVELOPER)) {
+                        if (user.getName().compareTo(teamMember) == 0) {
+                            //collect all timesheet entries of those team members
+                            Timesheet sheet = sheetService.getTimesheetByUser(
+                                    userAccessor.getUserByName(teamMember).getKey().getStringValue());
+                            //all entries of each user
+                            TimesheetEntry[] entries = entryService.getEntriesBySheet(sheet);
+                            for (TimesheetEntry entry : entries) {
+                                jsonTimesheetEntries.add(new JsonTimesheetEntry(entry.getID(), entry.getBeginDate(),
+                                        entry.getEndDate(), entry.getPauseMinutes(),
+                                        entry.getDescription(), entry.getTeam().getID(),
+                                        entry.getCategory().getID(), entry.getIsGoogleDocImport()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return Response.ok(jsonTimesheetEntries).build();
     }
 
     @GET
@@ -559,7 +605,7 @@ public class TimesheetRest {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Your timesheet has been disabled.").build();
         }
 
-        if(userManager.isAdmin(user.getUserKey())) {
+        if (userManager.isAdmin(user.getUserKey())) {
             sheetService.editTimesheet(sheet.getUserKey(), jsonTimesheet.getTargetHourPractice(),
                     jsonTimesheet.getTargetHourTheory(), jsonTimesheet.getTargetHours(), jsonTimesheet.getTargetHoursCompleted(),
                     jsonTimesheet.getTargetHoursRemoved(), jsonTimesheet.getLectures(), jsonTimesheet.getReason(),
@@ -574,7 +620,7 @@ public class TimesheetRest {
 
         JsonTimesheet newJsonTimesheet = new JsonTimesheet(timesheetID, sheet.getLectures(), sheet.getReason(),
                 sheet.getEcts(), sheet.getLatestEntryDate(), sheet.getTargetHoursPractice(), sheet.getTargetHoursTheory(),
-                sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getTargetHoursRemoved(),sheet.getIsActive(),
+                sheet.getTargetHours(), sheet.getTargetHoursCompleted(), sheet.getTargetHoursRemoved(), sheet.getIsActive(),
                 sheet.getIsEnabled());
 
         return Response.ok(newJsonTimesheet).build();

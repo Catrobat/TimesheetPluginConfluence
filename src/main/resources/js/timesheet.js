@@ -209,8 +209,8 @@ function updateTimesheetHours(existingTimesheetData) {
         targetHourPractice: AJS.$("#timesheet-hours-theory").val(),
         targetHourTheory: AJS.$("#timesheet-hours-practical").val(),
         targetHours: AJS.$("#timesheet-hours-text").val(),
-        targetHoursCompleted: AJS.$("#timesheet-hours-text").val() - AJS.$("#timesheet-hours-remain").val()
-        + AJS.$("#timesheet-hours-substract").val(),
+        targetHoursCompleted: AJS.$("#timesheet-hours-theory").val()
+        - (- AJS.$("#timesheet-hours-practical").val()) - AJS.$("#timesheet-hours-substract").val(),
         targetHoursRemoved: AJS.$("#timesheet-hours-substract").val(),
         isActive: existingTimesheetData.isActive
     };
@@ -400,6 +400,8 @@ function updateTimesheetInformationValues(timesheetData) {
 }
 
 function assembleTimesheetData(timesheetReply, categoriesReply, teamsReply, entriesReply) {
+
+    console.log(teamsReply[0]);
 
     var timesheetData = timesheetReply[0];
     timesheetData.entries = entriesReply[0];

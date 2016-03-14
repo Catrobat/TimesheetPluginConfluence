@@ -1,0 +1,2 @@
+java -cp "C:/Users/Markus/atlassianRepo/TimesheetPlugin/target/confluence/webapp/WEB-INF/lib/hsqldb-2.3.0.jar" org.hsqldb.util.DatabaseManager -user sa -url "jdbc:hsqldb:C:/Users/Markus/atlassianRepo/TimesheetPlugin/target/confluence/home/database/confluencedb"
+

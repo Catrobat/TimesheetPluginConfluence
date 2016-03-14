@@ -334,6 +334,6 @@ public class TimesheetRestTest {
 
     response = timesheetRest.cleanAndInitDB();
 
-    Assert.assertTrue(response.getEntity().toString() == "you're not admin");
+    Assert.assertTrue(response.getEntity().toString().equals("you're not admin"));
   }
 }

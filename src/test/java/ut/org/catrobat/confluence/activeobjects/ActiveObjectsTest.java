@@ -1,21 +1,23 @@
 package ut.org.catrobat.confluence.activeobjects;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
-import net.java.ao.EntityManager;
-import static org.junit.Assert.*;
-
-import org.catrobat.confluence.activeobjects.Team;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import com.atlassian.activeobjects.test.TestActiveObjects;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
+import net.java.ao.EntityManager;
 import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
 import org.catrobat.confluence.activeobjects.Category;
+import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.Timesheet;
 import org.catrobat.confluence.activeobjects.TimesheetEntry;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(MySampleDatabaseUpdater.class)
@@ -91,4 +93,6 @@ public class ActiveObjectsTest {
 		assertEquals(entries.length, 1);
 		assertEquals(entries[0].getDescription(), "Master Fixen");
 	}
+
+
 }

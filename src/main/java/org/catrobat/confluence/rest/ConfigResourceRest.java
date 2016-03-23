@@ -19,8 +19,6 @@ package org.catrobat.confluence.rest;
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.confluence.user.UserAccessor;
-import com.atlassian.crowd.embedded.api.Directory;
-import com.atlassian.crowd.manager.directory.DirectoryManager;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
 import org.catrobat.confluence.activeobjects.Category;
@@ -34,6 +32,7 @@ import org.catrobat.confluence.services.MailService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
 
+import javax.naming.spi.DirectoryManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -131,15 +130,16 @@ public class ConfigResourceRest {
             return unauthorized;
         }
 
-        List<Directory> directoryList = directoryManager.findAllDirectories();
-        List<JsonConfig> jsonDirectoryList = new ArrayList<JsonConfig>();
-        for (Directory directory : directoryList) {
-            JsonConfig config = new JsonConfig();
-            config.setUserDirectoryId(directory.getId());
-            jsonDirectoryList.add(config);
-        }
+        // @Adrian: TODO: fix it: I don't know what are you doint here
+//        List<Directory> directoryList = directoryManager.findAllDirectories();
+//        List<JsonConfig> jsonDirectoryList = new ArrayList<JsonConfig>();
+//        for (Directory directory : directoryList) {
+//            JsonConfig config = new JsonConfig();
+//            config.setUserDirectoryId(directory.getId());
+//            jsonDirectoryList.add(config);
+//        }
 
-        return Response.ok(jsonDirectoryList).build();
+        return null; // Response.ok(jsonDirectoryList).build();
     }
 
     @GET

@@ -16,11 +16,14 @@
 
 package org.catrobat.confluence.servlet;
 
+import com.atlassian.confluence.security.DefaultPermissionManager;
+import com.atlassian.confluence.user.AuthenticatedUserThreadLocal;
+import com.atlassian.confluence.user.ConfluenceUser;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserKey;
-import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.user.GroupManager;
+import com.atlassian.sal.api.user.UserManager;
 import org.catrobat.confluence.activeobjects.ConfigService;
 
 import javax.servlet.ServletException;
@@ -63,12 +66,17 @@ public abstract class HelperServlet extends HttpServlet {
 
     //PermissionCondition permissionCondition = new PermissionCondition(null, configurationService, userManager, groupManager);
 
-    UserKey userKey = userManager.getRemoteUserKey(request);
-    String username = userManager.getUserProfile(userKey).getUsername();
+    ConfluenceUser confluenceUser = AuthenticatedUserThreadLocal.get();
+
+    String username = confluenceUser.getName(); // @Arian: or getFullName() you have to try it out
+    UserKey userKey = confluenceUser.getKey(); // I am not sure if we need this anymore
+    DefaultPermissionManager contentPermissionManager = new DefaultPermissionManager();
+    boolean isSystemAdmin = contentPermissionManager.isSystemAdministrator(confluenceUser);
+
     if (username == null) {
       redirectToLogin(request, response);
       return;
-    } else if (!userManager.isSystemAdmin(userKey)) {
+    } else if (!isSystemAdmin) {
       response.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }

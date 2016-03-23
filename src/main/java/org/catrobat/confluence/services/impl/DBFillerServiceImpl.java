@@ -17,8 +17,7 @@
 package org.catrobat.confluence.services.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
-import com.atlassian.sal.api.user.UserKey;
-import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.user.UserManager;
 import org.catrobat.confluence.activeobjects.*;
 import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.DBFillerService;

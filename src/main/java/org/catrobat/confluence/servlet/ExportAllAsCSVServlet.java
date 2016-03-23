@@ -17,9 +17,9 @@
 package org.catrobat.confluence.servlet;
 
 import com.atlassian.sal.api.auth.LoginUriProvider;
-import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.user.GroupManager;
+import com.atlassian.sal.api.user.UserManager;
 import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.helper.CsvExporterAll;
 import org.catrobat.confluence.services.TimesheetService;

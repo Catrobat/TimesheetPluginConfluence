@@ -1,29 +1,25 @@
 package ut.org.catrobat.confluence.services.impl;
 
-import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.activeobjects.external.ActiveObjects;
-import net.java.ao.EntityManager;
-import static org.junit.Assert.*;
-
-import org.catrobat.confluence.activeobjects.ConfigService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import com.atlassian.activeobjects.test.TestActiveObjects;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.atlassian.confluence.user.UserAccessor;
+import net.java.ao.EntityManager;
 import net.java.ao.test.jdbc.Data;
 import net.java.ao.test.jdbc.DatabaseUpdater;
 import net.java.ao.test.junit.ActiveObjectsJUnitRunner;
+import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.services.TeamService;
 import org.catrobat.confluence.services.impl.TeamServiceImpl;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
+
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(ActiveObjectsJUnitRunner.class)
 @Data(TeamServiceImplTest.MyDatabaseUpdater.class)

@@ -20,7 +20,10 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.confluence.user.UserAccessor;
 import net.java.ao.Query;
-import org.catrobat.confluence.activeobjects.*;
+import org.catrobat.confluence.activeobjects.Config;
+import org.catrobat.confluence.activeobjects.ConfigService;
+import org.catrobat.confluence.activeobjects.Team;
+import org.catrobat.confluence.activeobjects.TeamToGroup;
 import org.catrobat.confluence.services.TeamService;
 
 import java.util.HashSet;

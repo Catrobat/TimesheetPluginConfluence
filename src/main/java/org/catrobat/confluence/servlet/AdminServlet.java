@@ -31,7 +31,7 @@ import java.io.IOException;
 public class AdminServlet extends HelperServlet {
     private TemplateRenderer renderer;
 
-    public AdminServlet(UserManager userManager, LoginUriProvider loginUriProvider, Object renderer,
+    public AdminServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer,
                         WebSudoManager webSudoManager, GroupManager groupManager, ConfigService configurationService) {
         super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
     }

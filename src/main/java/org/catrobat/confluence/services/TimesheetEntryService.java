@@ -26,16 +26,16 @@ import java.util.Date;
 
 @Transactional
 public interface TimesheetEntryService {
-  TimesheetEntry add(Timesheet sheet, Date begin, Date end, Category category,
-                     String description, int pause, Team team, boolean isGoogleDocImport);
+    TimesheetEntry add(Timesheet sheet, Date begin, Date end, Category category,
+                       String description, int pause, Team team, boolean isGoogleDocImport);
 
-  TimesheetEntry edit(int entryID, Timesheet sheet, Date begin, Date end,
-                      Category category, String description, int pause, Team team, boolean isGoogleDocImport);
+    TimesheetEntry edit(int entryID, Timesheet sheet, Date begin, Date end,
+                        Category category, String description, int pause, Team team, boolean isGoogleDocImport);
 
-  TimesheetEntry getEntryByID(int entryID);
+    TimesheetEntry getEntryByID(int entryID);
 
-  TimesheetEntry[] getEntriesBySheet(Timesheet sheet);
+    TimesheetEntry[] getEntriesBySheet(Timesheet sheet);
 
-  void delete(TimesheetEntry entry);
+    void delete(TimesheetEntry entry);
 
 }

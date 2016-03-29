@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.catrobat.confluence</groupId>
-    <artifactId>timesheet</artifactId>
+    <groupId>org.catrobat</groupId>
+    <artifactId>TimesheetPlugin</artifactId>
     <version>1.0-SNAPSHOT</version>
+
     <organization>
-        <name>Catrobat</name>
-        <url>http://www.catrobat.org</url>
+        <name>Example Company</name>
+        <url>http://www.example.com/</url>
     </organization>
-    <name>Catrobat Timesheet</name>
-    <description>This is the org.catrobat.confluence:timesheet plugin for Atlassian Confluence.</description>
+
+    <name>TimesheetPlugin</name>
+    <description>This is the org.catrobat:TimesheetPlugin plugin for Atlassian Confluence.</description>
     <packaging>atlassian-plugin</packaging>
+
     <dependencies>
-        <dependency>
-            <groupId>com.atlassian.templaterenderer</groupId>
-            <artifactId>atlassian-template-renderer-api</artifactId>
-            <version>1.5.5</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -32,26 +31,28 @@
             <version>${confluence.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>com.atlassian.activeobjects</groupId>
-            <artifactId>activeobjects-plugin</artifactId>
-            <version>${ao.version}</version>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-annotation</artifactId>
+            <version>${atlassian.spring.scanner.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.plugin</groupId>
+            <artifactId>atlassian-spring-scanner-runtime</artifactId>
+            <version>${atlassian.spring.scanner.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Google Collections, useful utilities for manipulating collections -->
-        <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- We're going to write a simple servlet -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
+
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
@@ -70,70 +71,39 @@
             <artifactId>gson</artifactId>
             <version>2.2.2-atlassian-1</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.applinks</groupId>
-            <artifactId>applinks-api</artifactId>
-            <version>3.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1.1</version>
-            <scope>test</scope>
-        </dependency>
+
+        <!-- some extra plugins we need -->
         <dependency>
             <groupId>com.atlassian.activeobjects</groupId>
-            <artifactId>activeobjects-test</artifactId>
-            <version>${ao.version}</version>
-            <scope>test</scope>
+            <artifactId>activeobjects-plugin</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
         </dependency>
+        <!-- SAL, the Active Objects plugin uses SAL's API for transactions -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.2</version>
-            <scope>test</scope>
+            <groupId>com.atlassian.sal</groupId>
+            <artifactId>sal-api</artifactId>
+            <version>2.4.1</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- Google Collections, useful utilities for manipulating collections -->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-            <scope>test</scope>
+            <groupId>com.google.collections</groupId>
+            <artifactId>google-collections</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- We're going to write a simple servlet -->
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
-            <scope>test</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>github-api</artifactId>
-            <version>1.59</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-		<dependency>
-			<groupId>com.atlassian.crowd</groupId>
-			<artifactId>crowd-integration-client</artifactId>
-			<version>2.1.0</version>
-				<type>pom</type>
-		</dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -142,58 +112,90 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <systemPropertyVariables>
-                        <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
-                    </systemPropertyVariables>
+                    <productVersion>${confluence.version}</productVersion>
+                    <productDataVersion>${confluence.data.version}</productDataVersion>
+                    <enableQuickReload>true</enableQuickReload>
+                    <enableFastdev>false</enableFastdev>
+					<allowGoogleTracking>false</allowGoogleTracking>
+
+                    <!-- See here for an explanation of default instructions: -->
+                    <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
+                    <instructions>
+
+                        <!-- Add package to export here -->
+                        <Export-Package>
+                            org.catrobat.confluence.api,
+                        </Export-Package>
+
+                        <!-- Add package import here -->
+                        <Import-Package>
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            *
+                        </Import-Package>
+
+                        <!-- Ensure plugin is spring powered -->
+                        <Spring-Context>*</Spring-Context>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.atlassian.plugin</groupId>
+                <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+                <version>1.2.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>atlassian-spring-scanner</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scannedDependencies>
+                        <dependency>
+                            <groupId>com.atlassian.plugin</groupId>
+                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                        </dependency>
+                    </scannedDependencies>
+                    <verbose>false</verbose>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-confluence-plugin</artifactId>
+                <version>${amps.version}</version>
+                <extensions>true</extensions>
+                <configuration>
                     <pluginArtifacts>
                         <pluginArtifact>
                             <groupId>com.atlassian.activeobjects</groupId>
                             <artifactId>activeobjects-plugin</artifactId>
-                            <version>${ao.version}</version>
+                            <version>1.1.1</version>
                         </pluginArtifact>
                         <pluginArtifact>
                             <groupId>com.atlassian.activeobjects</groupId>
                             <artifactId>activeobjects-confluence-spi</artifactId>
-                            <version>${ao.version}</version>
+                            <version>1.1.1</version>
                         </pluginArtifact>
                     </pluginArtifacts>
                     <productVersion>${confluence.version}</productVersion>
-                    <productDataVersion>${confluence.data.version}</productDataVersion>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.15</version>
-            </plugin>
+
         </plugins>
     </build>
+
     <properties>
-        <confluence.version>5.9.6</confluence.version>
+        <confluence.version>5.9.7</confluence.version>
         <confluence.data.version>5.9.6</confluence.data.version>
-        <amps.version>5.0.13</amps.version>
-        <ao.version>0.26.0</ao.version>
-        <rest.version>2.7.1</rest.version>
-        <plugin.testrunner.version>1.2.0</plugin.testrunner.version>
+        <amps.version>6.2.3</amps.version>
+        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
+        <atlassian.spring.scanner.version>1.2.6</atlassian.spring.scanner.version>
+        <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
+        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
     </properties>
-	<repositories>
-    <repository>
-        <id>central</id>
-        <url>https://m2proxy.atlassian.com/repository/public</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
-        <releases>
-            <enabled>true</enabled>
-        </releases>
-    </repository>
-</repositories>
+
 </project>

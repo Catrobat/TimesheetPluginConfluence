@@ -17,11 +17,11 @@
 package org.catrobat.confluence.servlet;
 
 import com.atlassian.sal.api.auth.LoginUriProvider;
+import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.user.GroupManager;
-import com.atlassian.sal.api.user.UserManager;
 import org.catrobat.confluence.activeobjects.ConfigService;
-import org.catrobat.confluence.helper.CsvExporterAll;
+import org.catrobat.confluence.helper.CsvExporter;
 import org.catrobat.confluence.services.TimesheetService;
 
 import javax.servlet.ServletException;
@@ -32,28 +32,28 @@ import java.io.PrintStream;
 
 public class ExportAllAsCSVServlet extends HelperServlet {
 
-  private final TimesheetService timesheetService;
-  private final UserManager userManager;
+    private final TimesheetService timesheetService;
+    private final UserManager userManager;
 
-  public ExportAllAsCSVServlet(UserManager userManager, LoginUriProvider loginUriProvider, WebSudoManager webSudoManager,
-                               GroupManager groupManager, ConfigService configurationService,
-                               TimesheetService timesheetService) {
-    super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
-    this.timesheetService = timesheetService;
-    this.userManager = userManager;
-  }
+    public ExportAllAsCSVServlet(UserManager userManager, LoginUriProvider loginUriProvider, WebSudoManager webSudoManager,
+                                 GroupManager groupManager, ConfigService configurationService,
+                                 TimesheetService timesheetService) {
+        super(userManager, loginUriProvider, webSudoManager, groupManager, configurationService);
+        this.timesheetService = timesheetService;
+        this.userManager = userManager;
+    }
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    super.doGet(request, response);
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        super.doGet(request, response);
 
-    response.setContentType("text/csv; charset=utf-8");
-    response.setHeader("Content-Disposition", "attachment; filename=\"timesheets.csv\"");
+        response.setContentType("text/csv; charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"timesheets.csv\"");
 
-    CsvExporterAll csvExporterAll = new CsvExporterAll(timesheetService.all(), userManager);
-    PrintStream printStream = new PrintStream(response.getOutputStream(), false, "UTF-8");
-    printStream.print(csvExporterAll.getCsvString());
-    printStream.flush();
-    printStream.close();
-  }
+        CsvExporter csvExporter = new CsvExporter(timesheetService.all(), userManager);
+        PrintStream printStream = new PrintStream(response.getOutputStream(), false, "UTF-8");
+        printStream.print(csvExporter.getCsvString());
+        printStream.flush();
+        printStream.close();
+    }
 }

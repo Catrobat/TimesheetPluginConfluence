@@ -19,53 +19,54 @@ package org.catrobat.confluence.services.impl;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import net.java.ao.Query;
+import net.java.ao.schema.Table;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.services.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 
+@Table("CatServiceI")
 public class CategoryServiceImpl implements CategoryService {
 
-  private final ActiveObjects ao;
+    @Autowired
+    private final ActiveObjects ao;
 
-  public CategoryServiceImpl(ActiveObjects ao) {
-    this.ao = ao;
-  }
-
-  @Override
-  public Category getCategoryByID(int id) {
-    Category[] found = ao.find(Category.class, "ID = ?", id);
-    assert (found.length <= 1);
-    return (found.length > 0) ? found[0] : null;
-  }
-
-  @Override
-  public List<Category> all() {
-    return newArrayList(ao.find(Category.class, Query.select().order("NAME ASC")));
-  }
-
-  @Override
-  public Category add(String name) {
-    Category category = ao.create(Category.class);
-    category.setName(name);
-    category.save();
-    return category;
-  }
-
-  @Override
-  public boolean removeCategory(String name) {
-    Category[] found = ao.find(Category.class, "NAME = ?", name);
-
-    if (found.length > 1) {
-      throw new NotAuthorizedException("Multiple Categories with the same Name");
-    } else if (found.length == 0) {
-      throw new NotAuthorizedException("No Category with this Name");
+    public CategoryServiceImpl(ActiveObjects ao) {
+        this.ao = checkNotNull(ao);
     }
 
-    ao.delete(found);
-    return true;
-  }
+    public Category getCategoryByID(int id) {
+        Category[] found = ao.find(Category.class, "ID = ?", id);
+        assert (found.length <= 1);
+        return (found.length > 0) ? found[0] : null;
+    }
+
+    public List<Category> all() {
+        return newArrayList(ao.find(Category.class, Query.select().order("NAME ASC")));
+    }
+
+    public Category add(String name) {
+        Category category = ao.create(Category.class);
+        category.setName(name);
+        category.save();
+        return category;
+    }
+
+    public boolean removeCategory(String name) {
+        Category[] found = ao.find(Category.class, "NAME = ?", name);
+
+        if (found.length > 1) {
+            throw new NotAuthorizedException("Multiple Categories with the same Name");
+        } else if (found.length == 0) {
+            throw new NotAuthorizedException("No Category with this Name");
+        }
+
+        ao.delete(found);
+        return true;
+    }
 
 }

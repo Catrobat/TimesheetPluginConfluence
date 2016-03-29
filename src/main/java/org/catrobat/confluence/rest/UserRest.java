@@ -19,8 +19,10 @@ package org.catrobat.confluence.rest;
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.crowd.manager.directory.DirectoryManager;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.user.Group;
 import com.atlassian.user.User;
+import com.atlassian.user.util.Assert;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.rest.json.JsonUser;
@@ -36,122 +38,133 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
+
 @Path("/user")
 public class UserRest extends PermissionServiceImpl {
-  public static final String DISABLED_GROUP = "Disabled";
-  private final ConfigService configService;
-  private final DirectoryManager directoryManager;
-  private final UserAccessor userAccessor;
-  private final UserManager userManager;
+    public static final String DISABLED_GROUP = "Disabled";
+    private final ConfigService configService;
+    private final DirectoryManager directoryManager;
 
-  public UserRest(final UserManager userManager, final ConfigService configService, final TeamService teamService,
-                  final DirectoryManager directoryManager, final UserAccessor userAccessor) {
-    super(userManager, teamService, configService, userAccessor);
-    this.configService = configService;
-    this.directoryManager = directoryManager;
-    this.userAccessor = userAccessor;
-    this.userManager = userManager;
-  }
 
-  @GET
-  @Path("/getUsers")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response getUsers(@Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+    public UserRest(final ConfigService configService, final TeamService teamService,
+                    final DirectoryManager directoryManager) {
+        super(teamService, configService);
+        this.configService = configService;
+        this.directoryManager = directoryManager;
     }
 
-    List<JsonUser> jsonUserList = new ArrayList<JsonUser>();
-
-    List<User> allUsers = userAccessor.getUsersWithConfluenceAccessAsList();
-    for (User user : allUsers) {
-
-      if (userIsAdmin(user.getFullName())) {
-        continue;
-      }
-
-      JsonUser jsonUser = new JsonUser();
-      jsonUser.setEmail(user.getEmail());
-      jsonUser.setUserName(user.getName());
-
-      String displayName = user.getFullName();
-      int lastSpaceIndex = displayName.lastIndexOf(' ');
-      if (lastSpaceIndex >= 0) {
-        jsonUser.setFirstName(displayName.substring(0, lastSpaceIndex));
-        jsonUser.setLastName(displayName.substring(lastSpaceIndex + 1));
-      } else {
-        jsonUser.setFirstName(displayName);
-      }
-
-      boolean isActive = true;
-      for (Group group : userAccessor.getGroupsAsList(user)) {
-        if (group.getName().toLowerCase().equals(DISABLED_GROUP.toLowerCase())) {
-          isActive = false;
-          break;
+    @GET
+    @Path("/getUsers")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsers(@Context HttpServletRequest request) {
+        Response unauthorized = checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
         }
-      }
 
-      jsonUser.setActive(isActive);
-      jsonUserList.add(jsonUser);
+        List<JsonUser> jsonUserList = new ArrayList<JsonUser>();
+
+        List<User> allUsers = userAccessor.getUsersWithConfluenceAccessAsList();
+        for (User user : allUsers) {
+
+            if (userIsAdmin(user.getFullName())) {
+                continue;
+            }
+
+            JsonUser jsonUser = new JsonUser();
+            jsonUser.setEmail(user.getEmail());
+            jsonUser.setUserName(user.getName());
+
+            String displayName = user.getFullName();
+            int lastSpaceIndex = displayName.lastIndexOf(' ');
+            if (lastSpaceIndex >= 0) {
+                jsonUser.setFirstName(displayName.substring(0, lastSpaceIndex));
+                jsonUser.setLastName(displayName.substring(lastSpaceIndex + 1));
+            } else {
+                jsonUser.setFirstName(displayName);
+            }
+
+            boolean isActive = true;
+            for (Group group : userAccessor.getGroupsAsList(user)) {
+                if (group.getName().toLowerCase().equals(DISABLED_GROUP.toLowerCase())) {
+                    isActive = false;
+                    break;
+                }
+            }
+
+            jsonUser.setActive(isActive);
+            jsonUserList.add(jsonUser);
+        }
+
+        return Response.ok(jsonUserList).build();
     }
 
-    return Response.ok(jsonUserList).build();
-  }
-
-  @GET
-  @Path("/search")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response searchUserGet(@QueryParam("query") String query, @Context HttpServletRequest request) {
-    return searchUser(query, request);
-  }
-
-  @POST
-  @Path("/search")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response searchUserPost(@FormParam("query") String query, @Context HttpServletRequest request) {
-    return searchUser(query, request);
-  }
-
-  private Response searchUser(String query, HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
-    }
-    if (query == null || query.length() < 1) {
-      return Response.ok(new ArrayList<JsonUser>()).build();
+    @GET
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchUserGet(@QueryParam("query") String query, @Context HttpServletRequest request) {
+        return searchUser(query, request);
     }
 
-    query = StringEscapeUtils.escapeHtml4(query);
-
-    TreeMap<String, JsonUser> jsonUsers = new TreeMap<String, JsonUser>();
-
-    for (User user : userAccessor.getUsers()) {
-      if (user.getName().toLowerCase().contains(query.toLowerCase()) ||
-              user.getFullName().toLowerCase().contains(query.toLowerCase())) {
-        JsonUser jsonUser = new JsonUser();
-        jsonUser.setUserName(userManager.getRemoteUser().getUserKey().toString());
-        jsonUser.setDisplayName(userManager.getRemoteUser().getFullName());
-        jsonUsers.put(user.getName().toLowerCase(), jsonUser);
-      }
+    @POST
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response searchUserPost(@FormParam("query") String query, @Context HttpServletRequest request) {
+        return searchUser(query, request);
     }
 
-    return Response.ok(jsonUsers.values()).build();
-  }
+    private Response searchUser(String query, HttpServletRequest request) {
+        Response unauthorized = checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
+        if (query == null || query.length() < 1) {
+            return Response.ok(new ArrayList<JsonUser>()).build();
+        }
 
-  @PUT
-  @Path("/activateUser")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response activateUser(final JsonUser jsonUser, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        query = StringEscapeUtils.escapeHtml4(query);
+
+        TreeMap<String, JsonUser> jsonUsers = new TreeMap<String, JsonUser>();
+
+        for (User user : userAccessor.getUsers()) {
+            if (user.getName().toLowerCase().contains(query.toLowerCase()) ||
+                    user.getFullName().toLowerCase().contains(query.toLowerCase())) {
+                JsonUser jsonUser = new JsonUser();
+                //TODO:
+//        jsonUser.setUserName(userManager.getRemoteUser().getUserKey().toString());
+//        jsonUser.setDisplayName(userManager.getRemoteUser().getFullName());
+                //REFACTORED: now we use a more elegant way
+                String username = userManager.getRemoteUsername();
+                UserProfile userProfile = userManager.getUserProfile(username);
+                String fullName = userProfile.getFullName();
+                String userName = userProfile.getUsername();
+                Assert.isTrue(userName.equals(username), "UserName and username are not the same!");
+
+                jsonUser.setUserName(username);
+                jsonUser.setDisplayName(fullName);
+
+                jsonUsers.put(username.toLowerCase(), jsonUser);
+                //jsonUsers.put(user.getName().toLowerCase(), jsonUser);
+            }
+        }
+
+        return Response.ok(jsonUsers.values()).build();
     }
 
-    if (jsonUser == null) {
-      return Response.serverError().entity("User not given").build();
-    }
-    //ToDo: create workaround
+    @PUT
+    @Path("/activateUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response activateUser(final JsonUser jsonUser, @Context HttpServletRequest request) {
+        Response unauthorized = checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
+
+        if (jsonUser == null) {
+            return Response.serverError().entity("User not given").build();
+        }
+        //ToDo: please find workaround
     /*
     ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(jsonUser.getUserName());
     if (applicationUser == null) {
@@ -183,70 +196,73 @@ public class UserRest extends PermissionServiceImpl {
     addUserToGithubAndJiraGroups(jsonUser, applicationUser.getDirectoryUser(), config);
     */
 
-    return Response.ok().build();
-  }
-
-  @PUT
-  @Path("/inactivateUser")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response inactivateUser(final String inactivateUser, @Context HttpServletRequest request) {
-    Response unauthorized = checkPermission(request);
-    if (unauthorized != null) {
-      return unauthorized;
+        return Response.ok().build();
     }
 
-    if (inactivateUser == null) {
-      return Response.serverError().entity("User not given").build();
-    }
+    @PUT
+    @Path("/inactivateUser")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response inactivateUser(final String inactivateUser, @Context HttpServletRequest request) {
+        Response unauthorized = checkPermission(request);
+        if (unauthorized != null) {
+            return unauthorized;
+        }
 
-    //ToDo: find workaround
-    /*
-    ApplicationUser applicationUser = ComponentAccessor.getUserManager().getUserByName(inactivateUser);
-    if (applicationUser == null) {
-      return Response.serverError().entity("User not found").build();
-    }
+        if (inactivateUser == null) {
+            return Response.serverError().entity("User not given").build();
+        }
 
-    // remove user from all GitHub teams
-    ExtendedPreferences extendedPreferences = userPreferencesManager.getExtendedPreferences(applicationUser);
-    String githubName = extendedPreferences.getText(GITHUB_PROPERTY);
-    if (githubName != null) {
-      GithubHelper githubHelper = new GithubHelper(configService);
-      String error = githubHelper.removeUserFromOrganization(githubName);
-      if (error != null) {
-        return Response.serverError().entity(error).build();
-      }
-    }
+        //ToDo: please find workaround
 
-    // remove user from all groups and add user to DISABLED_GROUP
-    try {
-      removeFromAllGroups(ApplicationUsers.toDirectoryUser(applicationUser));
-      Response error = addToGroups(applicationUser.getDirectoryUser(), Arrays.asList(DISABLED_GROUP));
-      if (error != null) {
-        return error;
-      }
-    } catch (NotAuthorizedException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
-    } catch (PermissionException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
-    } catch (UserNotFoundException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
-    } catch (InvalidGroupException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
-    } catch (OperationNotPermittedException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
-    } catch (GroupNotFoundException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
-    } catch (OperationFailedException e) {
-      e.printStackTrace();
-      return Response.serverError().entity(e.getMessage()).build();
+        UserProfile userProfile = userManager.getUserProfile(inactivateUser);
+
+        if (userProfile == null) {
+            return Response.serverError().entity("User not found").build();
+        }
+
+        /*
+        // remove user from all GitHub teams
+        ExtendedPreferences extendedPreferences = userPreferencesManager.getExtendedPreferences(applicationUser);
+        String githubName = extendedPreferences.getText(GITHUB_PROPERTY);
+        if (githubName != null) {
+            GithubHelper githubHelper = new GithubHelper(configService);
+            String error = githubHelper.removeUserFromOrganization(githubName);
+            if (error != null) {
+                return Response.serverError().entity(error).build();
+            }
+        }
+
+        // remove user from all groups and add user to DISABLED_GROUP
+        try {
+            removeFromAllGroups(ApplicationUsers.toDirectoryUser(applicationUser));
+            Response error = addToGroups(applicationUser.getDirectoryUser(), Arrays.asList(DISABLED_GROUP));
+            if (error != null) {
+                return error;
+            }
+        } catch (NotAuthorizedException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (PermissionException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (InvalidGroupException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (OperationNotPermittedException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (GroupNotFoundException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (OperationFailedException e) {
+            e.printStackTrace();
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+
+*/
+        return Response.ok().build();
     }
-    */
-    return Response.ok().build();
-  }
 }

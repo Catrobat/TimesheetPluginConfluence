@@ -18,6 +18,7 @@ package org.catrobat.confluence.rest;
 
 
 import com.atlassian.confluence.core.service.NotAuthorizedException;
+import com.atlassian.confluence.user.ConfluenceUserManager;
 import com.atlassian.confluence.user.UserAccessor;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
@@ -31,6 +32,7 @@ import org.catrobat.confluence.services.CategoryService;
 import org.catrobat.confluence.services.MailService;
 import org.catrobat.confluence.services.PermissionService;
 import org.catrobat.confluence.services.TeamService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.naming.spi.DirectoryManager;
 import javax.servlet.http.HttpServletRequest;
@@ -42,19 +44,26 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.bouncycastle.asn1.iana.IANAObjectIdentifiers.directory;
+
 @Path("/config")
 @Produces({MediaType.APPLICATION_JSON})
 public class ConfigResourceRest {
     private final ConfigService configService;
     private final DirectoryManager directoryManager;
-    private final UserManager userManager;
+    private UserManager userManager;
     private final UserAccessor userAccessor;
     private final TeamService teamService;
     private final CategoryService categoryService;
     private final PermissionService permissionService;
     private final MailService mailService;
 
-    public ConfigResourceRest(final UserManager userManager, final ConfigService configService,
+    @Autowired
+    public void setUserManager(UserManager userManager) {
+        this.userManager = userManager;
+    }
+
+    public ConfigResourceRest(final ConfigService configService,
                               final DirectoryManager directoryManager, final TeamService teamService,
                               final UserAccessor userAccessor, final CategoryService categoryService,
                               final PermissionService permissionService, final MailService mailService) {
@@ -62,7 +71,6 @@ public class ConfigResourceRest {
         this.directoryManager = directoryManager;
         this.teamService = teamService;
         this.userAccessor = userAccessor;
-        this.userManager = userManager;
         this.categoryService = categoryService;
         this.permissionService = permissionService;
         this.mailService = mailService;
@@ -111,7 +119,7 @@ public class ConfigResourceRest {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConfig(@Context HttpServletRequest request) {
 
-    /*ToDo: Refactor CheckPermission
+    /*ToDo: Refactor CheckPermission, I don't know which class you need, maybe there is a new method for that purpose
     Response unauthorized = checkPermission(request);
     if (unauthorized != null) {
       return unauthorized;
@@ -130,14 +138,17 @@ public class ConfigResourceRest {
             return unauthorized;
         }
 
-        // @Adrian: TODO: fix it: I don't know what are you doint here
-//        List<Directory> directoryList = directoryManager.findAllDirectories();
-//        List<JsonConfig> jsonDirectoryList = new ArrayList<JsonConfig>();
-//        for (Directory directory : directoryList) {
-//            JsonConfig config = new JsonConfig();
-//            config.setUserDirectoryId(directory.getId());
-//            jsonDirectoryList.add(config);
-//        }
+        // @Adrian: TODO: fix it: I don't know what are you doing here
+        /*
+        List<Directory> directoryList = directoryManager.findAllDirectories();
+        List<JsonConfig> jsonDirectoryList = new ArrayList<JsonConfig>();
+        for (Directory directory : directoryList) {
+            JsonConfig config = new JsonConfig();
+            config.setUserDirectoryId(directory.getId());
+            jsonDirectoryList.add(config);
+        }
+
+        */
 
         return null; // Response.ok(jsonDirectoryList).build();
     }
@@ -179,16 +190,18 @@ public class ConfigResourceRest {
                 configService.addApprovedGroup(approvedGroupName);
             }
         }
+        String username = userManager.getRemoteUsername();
 
         if (jsonConfig.getApprovedUsers() != null) {
             configService.clearApprovedUsers();
             for (String approvedUserName : jsonConfig.getApprovedUsers()) {
                 UserProfile userProfile = userManager.getUserProfile(approvedUserName);
                 if (userProfile != null) {
-                    configService.addApprovedUser(userManager.getRemoteUser().getUserKey().toString());
+                    configService.addApprovedUser(username);
                 }
             }
         }
+
 
         if (jsonConfig.getTeams() != null) {
             for (JsonTeam jsonTeam : jsonConfig.getTeams()) {
@@ -208,7 +221,7 @@ public class ConfigResourceRest {
         Response unauthorized = permissionService.checkPermission(request);
         if (unauthorized != null) {
             return unauthorized;
-        } else if(teamName.isEmpty()) {
+        } else if (teamName.isEmpty()) {
             return Response.serverError().entity("Team name must not be empty.").build();
         }
 

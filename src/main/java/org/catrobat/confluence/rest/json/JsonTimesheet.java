@@ -25,90 +25,90 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JsonTimesheet {
 
-  @XmlElement
-  private int timesheetID;
-  @XmlElement
-  private String lectures;
-  @XmlElement
-  private int targetHourPractice;
-  @XmlElement
-  private int targetHourTheory;
-  @XmlElement
-  private boolean isActive;
+    @XmlElement
+    private int timesheetID;
+    @XmlElement
+    private String lectures;
+    @XmlElement
+    private int targetHourPractice;
+    @XmlElement
+    private int targetHourTheory;
+    @XmlElement
+    private boolean isActive;
 
-  public JsonTimesheet(int timesheetID, int targetHourPractice, int targetHourTheory, String lectures, boolean isActive) {
-    this.timesheetID = timesheetID;
-    this.targetHourPractice = targetHourPractice;
-    this.targetHourTheory = targetHourTheory;
-    this.lectures = lectures;
-    this.isActive = isActive;
-  }
+    public JsonTimesheet(int timesheetID, int targetHourPractice, int targetHourTheory, String lectures, boolean isActive) {
+        this.timesheetID = timesheetID;
+        this.targetHourPractice = targetHourPractice;
+        this.targetHourTheory = targetHourTheory;
+        this.lectures = lectures;
+        this.isActive = isActive;
+    }
 
-  public JsonTimesheet() {
-  }
+    public JsonTimesheet() {
+    }
 
-  public int getTimesheetID() {
-    return timesheetID;
-  }
+    public int getTimesheetID() {
+        return timesheetID;
+    }
 
-  public void setTimesheetID(int timesheetID) {
-    this.timesheetID = timesheetID;
-  }
+    public void setTimesheetID(int timesheetID) {
+        this.timesheetID = timesheetID;
+    }
 
-  public int getTargetHourPractice() {
-    return targetHourPractice;
-  }
+    public int getTargetHourPractice() {
+        return targetHourPractice;
+    }
 
-  public void setTargetHourPractice(int targetHourPractice) {
-    this.targetHourPractice = targetHourPractice;
-  }
+    public void setTargetHourPractice(int targetHourPractice) {
+        this.targetHourPractice = targetHourPractice;
+    }
 
-  public int getTargetHourTheory() {
-    return targetHourTheory;
-  }
+    public int getTargetHourTheory() {
+        return targetHourTheory;
+    }
 
-  public void setTargetHourTheory(int targetHourTheory) {
-    this.targetHourTheory = targetHourTheory;
-  }
+    public void setTargetHourTheory(int targetHourTheory) {
+        this.targetHourTheory = targetHourTheory;
+    }
 
-  public String getLectures() {
-    return lectures;
-  }
+    public String getLectures() {
+        return lectures;
+    }
 
-  public void setLectures(String lectures) {
-    this.lectures = lectures;
-  }
+    public void setLectures(String lectures) {
+        this.lectures = lectures;
+    }
 
-  public boolean isIsActive() {
-    return isActive;
-  }
+    public boolean isIsActive() {
+        return isActive;
+    }
 
-  public void setIsActive(boolean isActive) {
-    this.isActive = isActive;
-  }
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    JsonTimesheet that = (JsonTimesheet) o;
+        JsonTimesheet that = (JsonTimesheet) o;
 
-    if (timesheetID != that.timesheetID) return false;
-    if (targetHourPractice != that.targetHourPractice) return false;
-    if (targetHourTheory != that.targetHourTheory) return false;
-    if (isActive != that.isActive) return false;
+        if (timesheetID != that.timesheetID) return false;
+        if (targetHourPractice != that.targetHourPractice) return false;
+        if (targetHourTheory != that.targetHourTheory) return false;
+        if (isActive != that.isActive) return false;
 
-    return lectures.equals(that.lectures);
-  }
+        return lectures.equals(that.lectures);
+    }
 
-  @Override
-  public int hashCode() {
-    int result = timesheetID;
-    result = 31 * result + lectures.hashCode();
-    result = 31 * result + targetHourPractice;
-    result = 31 * result + targetHourTheory;
-    result = 31 * result + (isActive ? 1 : 0);
-    return result;
-  }
+    @Override
+    public int hashCode() {
+        int result = timesheetID;
+        result = 31 * result + lectures.hashCode();
+        result = 31 * result + targetHourPractice;
+        result = 31 * result + targetHourTheory;
+        result = 31 * result + (isActive ? 1 : 0);
+        return result;
+    }
 }

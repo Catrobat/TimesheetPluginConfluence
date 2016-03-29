@@ -17,20 +17,12 @@
 package org.catrobat.confluence.services;
 
 import com.atlassian.activeobjects.tx.Transactional;
-import org.catrobat.confluence.activeobjects.Category;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 @Transactional
-public interface CategoryService {
-    @Nullable
-    Category getCategoryByID(int id);
+public interface DBUtil {
+    void cleanDB();
 
-    public List<Category> all();
+    void insertDefaultData();
 
-    Category add(String name);
-
-    boolean removeCategory(String name);
-
+    void printDBStatus();
 }

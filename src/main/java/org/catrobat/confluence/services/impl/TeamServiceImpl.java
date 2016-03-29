@@ -20,79 +20,82 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import com.atlassian.confluence.user.UserAccessor;
 import net.java.ao.Query;
+import net.java.ao.schema.Table;
 import org.catrobat.confluence.activeobjects.Config;
 import org.catrobat.confluence.activeobjects.ConfigService;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.TeamToGroup;
 import org.catrobat.confluence.services.TeamService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 
+@Table("Team")
 public class TeamServiceImpl implements TeamService {
 
-  private final ActiveObjects ao;
-  private final UserAccessor userAccessor;
-  private final ConfigService configService;
+    private ActiveObjects ao;
+    private final UserAccessor userAccessor;
+    private final ConfigService configService;
 
-  public TeamServiceImpl(ActiveObjects ao, UserAccessor ua, ConfigService cs) {
-    this.ao = ao;
-    this.userAccessor = ua;
-    this.configService = cs;
-  }
-
-  @Override
-  public Team add(String name) {
-    Team team = ao.create(Team.class);
-    team.setTeamName(name);
-    team.save();
-
-    return team;
-  }
-
-  @Override
-  public boolean removeTeam(String name) {
-    Team[] found = ao.find(Team.class, "TEAM_NAME = ?", name);
-
-    if (found.length > 1) {
-      throw new NotAuthorizedException("Multiple Teams with the same Name");
+    public TeamServiceImpl(UserAccessor ua, ConfigService cs) {
+        this.userAccessor = ua;
+        this.configService = cs;
     }
 
-    ao.delete(found);
-    return true;
-  }
-
-  @Override
-  public List<Team> all() {
-    return newArrayList(ao.find(Team.class, Query.select().order("TEAM_NAME ASC")));
-  }
-
-  @Override
-  public Team getTeamByID(int id) {
-    Team[] found = ao.find(Team.class, "ID = ?", id);
-
-    if (found.length > 1) {
-      throw new NotAuthorizedException("Multiple Teams with the same ID");
+    @Autowired
+    public void setActiveObjects(ActiveObjects ao) {
+        this.ao = checkNotNull(ao);
     }
 
-    return (found.length > 0) ? found[0] : null;
-  }
+    public Team add(String name) {
+        Team team = ao.create(Team.class);
+        team.setTeamName(name);
+        team.save();
 
-  @Override
-  public Team getTeamByName(String name) {
-    Team[] found = ao.find(Team.class, "TEAM_NAME = ?", name);
-
-    if (found.length > 1) {
-      throw new NotAuthorizedException("Multiple Teams with the same Name");
+        return team;
     }
 
-    return (found.length > 0) ? found[0] : null;
-  }
+    public boolean removeTeam(String name) {
+        Team[] found = ao.find(Team.class, "TEAM_NAME = ?", name);
 
-  //LDAP access
+        if (found.length > 1) {
+            throw new NotAuthorizedException("Multiple Teams with the same Name");
+        }
+
+        ao.delete(found);
+        return true;
+    }
+
+    public List<Team> all() {
+        return newArrayList(ao.find(Team.class, Query.select().order("TEAM_NAME ASC")));
+    }
+
+    public Team getTeamByID(int id) {
+        Team[] found = ao.find(Team.class, "ID = ?", id);
+
+        if (found.length > 1) {
+            throw new NotAuthorizedException("Multiple Teams with the same ID");
+        }
+
+        return (found.length > 0) ? found[0] : null;
+    }
+
+    public Team getTeamByName(String name) {
+        Team[] found = ao.find(Team.class, "TEAM_NAME = ?", name);
+
+        if (found.length > 1) {
+            throw new NotAuthorizedException("Multiple Teams with the same Name");
+        }
+
+        return (found.length > 0) ? found[0] : null;
+    }
+
+    //LDAP access
   /*
   @Override
   public Set<Team> getTeamsOfUser(String userName) {
@@ -111,30 +114,29 @@ public class TeamServiceImpl implements TeamService {
   }
   */
 
-  //Config access
-  @Override
-  public Set<Team> getTeamsOfUser(String userName) {
+    //Config access
+    public Set<Team> getTeamsOfUser(String userName) {
 
-    Set<Team> teams = new HashSet<Team>();
-    Config config = configService.getConfiguration();
+        Set<Team> teams = new HashSet<Team>();
+        Config config = configService.getConfiguration();
 
-    for (Team team : config.getTeams()) {
-      String teamName = team.getTeamName();
+        for (Team team : config.getTeams()) {
+            String teamName = team.getTeamName();
 
-      List<String> developerList = configService.getGroupsForRole(teamName, TeamToGroup.Role.DEVELOPER);
+            List<String> developerList = configService.getGroupsForRole(teamName, TeamToGroup.Role.DEVELOPER);
 
-      for(String developerName : developerList) {
-        if(developerName.compareTo(userName) == 0) {
-          if (team != null) {
-            teams.add(team);
-          }
+            for (String developerName : developerList) {
+                if (developerName.compareTo(userName) == 0) {
+                    if (team != null) {
+                        teams.add(team);
+                    }
+                }
+            }
         }
-      }
+        return teams;
     }
-    return teams;
-  }
 
-  //LDAP access
+    //LDAP access
   /*
   @Override
   public Set<Team> getCoordinatorTeamsOfUser(String userName) {
@@ -160,26 +162,25 @@ public class TeamServiceImpl implements TeamService {
   }
   */
 
-  //Config access
-  @Override
-  public Set<Team> getCoordinatorTeamsOfUser(String userName) {
+    //Config access
+    public Set<Team> getCoordinatorTeamsOfUser(String userName) {
 
-    Set<Team> teams = new HashSet<Team>();
-    Config config = configService.getConfiguration();
+        Set<Team> teams = new HashSet<Team>();
+        Config config = configService.getConfiguration();
 
-    for (Team team : config.getTeams()) {
-      String teamName = team.getTeamName();
+        for (Team team : config.getTeams()) {
+            String teamName = team.getTeamName();
 
-      List<String> coordinatorList = configService.getGroupsForRole(teamName, TeamToGroup.Role.COORDINATOR);
+            List<String> coordinatorList = configService.getGroupsForRole(teamName, TeamToGroup.Role.COORDINATOR);
 
-      for(String coordinatorName : coordinatorList) {
-        if(coordinatorName.compareTo(userName) == 0) {
-          if (team != null) {
-            teams.add(team);
-          }
+            for (String coordinatorName : coordinatorList) {
+                if (coordinatorName.compareTo(userName) == 0) {
+                    if (team != null) {
+                        teams.add(team);
+                    }
+                }
+            }
         }
-      }
+        return teams;
     }
-    return teams;
-  }
 }

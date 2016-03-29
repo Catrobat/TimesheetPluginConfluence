@@ -9,7 +9,7 @@
         <param name="plugin-logo">images/pluginLogo.png</param>
     </plugin-info>
     <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="timesheet"  />
+    <resource type="i18n" name="i18n" location="timesheet"/>
 
     <!-- web-resources -->
     <web-resource key="timesheet-resources" name="Timesheet Web Resources">
@@ -96,19 +96,23 @@
         <url-pattern>/timesheet</url-pattern>
         <url-pattern>/timesheet/</url-pattern>
     </servlet>
-    <servlet name="visualization" class="org.catrobat.confluence.servlet.VisualizationServlet" key="visualization-servlet">
+    <servlet name="visualization" class="org.catrobat.confluence.servlet.VisualizationServlet"
+             key="visualization-servlet">
         <url-pattern>/timesheet/visualization</url-pattern>
         <url-pattern>/timesheet/visualization/</url-pattern>
     </servlet>
-    <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet" key="teammanagement-servlet">
+    <servlet name="teammanagement" class="org.catrobat.confluence.servlet.TeamManagementServlet"
+             key="teammanagement-servlet">
         <url-pattern>/teams</url-pattern>
         <url-pattern>/teams/</url-pattern>
     </servlet>
-    <servlet name="administration-servlet" class="org.catrobat.confluence.servlet.AdminServlet" key="administration-servlet">
+    <servlet name="administration-servlet" class="org.catrobat.confluence.servlet.AdminServlet"
+             key="administration-servlet">
         <url-pattern>/timesheet/administration</url-pattern>
         <url-pattern>/timesheet/administration/</url-pattern>
     </servlet>
-    <servlet name="user-information-servlet" class="org.catrobat.confluence.servlet.UserInformationServlet" key="modify-user-servlet">
+    <servlet name="user-information-servlet" class="org.catrobat.confluence.servlet.UserInformationServlet"
+             key="modify-user-servlet">
         <url-pattern>/timesheet/user/information</url-pattern>
         <url-pattern>/timesheet/user/information/</url-pattern>
     </servlet>
@@ -120,7 +124,7 @@
 
     <!-- import from the product container -->
     <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
-    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
+    <component-import key="renderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
     <component-import key="groupManager" interface="com.atlassian.user.GroupManager" filter=""/>
     <component-import key="userAccessor" interface="com.atlassian.confluence.user.UserAccessor" filter=""/>
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
@@ -132,26 +136,36 @@
     <component-import key="ApplicationLinkService">
         <interface>com.atlassian.applinks.api.ApplicationLinkService</interface>
     </component-import>
-    <component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
+    <component key="tx-processor" name="Transactional Annotation Processor"
+               class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
         <decription>Processes @Transactional annotations.</decription>
     </component>
 
     <!-- additional components for administration -->
-    <component-import key="transactionTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate" filter=""/>
+    <component-import key="transactionTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate"
+                      filter=""/>
     <component-import key="webSudoManager" interface="com.atlassian.sal.api.websudo.WebSudoManager" filter=""/>
     <!-- end of import from the product container -->
 
+    <component-import key="velocity-renderer" interface="com.atlassian.templaterenderer.TemplateRenderer"/>
+
     <component key="team-service" name="Team Service" class="org.catrobat.confluence.services.impl.TeamServiceImpl"/>
-    <component key="timesheet-service" name="Timesheet Service" class="org.catrobat.confluence.services.impl.TimesheetServiceImpl"/>
-    <component key="timesheetentry-service" name="Timesheet Entry Service" class="org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl"/>
-    <component key="category-service" name="Category Service" class="org.catrobat.confluence.services.impl.CategoryServiceImpl"/>
-    <component key="permission-service" name="Permission Service" class="org.catrobat.confluence.services.impl.PermissionServiceImpl"/>
-    <component key="dbfiller-service" name="DBFiller Service" class="org.catrobat.confluence.services.impl.DBFillerServiceImpl"/>
+    <component key="timesheet-service" name="Timesheet Service"
+               class="org.catrobat.confluence.services.impl.TimesheetServiceImpl"/>
+    <component key="timesheetentry-service" name="Timesheet Entry Service"
+               class="org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl"/>
+    <component key="category-service" name="Category Service"
+               class="org.catrobat.confluence.services.impl.CategoryServiceImpl"/>
+    <component key="permission-service" name="Permission Service"
+               class="org.catrobat.confluence.services.impl.PermissionServiceImpl"/>
+    <component key="dbfiller-service" name="DBFiller Service"
+               class="org.catrobat.confluence.services.impl.DBUtilImpl"/>
     <component key="mail-service" name="Mail Service" class="org.catrobat.confluence.services.impl.MailServiceImpl"/>
     <!-- end of timesheet-components -->
 
     <!-- administration-components -->
-    <component key="configuration" name="Config Service" class="org.catrobat.confluence.activeobjects.impl.ConfigServiceImpl"/>
+    <component key="configuration" name="Config Service"
+               class="org.catrobat.confluence.activeobjects.impl.ConfigServiceImpl"/>
     <!-- end of administration-components -->
 
     <ao key="ao-module">
@@ -169,6 +183,17 @@
         <entity>org.catrobat.confluence.activeobjects.Config</entity>
         <entity>org.catrobat.confluence.activeobjects.ApprovedUser</entity>
         <entity>org.catrobat.confluence.activeobjects.TeamToGroup</entity>
+
+        <!-- some more entities we need -->
+        <entity>org.catrobat.confluence.services.impl.DBUtilImpl</entity>
+        <entity>org.catrobat.confluence.activeobjects.impl.ConfigServiceImpl</entity>
+        <entity>org.catrobat.confluence.services.impl.PermissionServiceImpl</entity>
+
+        <entity>org.catrobat.confluence.rest.json.JsonConfig</entity>
+        <entity>org.catrobat.confluence.services.impl.CategoryServiceImpl</entity>
+        <entity>org.catrobat.confluence.services.impl.TeamServiceImpl</entity>
+        <entity>org.catrobat.confluence.services.impl.TimesheetEntryServiceImpl</entity>
+        <entity>org.catrobat.confluence.services.impl.TimesheetServiceImpl</entity>
     </ao>
 
     <!-- rest-resources -->
@@ -191,13 +216,15 @@
     </web-item>
 
     <!-- administration -->
-    <web-item key="administration_view" name="Link to Administration View" section="system.admin/administration" weight="1">
+    <web-item key="administration_view" name="Link to Administration View" section="system.admin/administration"
+              weight="1">
         <description key="item.google.home.desc">Link to Administration menu</description>
-        <label key="Timesheet User Permissions" />
+        <label key="Timesheet User Permissions"/>
         <link linkId="administration_view_link">/plugins/servlet/timesheet/administration/</link>
     </web-item>
-    <web-item key="user_information" name="Link to User Information View" section="system.admin/administration" weight="3">
-        <label key="Timesheet User Information" />
+    <web-item key="user_information" name="Link to User Information View" section="system.admin/administration"
+              weight="3">
+        <label key="Timesheet User Information"/>
         <link linkId="user_information_view_link">/plugins/servlet/timesheet/user/information/</link>
     </web-item>
     <!-- end of web-items -->

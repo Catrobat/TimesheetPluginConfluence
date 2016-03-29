@@ -18,46 +18,45 @@ package org.catrobat.confluence.activeobjects;
 
 import net.java.ao.Entity;
 import net.java.ao.Implementation;
-import org.catrobat.confluence.activeobjects.impl.TimesheetEntryImpl;
 
 import java.util.Date;
 
-@Implementation(TimesheetEntryImpl.class)
+@Implementation(org.catrobat.confluence.activeobjects.impl.TimesheetEntry.class)
 public interface TimesheetEntry extends Entity {
 
-  public Timesheet getTimeSheet();
+    public Timesheet getTimeSheet();
 
-  public void setTimeSheet(Timesheet sheet);
+    public void setTimeSheet(Timesheet sheet);
 
-  public Date getBeginDate();
+    public Date getBeginDate();
 
-  public void setBeginDate(Date date);
+    public void setBeginDate(Date date);
 
-  public Date getEndDate();
+    public Date getEndDate();
 
-  public void setEndDate(Date date);
+    public void setEndDate(Date date);
 
-  public Category getCategory();
+    public Category getCategory();
 
-  public void setCategory(Category category);
+    public void setCategory(Category category);
 
-  public boolean getIsGoogleDocImport();
+    public boolean getIsGoogleDocImport();
 
-  public void setIsGoogleDocImport(boolean isGoogleDocImport);
+    public void setIsGoogleDocImport(boolean isGoogleDocImport);
 
-  public String getDescription();
+    public String getDescription();
 
-  public void setDescription(String description);
+    public void setDescription(String description);
 
-  public int getPauseMinutes();
+    public int getPauseMinutes();
 
-  public void setPauseMinutes(int pause);
+    public void setPauseMinutes(int pause);
 
-  public Team getTeam();
+    public Team getTeam();
 
-  public void setTeam(Team team);
+    public void setTeam(Team team);
 
-  public int getDurationMinutes();
+    public int getDurationMinutes();
 
-  public void setDurationMinutes(int duration);
+    public void setDurationMinutes(int duration);
 }

@@ -26,20 +26,20 @@ import java.util.Set;
 @Transactional
 public interface TeamService {
 
-  Team add(String name);
+    Team add(String name);
 
-  boolean removeTeam(String teamName);
+    boolean removeTeam(String teamName);
 
-  List<Team> all();
+    List<Team> all();
 
-  @Nullable
-  Team getTeamByID(int id);
+    @Nullable
+    Team getTeamByID(int id);
 
-  @Nullable
-  Team getTeamByName(String name);
+    @Nullable
+    Team getTeamByName(String name);
 
-  Set<Team> getTeamsOfUser(String userName);
+    Set<Team> getTeamsOfUser(String userName);
 
-  Set<Team> getCoordinatorTeamsOfUser(String userName);
+    Set<Team> getCoordinatorTeamsOfUser(String userName);
 
 }

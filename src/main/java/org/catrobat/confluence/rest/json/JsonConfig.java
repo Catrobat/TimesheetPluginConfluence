@@ -32,165 +32,165 @@ import java.util.TreeMap;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class JsonConfig {
 
-  @XmlElement
-  private List<JsonTeam> teams;
-  @XmlElement
-  private List<String> approvedGroups;
-  @XmlElement
-  private List<String> approvedUsers;
-  @XmlElement
-  private long userDirectoryId;
-  @XmlElement
-  private String mailFromName;
-  @XmlElement
-  private String mailFrom;
-  @XmlElement
-  private String mailSubjectTime;
-  @XmlElement
-  private String mailSubjectInactive;
-  @XmlElement
-  private String mailSubjectEntry;
-  @XmlElement
-  private String mailBodyTime;
-  @XmlElement
-  private String mailBodyInactive;
-  @XmlElement
-  private String mailBodyEntry;
+    @XmlElement
+    private List<JsonTeam> teams;
+    @XmlElement
+    private List<String> approvedGroups;
+    @XmlElement
+    private List<String> approvedUsers;
+    @XmlElement
+    private long userDirectoryId;
+    @XmlElement
+    private String mailFromName;
+    @XmlElement
+    private String mailFrom;
+    @XmlElement
+    private String mailSubjectTime;
+    @XmlElement
+    private String mailSubjectInactive;
+    @XmlElement
+    private String mailSubjectEntry;
+    @XmlElement
+    private String mailBodyTime;
+    @XmlElement
+    private String mailBodyInactive;
+    @XmlElement
+    private String mailBodyEntry;
 
-  public JsonConfig() {
+    public JsonConfig() {
 
-  }
-
-  public JsonConfig(ConfigService configService) {
-    Config toCopy = configService.getConfiguration();
-
-    Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
-    for (Team team : toCopy.getTeams()) {
-      teamMap.put(team.getTeamName(), new JsonTeam(team, configService));
     }
 
-    this.teams = new ArrayList<JsonTeam>();
-    this.teams.addAll(teamMap.values());
+    public JsonConfig(ConfigService configService) {
+        Config toCopy = configService.getConfiguration();
 
-    //ToDO: not correct
-    this.approvedUsers = new ArrayList<String>();
-    for (ApprovedUser approvedUser : toCopy.getApprovedUsers()) {
-      if (approvedUser.getUserKey() != null) {
-        approvedUsers.add(approvedUser.getUserKey());
-      }
+        Map<String, JsonTeam> teamMap = new TreeMap<String, JsonTeam>();
+        for (Team team : toCopy.getTeams()) {
+            teamMap.put(team.getTeamName(), new JsonTeam(team, configService));
+        }
+
+        this.teams = new ArrayList<JsonTeam>();
+        this.teams.addAll(teamMap.values());
+
+        //ToDO: not correct
+        this.approvedUsers = new ArrayList<String>();
+        for (ApprovedUser approvedUser : toCopy.getApprovedUsers()) {
+            if (approvedUser.getUserKey() != null) {
+                approvedUsers.add(approvedUser.getUserKey());
+            }
+        }
+
+        this.approvedGroups = new ArrayList<String>();
+        for (ApprovedGroup approvedGroup : toCopy.getApprovedGroups()) {
+            approvedGroups.add(approvedGroup.getGroupName());
+        }
+
+        this.userDirectoryId = toCopy.getUserDirectoryId();
+        this.mailFromName = toCopy.getMailFromName();
+        this.mailFrom = toCopy.getMailFrom();
+
+        this.mailSubjectTime = toCopy.getMailSubjectTime();
+        this.mailSubjectInactive = toCopy.getMailSubjectInactive();
+        this.mailSubjectEntry = toCopy.getMailSubjectEntry();
+
+        this.mailBodyTime = toCopy.getMailBodyTime();
+        this.mailBodyInactive = toCopy.getMailBodyInactive();
+        this.mailBodyEntry = toCopy.getMailBodyEntry();
     }
 
-    this.approvedGroups = new ArrayList<String>();
-    for (ApprovedGroup approvedGroup : toCopy.getApprovedGroups()) {
-      approvedGroups.add(approvedGroup.getGroupName());
+    public List<JsonTeam> getTeams() {
+        return teams;
     }
 
-    this.userDirectoryId = toCopy.getUserDirectoryId();
-    this.mailFromName = toCopy.getMailFromName();
-    this.mailFrom = toCopy.getMailFrom();
+    public void setTeams(List<JsonTeam> teams) {
+        this.teams = teams;
+    }
 
-    this.mailSubjectTime = toCopy.getMailSubjectTime();
-    this.mailSubjectInactive = toCopy.getMailSubjectInactive();
-    this.mailSubjectEntry = toCopy.getMailSubjectEntry();
+    public List<String> getApprovedGroups() {
+        return approvedGroups;
+    }
 
-    this.mailBodyTime = toCopy.getMailBodyTime();
-    this.mailBodyInactive = toCopy.getMailBodyInactive();
-    this.mailBodyEntry = toCopy.getMailBodyEntry();
-  }
+    public void setApprovedGroups(List<String> approvedGroups) {
+        this.approvedGroups = approvedGroups;
+    }
 
-  public List<JsonTeam> getTeams() {
-    return teams;
-  }
+    public List<String> getApprovedUsers() {
+        return approvedUsers;
+    }
 
-  public void setTeams(List<JsonTeam> teams) {
-    this.teams = teams;
-  }
+    public void setApprovedUsers(List<String> approvedUsers) {
+        this.approvedUsers = approvedUsers;
+    }
 
-  public List<String> getApprovedGroups() {
-    return approvedGroups;
-  }
+    public long getUserDirectoryId() {
+        return userDirectoryId;
+    }
 
-  public void setApprovedGroups(List<String> approvedGroups) {
-    this.approvedGroups = approvedGroups;
-  }
+    public void setUserDirectoryId(long userDirectoryId) {
+        this.userDirectoryId = userDirectoryId;
+    }
 
-  public List<String> getApprovedUsers() {
-    return approvedUsers;
-  }
+    public String getMailFromName() {
+        return mailFromName;
+    }
 
-  public void setApprovedUsers(List<String> approvedUsers) {
-    this.approvedUsers = approvedUsers;
-  }
+    public void setMailFromName(String mailFromName) {
+        this.mailFromName = mailFromName;
+    }
 
-  public long getUserDirectoryId() {
-    return userDirectoryId;
-  }
+    public String getMailFrom() {
+        return mailFrom;
+    }
 
-  public void setUserDirectoryId(long userDirectoryId) {
-    this.userDirectoryId = userDirectoryId;
-  }
+    public void setMailFrom(String mailFrom) {
+        this.mailFrom = mailFrom;
+    }
 
-  public String getMailFromName() {
-    return mailFromName;
-  }
+    public String getMailSubjectTime() {
+        return mailSubjectTime;
+    }
 
-  public void setMailFromName(String mailFromName) {
-    this.mailFromName = mailFromName;
-  }
+    public void setMailSubjectTime(String mailSubjectTime) {
+        this.mailSubjectTime = mailSubjectTime;
+    }
 
-  public String getMailFrom() {
-    return mailFrom;
-  }
+    public String getMailSubjectInactive() {
+        return mailSubjectInactive;
+    }
 
-  public void setMailFrom(String mailFrom) {
-    this.mailFrom = mailFrom;
-  }
+    public void setMailSubjectInactive(String mailSubjectInactive) {
+        this.mailSubjectInactive = mailSubjectInactive;
+    }
 
-  public String getMailSubjectTime() {
-    return mailSubjectTime;
-  }
+    public String getMailSubjectEntry() {
+        return mailSubjectEntry;
+    }
 
-  public void setMailSubjectTime(String mailSubjectTime) {
-    this.mailSubjectTime = mailSubjectTime;
-  }
+    public void setMailSubjectEntry(String mailSubjectEntry) {
+        this.mailSubjectEntry = mailSubjectEntry;
+    }
 
-  public String getMailSubjectInactive() {
-    return mailSubjectInactive;
-  }
+    public String getMailBodyTime() {
+        return mailBodyTime;
+    }
 
-  public void setMailSubjectInactive(String mailSubjectInactive) {
-    this.mailSubjectInactive = mailSubjectInactive;
-  }
+    public void setMailBodyTime(String mailBodyTime) {
+        this.mailBodyTime = mailBodyTime;
+    }
 
-  public String getMailSubjectEntry() {
-    return mailSubjectEntry;
-  }
+    public String getMailBodyInactive() {
+        return mailBodyInactive;
+    }
 
-  public void setMailSubjectEntry(String mailSubjectEntry) {
-    this.mailSubjectEntry = mailSubjectEntry;
-  }
+    public void setMailBodyInactive(String mailBodyInactive) {
+        this.mailBodyInactive = mailBodyInactive;
+    }
 
-  public String getMailBodyTime() {
-    return mailBodyTime;
-  }
+    public String getMailBodyEntry() {
+        return mailBodyEntry;
+    }
 
-  public void setMailBodyTime(String mailBodyTime) {
-    this.mailBodyTime = mailBodyTime;
-  }
-
-  public String getMailBodyInactive() {
-    return mailBodyInactive;
-  }
-
-  public void setMailBodyInactive(String mailBodyInactive) {
-    this.mailBodyInactive = mailBodyInactive;
-  }
-
-  public String getMailBodyEntry() {
-    return mailBodyEntry;
-  }
-
-  public void setMailBodyEntry(String mailBodyEntry) {
-    this.mailBodyEntry = mailBodyEntry;
-  }
+    public void setMailBodyEntry(String mailBodyEntry) {
+        this.mailBodyEntry = mailBodyEntry;
+    }
 }

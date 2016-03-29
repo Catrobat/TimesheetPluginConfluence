@@ -21,27 +21,27 @@ import net.java.ao.OneToMany;
 
 public interface Timesheet extends Entity {
 
-  String getUserKey();
+    String getUserKey();
 
-  void setUserKey(String key);
+    void setUserKey(String key);
 
-  int getTargetHoursPractice();
+    int getTargetHoursPractice();
 
-  void setTargetHoursPractice(int hours);
+    void setTargetHoursPractice(int hours);
 
-  int getTargetHoursTheory();
+    int getTargetHoursTheory();
 
-  void setTargetHoursTheory(int hours);
+    void setTargetHoursTheory(int hours);
 
-  boolean getIsActive();
+    boolean getIsActive();
 
-  void setIsActive(boolean isActive);
+    void setIsActive(boolean isActive);
 
-  String getLecture();
+    String getLecture();
 
-  void setLecture(String lecture);
+    void setLecture(String lecture);
 
-  @OneToMany(reverse = "getTimeSheet")
-  TimesheetEntry[] getEntries();
+    @OneToMany(reverse = "getTimeSheet")
+    TimesheetEntry[] getEntries();
 
 }

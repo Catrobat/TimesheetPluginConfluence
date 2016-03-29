@@ -19,6 +19,7 @@ package org.catrobat.confluence.services.impl;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.confluence.core.service.NotAuthorizedException;
 import net.java.ao.Query;
+import net.java.ao.schema.Table;
 import org.catrobat.confluence.activeobjects.Category;
 import org.catrobat.confluence.activeobjects.Team;
 import org.catrobat.confluence.activeobjects.Timesheet;
@@ -28,85 +29,83 @@ import org.catrobat.confluence.services.TimesheetEntryService;
 import javax.annotation.Nullable;
 import java.util.Date;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Table("Timesheet_Entries")
 public class TimesheetEntryServiceImpl implements TimesheetEntryService {
 
-  private final ActiveObjects ao;
+    private final ActiveObjects ao;
 
-  public TimesheetEntryServiceImpl(ActiveObjects ao) {
-    this.ao = ao;
-  }
-
-  @Override
-  public TimesheetEntry add(Timesheet sheet, Date begin, Date end,
-                            Category category, String description, int pause, Team team, boolean isGoogleDocImport) {
-
-    TimesheetEntry entry = ao.create(TimesheetEntry.class);
-
-    entry.setTimeSheet(sheet);
-    entry.setBeginDate(begin);
-    entry.setEndDate(end);
-    entry.setCategory(category);
-    entry.setDescription(description);
-    entry.setPauseMinutes(pause);
-    entry.setTeam(team);
-    entry.setIsGoogleDocImport(isGoogleDocImport);
-
-    entry.save();
-
-    return entry;
-
-  }
-
-  @Override
-  @Nullable
-  public TimesheetEntry getEntryByID(int entryID) {
-    TimesheetEntry[] found = ao.find(TimesheetEntry.class, "ID = ?", entryID);
-
-    if (found.length > 1) {
-      throw new NotAuthorizedException("Multiple Timesheet Entries with the same ID.");
+    public TimesheetEntryServiceImpl(ActiveObjects ao) {
+        this.ao = checkNotNull(ao);
     }
 
-    return (found.length > 0) ? found[0] : null;
-  }
+    public TimesheetEntry add(Timesheet sheet, Date begin, Date end,
+                              Category category, String description, int pause, Team team, boolean isGoogleDocImport) {
 
-  @Override
-  @Nullable
-  public TimesheetEntry edit(int entryId, Timesheet sheet, Date begin, Date end,
-                             Category category, String description, int pause, Team team, boolean isGoogleDocImport) {
+        TimesheetEntry entry = ao.create(TimesheetEntry.class);
 
-    TimesheetEntry entry = getEntryByID(entryId);
+        entry.setTimeSheet(sheet);
+        entry.setBeginDate(begin);
+        entry.setEndDate(end);
+        entry.setCategory(category);
+        entry.setDescription(description);
+        entry.setPauseMinutes(pause);
+        entry.setTeam(team);
+        entry.setIsGoogleDocImport(isGoogleDocImport);
 
-    if (entry == null) {
-      return null;
+        entry.save();
+
+        return entry;
+
     }
 
-    entry.setTimeSheet(sheet);
-    entry.setBeginDate(begin);
-    entry.setEndDate(end);
-    entry.setCategory(category);
-    entry.setDescription(description);
-    entry.setPauseMinutes(pause);
-    entry.setTeam(team);
-    entry.setIsGoogleDocImport(isGoogleDocImport);
+    @Nullable
+    public TimesheetEntry getEntryByID(int entryID) {
+        TimesheetEntry[] found = ao.find(TimesheetEntry.class, "ID = ?", entryID);
 
-    entry.save();
+        if (found.length > 1) {
+            throw new NotAuthorizedException("Multiple Timesheet Entries with the same ID.");
+        }
 
-    return entry;
-  }
+        return (found.length > 0) ? found[0] : null;
+    }
 
-  @Override
-  public TimesheetEntry[] getEntriesBySheet(Timesheet sheet) {
-    if (sheet == null) return new TimesheetEntry[0];
-    return ao.find(
-            TimesheetEntry.class,
-            Query.select()
-                    .where("TIME_SHEET_ID = ?", sheet.getID())
-                    .order("BEGIN_DATE DESC")
-    );
-  }
+    @Nullable
+    public TimesheetEntry edit(int entryId, Timesheet sheet, Date begin, Date end,
+                               Category category, String description, int pause, Team team, boolean isGoogleDocImport) {
 
-  @Override
-  public void delete(TimesheetEntry entry) {
-    ao.delete(entry);
-  }
+        TimesheetEntry entry = getEntryByID(entryId);
+
+        if (entry == null) {
+            return null;
+        }
+
+        entry.setTimeSheet(sheet);
+        entry.setBeginDate(begin);
+        entry.setEndDate(end);
+        entry.setCategory(category);
+        entry.setDescription(description);
+        entry.setPauseMinutes(pause);
+        entry.setTeam(team);
+        entry.setIsGoogleDocImport(isGoogleDocImport);
+
+        entry.save();
+
+        return entry;
+    }
+
+    public TimesheetEntry[] getEntriesBySheet(Timesheet sheet) {
+        if (sheet == null) return new TimesheetEntry[0];
+        return ao.find(
+                TimesheetEntry.class,
+                Query.select()
+                        .where("TIME_SHEET_ID = ?", sheet.getID())
+                        .order("BEGIN_DATE DESC")
+        );
+    }
+
+    public void delete(TimesheetEntry entry) {
+        ao.delete(entry);
+    }
 }

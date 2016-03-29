@@ -22,11 +22,11 @@ import net.java.ao.Preload;
 @Preload
 public interface ApprovedUser extends Entity {
 
-  Config getConfiguration();
+    Config getConfiguration();
 
-  void setConfiguration(Config configuration);
+    void setConfiguration(Config configuration);
 
-  String getUserKey();
+    String getUserKey();
 
-  void setUserKey(String userKey);
+    void setUserKey(String userKey);
 }
